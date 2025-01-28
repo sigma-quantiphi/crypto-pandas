@@ -139,7 +139,7 @@ class BinanceFuturesClient(BaseModel):
         Get Orderbook
         Parameters:
         :param symbol: Trading symbol.
-            Type:str
+            Type: str
         :param limit: Limit the number of results. Default is 500.
             Type:int.
         :returns: OK
@@ -163,7 +163,7 @@ class BinanceFuturesClient(BaseModel):
         Recent Market Trades
         Parameters:
         :param symbol: Trading symbol.
-            Type:str
+            Type: str
         :param limit: Limit the number of results. Default is 500, max is 1000.
             Type:int.
         :returns: OK
@@ -188,7 +188,7 @@ class BinanceFuturesClient(BaseModel):
         Old Trade Lookup
         Parameters:
         :param symbol: Trading symbol.
-            Type:str
+            Type: str
         :param limit: Limit the number of results. Default is 500, max is 1000.
             Type:int
         :param fromId: Trade ID to fetch from.
@@ -218,7 +218,7 @@ class BinanceFuturesClient(BaseModel):
         Compressed/Aggregate Trades
         Parameters:
         :param symbol: Trading symbol.
-            Type:str
+            Type: str
         :param limit: Limit the number of results. Default is 500, max is 1000.
             Type:int
         :param fromId: Aggregate trade ID to fetch from.
@@ -254,9 +254,9 @@ class BinanceFuturesClient(BaseModel):
         Kline/Candlestick Data
         Parameters:
         :param symbol: Trading symbol.
-            Type:str
+            Type: str
         :param interval: Kline interval (e.g., 1m, 5m, 1h, 1d).
-            Type:str
+            Type: str
         :param limit: Limit the number of results. Default is 500, max is 1000.
             Type:int
         :param startTime: Start time in milliseconds.
@@ -287,7 +287,7 @@ class BinanceFuturesClient(BaseModel):
         Mark Price and Funding Rate
         Parameters:
         :param symbol: Trading symbol.
-            Type:str.
+            Type: str.
         :returns: OK
         :raises: Any exceptions raised by the `requests` library.
         """
@@ -310,7 +310,7 @@ class BinanceFuturesClient(BaseModel):
         Funding Rate History
         Parameters:
         :param symbol: Trading symbol.
-            Type:str
+            Type: str
         :param limit: Limit the number of results. Default is 500, max is 1000.
             Type:int
         :param startTime: Start time in milliseconds.
@@ -339,7 +339,7 @@ class BinanceFuturesClient(BaseModel):
         24-Hour Ticker Price Change
         Parameters:
         :param symbol: Trading symbol. If not sent, returns data for all symbols.
-            Type:str.
+            Type: str.
         :returns: OK
         :raises: Any exceptions raised by the `requests` library.
         """
@@ -359,7 +359,7 @@ class BinanceFuturesClient(BaseModel):
         Symbol Price Ticker
         Parameters:
         :param symbol: Trading symbol. If not sent, returns data for all symbols.
-            Type:str.
+            Type: str.
         :returns: OK
         :raises: Any exceptions raised by the `requests` library.
         """
@@ -379,7 +379,7 @@ class BinanceFuturesClient(BaseModel):
         Order Book Best Price/Quantity
         Parameters:
         :param symbol: Trading symbol. If not sent, returns data for all symbols.
-            Type:str.
+            Type: str.
         :returns: OK
         :raises: Any exceptions raised by the `requests` library.
         """

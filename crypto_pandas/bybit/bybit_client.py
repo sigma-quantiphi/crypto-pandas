@@ -10,6 +10,7 @@ from crypto_pandas.bybit.bybit_pandas import (
     market_kline_response_to_dataframe,
     market_mark_price_kline_response_to_dataframe,
     account_wallet_balance_response_to_dataframe,
+    orderbook_response_to_dataframe, market_tickers_response_to_dataframe,
 )
 
 
@@ -107,7 +108,7 @@ class BybitClient(BaseModel):
         kline
         Parameters:
         :param symbol: No description.
-            Type:str
+            Type: str
         :param interval: No description.
             Type:int
         :param start: No description.
@@ -117,7 +118,7 @@ class BybitClient(BaseModel):
         :param limit: No description.
             Type:int
         :param category: No description.
-            Type:str.
+            Type: str.
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
@@ -152,7 +153,7 @@ class BybitClient(BaseModel):
         :param end: No description.
             Type:pd.Timestamp
         :param locale: No description.
-            Type:str
+            Type: str
         :param limit: No description.
             Type:int
         :param offset: No description.
@@ -188,9 +189,9 @@ class BybitClient(BaseModel):
         mark-price-kline
         Parameters:
         :param category: No description.
-            Type:str
+            Type: str
         :param symbol: No description.
-            Type:str
+            Type: str
         :param interval: No description.
             Type:int
         :param start: No description.
@@ -224,14 +225,14 @@ class BybitClient(BaseModel):
         start: pd.Timestamp = None,
         end: pd.Timestamp = None,
         limit: int = None,
-    ) -> Dict[str, Any]:
+    ) -> pd.DataFrame:
         """
         index-price-kline
         Parameters:
         :param category: No description.
-            Type:str
+            Type: str
         :param symbol: No description.
-            Type:str
+            Type: str
         :param interval: No description.
             Type:int
         :param start: No description.
@@ -243,7 +244,7 @@ class BybitClient(BaseModel):
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
-        return self._request(
+        data = self._request(
             method="GET",
             path="/v5/market/index-price-kline",
             params={
@@ -255,6 +256,7 @@ class BybitClient(BaseModel):
                 "limit": limit,
             },
         )
+        return market_mark_price_kline_response_to_dataframe(data)
 
     def get_market_premium_index_price_kline(
         self,
@@ -269,9 +271,9 @@ class BybitClient(BaseModel):
         premium-index-price-kline
         Parameters:
         :param category: No description.
-            Type:str
+            Type: str
         :param symbol: No description.
-            Type:str
+            Type: str
         :param interval: No description.
             Type:int
         :param start: No description.
@@ -301,20 +303,20 @@ class BybitClient(BaseModel):
         category: str = None,
         symbol: str = None,
         limit: int = None,
-    ) -> Dict[str, Any]:
+    ) -> pd.DataFrame:
         """
         orderbook
         Parameters:
         :param category: linear inverse
-            Type:str
+            Type: str
         :param symbol: No description.
-            Type:str
+            Type: str
         :param limit: No description.
             Type:int.
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
-        return self._request(
+        data = self._request(
             method="GET",
             path="/v5/market/orderbook",
             params={
@@ -323,6 +325,7 @@ class BybitClient(BaseModel):
                 "limit": limit,
             },
         )
+        return orderbook_response_to_dataframe(data)
 
     def get_market_instruments_info(
         self,
@@ -337,17 +340,17 @@ class BybitClient(BaseModel):
         instruments-info
         Parameters:
         :param category: No description.
-            Type:str
+            Type: str
         :param symbol: BTCUSDH23
-            Type:str
+            Type: str
         :param limit: No description.
             Type:int
         :param cursor: No description.
-            Type:str
+            Type: str
         :param baseCoin: No description.
-            Type:str
+            Type: str
         :param direction: No description.
-            Type:str.
+            Type: str.
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
@@ -370,22 +373,22 @@ class BybitClient(BaseModel):
         symbol: str = None,
         limit: int = None,
         baseCoin: str = None,
-    ) -> Dict[str, Any]:
+    ) -> pd.DataFrame:
         """
         tickers
         Parameters:
         :param category: linear inverse option
-            Type:str
+            Type: str
         :param symbol: BTCPERP
-            Type:str
+            Type: str
         :param limit: No description.
             Type:int
         :param baseCoin: No description.
-            Type:str.
+            Type: str.
         :returns: OK
         :raises: Any exceptions raised by the `requests` library.
         """
-        return self._request(
+        data = self._request(
             method="GET",
             path="/v5/market/tickers",
             params={
@@ -395,26 +398,28 @@ class BybitClient(BaseModel):
                 "baseCoin": baseCoin,
             },
         )
+        return market_tickers_response_to_dataframe(data)
+
 
     def get_market_funding_history(
         self,
         category: str = None,
         symbol: str = None,
         limit: int = None,
-    ) -> Dict[str, Any]:
+    ) -> pd.DataFrame:
         """
         funding/history
         Parameters:
         :param category: No description.
-            Type:str
+            Type: str
         :param symbol: No description.
-            Type:str
+            Type: str
         :param limit: No description.
             Type:int.
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
-        return self._request(
+        data = self._request(
             method="GET",
             path="/v5/market/funding/history",
             params={
@@ -423,6 +428,7 @@ class BybitClient(BaseModel):
                 "limit": limit,
             },
         )
+        return market_tickers_response_to_dataframe(data)
 
     def get_market_risk_limit(
         self,
@@ -437,9 +443,9 @@ class BybitClient(BaseModel):
         risk-limit
         Parameters:
         :param category: No description.
-            Type:str
+            Type: str
         :param symbol: BTCPERP
-            Type:str
+            Type: str
         :param interval: No description.
             Type:int
         :param start: No description.
@@ -478,11 +484,11 @@ class BybitClient(BaseModel):
         open-interest
         Parameters:
         :param category: linear
-            Type:str
+            Type: str
         :param symbol: No description.
-            Type:str
+            Type: str
         :param intervalTime: No description.
-            Type:str
+            Type: str
         :param startTime: No description.
             Type:int
         :param endTime: No description.
@@ -490,7 +496,7 @@ class BybitClient(BaseModel):
         :param limit: No description.
             Type:int
         :param cursor: No description.
-            Type:str.
+            Type: str.
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
@@ -516,7 +522,7 @@ class BybitClient(BaseModel):
         insurance
         Parameters:
         :param coin: No description.
-            Type:str.
+            Type: str.
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
@@ -540,9 +546,9 @@ class BybitClient(BaseModel):
         recent-trade
         Parameters:
         :param category: linear
-            Type:str
+            Type: str
         :param symbol: No description.
-            Type:str
+            Type: str
         :param interval: No description.
             Type:int
         :param start: No description.
@@ -578,19 +584,19 @@ class BybitClient(BaseModel):
         delivery-price
         Parameters:
         :param category: No description.
-            Type:str
+            Type: str
         :param baseCoin: No description.
-            Type:str
+            Type: str
         :param period: No description.
-            Type:str
+            Type: str
         :param symbol: No description.
-            Type:str
+            Type: str
         :param limit: No description.
             Type:int
         :param cursor: No description.
-            Type:str
+            Type: str
         :param direction: No description.
-            Type:str.
+            Type: str.
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
@@ -618,9 +624,9 @@ class BybitClient(BaseModel):
         historical-volatility
         Parameters:
         :param category: No description.
-            Type:str
+            Type: str
         :param baseCoin: No description.
-            Type:str
+            Type: str
         :param period: No description.
             Type:int.
         :returns: Successful response
@@ -645,27 +651,30 @@ class BybitClient(BaseModel):
         timeInForce: str = None,
         positionIdx: str = None,
         orderLinkId: str = None,
-        body: dict = None,
+        category: str = None,
+        orders: pd.DataFrame = None,
     ) -> Dict[str, Any]:
         """
         create（Conditional Order）
         Parameters:
         :param symbol: No description.
-            Type:str
+            Type: str
         :param orderType: No description.
-            Type:str
+            Type: str
         :param side: No description.
-            Type:str
+            Type: str
         :param qty: No description.
-            Type:float
+            Type: float
         :param timeInForce: No description.
-            Type:str
+            Type: str
         :param positionIdx: No description.
-            Type:str
+            Type: str
         :param orderLinkId: No description.
-            Type:str
-        :param body: Request body.
-            Type: dict.
+            Type: str
+        :param category: No description.
+            Type: str
+        :param orders: Request body.
+            Type: pd.DataFrame.
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
@@ -681,7 +690,10 @@ class BybitClient(BaseModel):
                 "positionIdx": positionIdx,
                 "orderLinkId": orderLinkId,
             },
-            body=body,
+            body={
+                "category": category,
+                "request": orders.to_dict("records"),
+            },
         )
 
     def post_order_create_batch(
@@ -693,27 +705,28 @@ class BybitClient(BaseModel):
         timeInForce: str = None,
         positionIdx: str = None,
         orderLinkId: str = None,
-        body: dict = None,
+        category: str = None,
+        orders: pd.DataFrame = None,
     ) -> Dict[str, Any]:
         """
         create-batch
         Parameters:
         :param symbol: No description.
-            Type:str
+            Type: str
         :param orderType: No description.
-            Type:str
+            Type: str
         :param side: No description.
-            Type:str
+            Type: str
         :param qty: No description.
-            Type:float
+            Type: float
         :param timeInForce: No description.
-            Type:str
+            Type: str
         :param positionIdx: No description.
-            Type:str
+            Type: str
         :param orderLinkId: No description.
-            Type:str
-        :param body: Request body.
-            Type: dict.
+            Type: str
+        :param orders: Request body.
+            Type: pd.DataFrame.
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
@@ -729,7 +742,10 @@ class BybitClient(BaseModel):
                 "positionIdx": positionIdx,
                 "orderLinkId": orderLinkId,
             },
-            body=body,
+            body={
+                "category": category,
+                "request": orders.to_dict("records"),
+            },
         )
 
     def post_order_amend_batch(
@@ -747,19 +763,19 @@ class BybitClient(BaseModel):
         amend-batch
         Parameters:
         :param symbol: No description.
-            Type:str
+            Type: str
         :param orderType: No description.
-            Type:str
+            Type: str
         :param side: No description.
-            Type:str
+            Type: str
         :param qty: No description.
-            Type:float
+            Type: float
         :param timeInForce: No description.
-            Type:str
+            Type: str
         :param positionIdx: No description.
-            Type:str
+            Type: str
         :param orderLinkId: No description.
-            Type:str
+            Type: str
         :param body: Request body.
             Type: dict.
         :returns: Successful response
@@ -795,19 +811,19 @@ class BybitClient(BaseModel):
         cancel-batch
         Parameters:
         :param symbol: No description.
-            Type:str
+            Type: str
         :param orderType: No description.
-            Type:str
+            Type: str
         :param side: No description.
-            Type:str
+            Type: str
         :param qty: No description.
-            Type:float
+            Type: float
         :param timeInForce: No description.
-            Type:str
+            Type: str
         :param positionIdx: No description.
-            Type:str
+            Type: str
         :param orderLinkId: No description.
-            Type:str
+            Type: str
         :param body: Request body.
             Type: dict.
         :returns: Successful response
@@ -843,19 +859,19 @@ class BybitClient(BaseModel):
         amend
         Parameters:
         :param symbol: No description.
-            Type:str
+            Type: str
         :param orderType: No description.
-            Type:str
+            Type: str
         :param side: No description.
-            Type:str
+            Type: str
         :param qty: No description.
-            Type:float
+            Type: float
         :param timeInForce: No description.
-            Type:str
+            Type: str
         :param positionIdx: No description.
-            Type:str
+            Type: str
         :param orderLinkId: No description.
-            Type:str
+            Type: str
         :param body: Request body.
             Type: dict.
         :returns: Successful response
@@ -891,19 +907,19 @@ class BybitClient(BaseModel):
         cancel
         Parameters:
         :param symbol: No description.
-            Type:str
+            Type: str
         :param orderType: No description.
-            Type:str
+            Type: str
         :param side: No description.
-            Type:str
+            Type: str
         :param qty: No description.
-            Type:float
+            Type: float
         :param timeInForce: No description.
-            Type:str
+            Type: str
         :param positionIdx: No description.
-            Type:str
+            Type: str
         :param orderLinkId: No description.
-            Type:str
+            Type: str
         :param body: Request body.
             Type: dict.
         :returns: Successful response
@@ -939,19 +955,19 @@ class BybitClient(BaseModel):
         cancel-all
         Parameters:
         :param symbol: No description.
-            Type:str
+            Type: str
         :param orderType: No description.
-            Type:str
+            Type: str
         :param side: No description.
-            Type:str
+            Type: str
         :param qty: No description.
-            Type:float
+            Type: float
         :param timeInForce: No description.
-            Type:str
+            Type: str
         :param positionIdx: No description.
-            Type:str
+            Type: str
         :param orderLinkId: No description.
-            Type:str
+            Type: str
         :param body: Request body.
             Type: dict.
         :returns: Successful response
@@ -989,25 +1005,25 @@ class BybitClient(BaseModel):
         order/realtime
         Parameters:
         :param baseCoin: No description.
-            Type:str
+            Type: str
         :param settleCoin: No description.
-            Type:str
+            Type: str
         :param openOnly: No description.
             Type:int
         :param orderFilter: No description.
-            Type:str
+            Type: str
         :param cursor: No description.
-            Type:str
+            Type: str
         :param limit: No description.
             Type:int
         :param orderId: No description.
             Type:int
         :param category: No description.
-            Type:str
+            Type: str
         :param orderStatus: No description.
-            Type:str
+            Type: str
         :param symbol: No description.
-            Type:str.
+            Type: str.
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
@@ -1045,23 +1061,23 @@ class BybitClient(BaseModel):
         order/history
         Parameters:
         :param category: No description.
-            Type:str
+            Type: str
         :param orderType: No description.
-            Type:str
+            Type: str
         :param side: No description.
-            Type:str
+            Type: str
         :param cursor: No description.
-            Type:str
+            Type: str
         :param orderFilter: No description.
-            Type:str
+            Type: str
         :param limit: No description.
             Type:int
         :param orderStatus: No description.
-            Type:str
+            Type: str
         :param symbol: No description.
-            Type:str
+            Type: str
         :param baseCoin: No description.
-            Type:str
+            Type: str
         :param orderId: No description.
             Type:int.
         :returns: Successful response
@@ -1094,11 +1110,11 @@ class BybitClient(BaseModel):
         spot borrow check
         Parameters:
         :param category: No description.
-            Type:str
+            Type: str
         :param symbol: No description.
-            Type:str
+            Type: str
         :param side: No description.
-            Type:str.
+            Type: str.
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
@@ -1126,19 +1142,19 @@ class BybitClient(BaseModel):
         execution/list
         Parameters:
         :param category: No description.
-            Type:str
+            Type: str
         :param startTime: No description.
             Type:int
         :param symbol: No description.
-            Type:str
+            Type: str
         :param endTime: No description.
             Type:int
         :param cursor: No description.
-            Type:str
+            Type: str
         :param orderLinkId: No description.
-            Type:str
+            Type: str
         :param execType: No description.
-            Type:str.
+            Type: str.
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
@@ -1167,13 +1183,13 @@ class BybitClient(BaseModel):
         position/list
         Parameters:
         :param cursor: No description.
-            Type:str
+            Type: str
         :param settleCoin: No description.
-            Type:str
+            Type: str
         :param symbol: No description.
-            Type:str
+            Type: str
         :param category: No description.
-            Type:str.
+            Type: str.
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
@@ -1201,7 +1217,7 @@ class BybitClient(BaseModel):
         :raises: Any exceptions raised by the `requests` library.
         """
         return self._request(
-            method="POST", path="/v5/position/switch-isolated", params={}, body=body
+            method="POST", path="/v5/position/switch-isolated", body=body
         )
 
     def post_position_switch_mode(
@@ -1216,9 +1232,7 @@ class BybitClient(BaseModel):
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
-        return self._request(
-            method="POST", path="/v5/position/switch-mode", params={}, body=body
-        )
+        return self._request(method="POST", path="/v5/position/switch-mode", body=body)
 
     def post_position_set_tpsl_mode(
         self,
@@ -1233,7 +1247,7 @@ class BybitClient(BaseModel):
         :raises: Any exceptions raised by the `requests` library.
         """
         return self._request(
-            method="POST", path="/v5/position/set-tpsl-mode", params={}, body=body
+            method="POST", path="/v5/position/set-tpsl-mode", body=body
         )
 
     def post_position_trading_stop(
@@ -1248,9 +1262,7 @@ class BybitClient(BaseModel):
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
-        return self._request(
-            method="POST", path="/v5/position/trading-stop", params={}, body=body
-        )
+        return self._request(method="POST", path="/v5/position/trading-stop", body=body)
 
     def post_position_set_leverage(
         self,
@@ -1264,9 +1276,7 @@ class BybitClient(BaseModel):
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
-        return self._request(
-            method="POST", path="/v5/position/set-leverage", params={}, body=body
-        )
+        return self._request(method="POST", path="/v5/position/set-leverage", body=body)
 
     def post_position_set_risk_limit(
         self,
@@ -1281,7 +1291,7 @@ class BybitClient(BaseModel):
         :raises: Any exceptions raised by the `requests` library.
         """
         return self._request(
-            method="POST", path="/v5/position/set-risk-limit", params={}, body=body
+            method="POST", path="/v5/position/set-risk-limit", body=body
         )
 
     def post_position_set_auto_add_margin(
@@ -1299,7 +1309,6 @@ class BybitClient(BaseModel):
         return self._request(
             method="POST",
             path="/v5/position/set-auto-add-margin",
-            params={},
             body=body,
         )
 
@@ -1316,15 +1325,15 @@ class BybitClient(BaseModel):
         closed-pnl
         Parameters:
         :param category: No description.
-            Type:str
+            Type: str
         :param startTime: No description.
-            Type:str
+            Type: str
         :param symbol: LINKUSDT
-            Type:str
+            Type: str
         :param limit: No description.
             Type:int
         :param cursor: No description.
-            Type:str
+            Type: str
         :param endTime: No description.
             Type:int.
         :returns: Successful response
@@ -1356,15 +1365,15 @@ class BybitClient(BaseModel):
         delivery-record
         Parameters:
         :param category: No description.
-            Type:str
+            Type: str
         :param startTime: No description.
-            Type:str
+            Type: str
         :param symbol: LINKUSDT
-            Type:str
+            Type: str
         :param limit: No description.
             Type:int
         :param cursor: No description.
-            Type:str
+            Type: str
         :param endTime: No description.
             Type:int.
         :returns: Successful response
@@ -1393,11 +1402,11 @@ class BybitClient(BaseModel):
         settlement-record
         Parameters:
         :param category: No description.
-            Type:str
+            Type: str
         :param orderFilter: No description.
-            Type:str
+            Type: str
         :param symbol: No description.
-            Type:str.
+            Type: str.
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
@@ -1425,19 +1434,19 @@ class BybitClient(BaseModel):
         Get Repay Orders
         Parameters:
         :param currency: No description.
-            Type:str
+            Type: str
         :param startTime: No description.
-            Type:str
+            Type: str
         :param endTime: No description.
-            Type:str
+            Type: str
         :param limit: No description.
-            Type:float
+            Type: float
         :param cursor: No description.
-            Type:str
+            Type: str
         :param orderLinkId: No description.
-            Type:str
+            Type: str
         :param orderStatus: No description.
-            Type:str.
+            Type: str.
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
@@ -1464,9 +1473,9 @@ class BybitClient(BaseModel):
         Get Margin Coin Info
         Parameters:
         :param coin: No description.
-            Type:str
+            Type: str
         :param accountType: No description.
-            Type:str.
+            Type: str.
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
@@ -1494,19 +1503,19 @@ class BybitClient(BaseModel):
         coin-greeks
         Parameters:
         :param baseCoin: No description.
-            Type:str
+            Type: str
         :param coin: No description.
-            Type:str
+            Type: str
         :param qty: No description.
-            Type:float
+            Type: float
         :param timeInForce: No description.
-            Type:str
+            Type: str
         :param positionIdx: No description.
-            Type:str
+            Type: str
         :param orderLinkId: No description.
-            Type:str
+            Type: str
         :param orderStatus: No description.
-            Type:str.
+            Type: str.
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
@@ -1532,7 +1541,7 @@ class BybitClient(BaseModel):
         collateral-info
         Parameters:
         :param currency: No description.
-            Type:str.
+            Type: str.
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
@@ -1559,21 +1568,21 @@ class BybitClient(BaseModel):
         account/info
         Parameters:
         :param baseCoin: No description.
-            Type:str
+            Type: str
         :param coin: No description.
-            Type:str
+            Type: str
         :param unifiedMarginStatus: No description.
-            Type:str
+            Type: str
         :param qty: No description.
-            Type:float
+            Type: float
         :param timeInForce: No description.
-            Type:str
+            Type: str
         :param positionIdx: No description.
-            Type:str
+            Type: str
         :param orderLinkId: No description.
-            Type:str
+            Type: str
         :param orderStatus: No description.
-            Type:str.
+            Type: str.
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
@@ -1607,21 +1616,21 @@ class BybitClient(BaseModel):
         fee-rate
         Parameters:
         :param baseCoin: No description.
-            Type:str
+            Type: str
         :param coin: No description.
-            Type:str
+            Type: str
         :param unifiedMarginStatus: No description.
-            Type:str
+            Type: str
         :param qty: No description.
-            Type:float
+            Type: float
         :param timeInForce: No description.
-            Type:str
+            Type: str
         :param positionIdx: No description.
-            Type:str
+            Type: str
         :param orderLinkId: No description.
-            Type:str
+            Type: str
         :param orderStatus: No description.
-            Type:str.
+            Type: str.
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
@@ -1655,21 +1664,21 @@ class BybitClient(BaseModel):
         transaction-log
         Parameters:
         :param accountType: No description.
-            Type:str
+            Type: str
         :param category: No description.
-            Type:str
+            Type: str
         :param side: No description.
-            Type:str
+            Type: str
         :param qty: No description.
-            Type:float
+            Type: float
         :param timeInForce: No description.
-            Type:str
+            Type: str
         :param positionIdx: No description.
-            Type:str
+            Type: str
         :param orderLinkId: No description.
-            Type:str
+            Type: str
         :param orderStatus: No description.
-            Type:str.
+            Type: str.
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
@@ -1703,21 +1712,21 @@ class BybitClient(BaseModel):
         borrow-history
         Parameters:
         :param currency: No description.
-            Type:str
+            Type: str
         :param startTime: No description.
-            Type:str
+            Type: str
         :param endTime: No description.
-            Type:str
+            Type: str
         :param limit: No description.
-            Type:float
+            Type: float
         :param cursor: No description.
-            Type:str
+            Type: str
         :param category: No description.
-            Type:str
+            Type: str
         :param orderLinkId: No description.
-            Type:str
+            Type: str
         :param orderStatus: No description.
-            Type:str.
+            Type: str.
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
@@ -1749,7 +1758,7 @@ class BybitClient(BaseModel):
         :raises: Any exceptions raised by the `requests` library.
         """
         return self._request(
-            method="POST", path="/v5/account/upgrade-to-uta", params={}, body=body
+            method="POST", path="/v5/account/upgrade-to-uta", body=body
         )
 
     def post_account_set_margin_mode(
@@ -1765,7 +1774,7 @@ class BybitClient(BaseModel):
         :raises: Any exceptions raised by the `requests` library.
         """
         return self._request(
-            method="POST", path="/v5/account/set-margin-mode", params={}, body=body
+            method="POST", path="/v5/account/set-margin-mode", body=body
         )
 
     def post_account_mmp_modify(
@@ -1780,9 +1789,7 @@ class BybitClient(BaseModel):
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
-        return self._request(
-            method="POST", path="/v5/account/mmp-modify", params={}, body=body
-        )
+        return self._request(method="POST", path="/v5/account/mmp-modify", body=body)
 
     def post_account_mmp_reset(
         self,
@@ -1796,9 +1803,7 @@ class BybitClient(BaseModel):
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
-        return self._request(
-            method="POST", path="/v5/account/mmp-reset", params={}, body=body
-        )
+        return self._request(method="POST", path="/v5/account/mmp-reset", body=body)
 
     def post_order_disconnected_cancel_all(
         self,
@@ -1815,7 +1820,6 @@ class BybitClient(BaseModel):
         return self._request(
             method="POST",
             path="/v5/order/disconnected-cancel-all",
-            params={},
             body=body,
         )
 
@@ -1827,7 +1831,7 @@ class BybitClient(BaseModel):
         spot-lever-token/info
         Parameters:
         :param ltCoin: No description.
-            Type:str.
+            Type: str.
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
@@ -1847,7 +1851,7 @@ class BybitClient(BaseModel):
         spot-lever-token/reference
         Parameters:
         :param ltCoin: No description.
-            Type:str.
+            Type: str.
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
@@ -1872,7 +1876,7 @@ class BybitClient(BaseModel):
         :raises: Any exceptions raised by the `requests` library.
         """
         return self._request(
-            method="POST", path="/v5/spot-lever-token/purchase", params={}, body=body
+            method="POST", path="/v5/spot-lever-token/purchase", body=body
         )
 
     def post_spot_lever_token_redeem(
@@ -1888,7 +1892,7 @@ class BybitClient(BaseModel):
         :raises: Any exceptions raised by the `requests` library.
         """
         return self._request(
-            method="POST", path="/v5/spot-lever-token/redeem", params={}, body=body
+            method="POST", path="/v5/spot-lever-token/redeem", body=body
         )
 
     def get_spot_lever_token_order_record(
@@ -1901,11 +1905,11 @@ class BybitClient(BaseModel):
         spot-lever-token/order-record
         Parameters:
         :param api_key: No description.
-            Type:str
+            Type: str
         :param timestamp: No description.
-            Type:str
+            Type: str
         :param sign: No description.
-            Type:str.
+            Type: str.
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
@@ -1934,7 +1938,6 @@ class BybitClient(BaseModel):
         return self._request(
             method="POST",
             path="/v5/spot-margin-trade/switch-mode",
-            params={},
             body=body,
         )
 
@@ -1953,7 +1956,6 @@ class BybitClient(BaseModel):
         return self._request(
             method="POST",
             path="/v5/spot-margin-trade/set-leverage",
-            params={},
             body=body,
         )
 
@@ -1970,7 +1972,7 @@ class BybitClient(BaseModel):
         :raises: Any exceptions raised by the `requests` library.
         """
         return self._request(
-            method="POST", path="/v5/user/create-sub-member", params={}, body=body
+            method="POST", path="/v5/user/create-sub-member", body=body
         )
 
     def post_user_create_sub_api(
@@ -1985,9 +1987,7 @@ class BybitClient(BaseModel):
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
-        return self._request(
-            method="POST", path="/v5/user/create-sub-api", params={}, body=body
-        )
+        return self._request(method="POST", path="/v5/user/create-sub-api", body=body)
 
     def get_user_query_sub_members(
         self,
@@ -2001,7 +2001,6 @@ class BybitClient(BaseModel):
         return self._request(
             method="GET",
             path="/v5/user/query-sub-members",
-            params={},
         )
 
     def get_user_query_api(
@@ -2016,7 +2015,6 @@ class BybitClient(BaseModel):
         return self._request(
             method="GET",
             path="/v5/user/query-api",
-            params={},
         )
 
     def post_user_frozen_sub_member(
@@ -2032,7 +2030,7 @@ class BybitClient(BaseModel):
         :raises: Any exceptions raised by the `requests` library.
         """
         return self._request(
-            method="POST", path="/v5/user/frozen-sub-member", params={}, body=body
+            method="POST", path="/v5/user/frozen-sub-member", body=body
         )
 
     def post_user_update_api(
@@ -2047,9 +2045,7 @@ class BybitClient(BaseModel):
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
-        return self._request(
-            method="POST", path="/v5/user/update-api", params={}, body=body
-        )
+        return self._request(method="POST", path="/v5/user/update-api", body=body)
 
     def post_user_delete_api(
         self,
@@ -2063,9 +2059,7 @@ class BybitClient(BaseModel):
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
-        return self._request(
-            method="POST", path="/v5/user/delete-api", params={}, body=body
-        )
+        return self._request(method="POST", path="/v5/user/delete-api", body=body)
 
     def post_user_update_sub_api(
         self,
@@ -2079,9 +2073,7 @@ class BybitClient(BaseModel):
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
-        return self._request(
-            method="POST", path="/v5/user/update-sub-api", params={}, body=body
-        )
+        return self._request(method="POST", path="/v5/user/update-sub-api", body=body)
 
     def post_user_delete_sub_api(
         self,
@@ -2095,9 +2087,7 @@ class BybitClient(BaseModel):
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
-        return self._request(
-            method="POST", path="/v5/user/delete-sub-api", params={}, body=body
-        )
+        return self._request(method="POST", path="/v5/user/delete-sub-api", body=body)
 
     def get_asset_deposit_query_address(
         self,
@@ -2107,7 +2097,7 @@ class BybitClient(BaseModel):
         deposit/query-address
         Parameters:
         :param coin: No description.
-            Type:str.
+            Type: str.
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
@@ -2144,7 +2134,6 @@ class BybitClient(BaseModel):
         return self._request(
             method="GET",
             path="/v5/asset/deposit/query-record",
-            params={},
         )
 
     def get_asset_deposit_query_sub_member_address(
@@ -2157,9 +2146,9 @@ class BybitClient(BaseModel):
         deposit/query-sub-member-address
         Parameters:
         :param coin: No description.
-            Type:str
+            Type: str
         :param chainType: No description.
-            Type:str
+            Type: str
         :param subMemberId: No description.
             Type:int.
         :returns: Successful response
@@ -2224,9 +2213,9 @@ class BybitClient(BaseModel):
         transfer/query-account-coin-balance
         Parameters:
         :param accountType: No description.
-            Type:str
+            Type: str
         :param coin: No description.
-            Type:str.
+            Type: str.
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
@@ -2248,9 +2237,9 @@ class BybitClient(BaseModel):
         transfer/query-account-coins-balance
         Parameters:
         :param accountType: No description.
-            Type:str
+            Type: str
         :param coin: No description.
-            Type:str.
+            Type: str.
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
@@ -2271,7 +2260,7 @@ class BybitClient(BaseModel):
         transfer/query-asset-info
         Parameters:
         :param accountType: No description.
-            Type:str.
+            Type: str.
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
@@ -2291,7 +2280,7 @@ class BybitClient(BaseModel):
         coin/query-info
         Parameters:
         :param coin: No description.
-            Type:str.
+            Type: str.
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
@@ -2315,7 +2304,6 @@ class BybitClient(BaseModel):
         return self._request(
             method="GET",
             path="/v5/asset/transfer/query-sub-member-list",
-            params={},
         )
 
     def get_asset_transfer_query_inter_transfer_list(
@@ -2330,7 +2318,6 @@ class BybitClient(BaseModel):
         return self._request(
             method="GET",
             path="/v5/asset/transfer/query-inter-transfer-list",
-            params={},
         )
 
     def get_asset_transfer_query_universal_transfer_list(
@@ -2345,7 +2332,6 @@ class BybitClient(BaseModel):
         return self._request(
             method="GET",
             path="/v5/asset/transfer/query-universal-transfer-list",
-            params={},
         )
 
     def post_asset_transfer_save_transfer_sub_member(
@@ -2363,7 +2349,6 @@ class BybitClient(BaseModel):
         return self._request(
             method="POST",
             path="/v5/asset/transfer/save-transfer-sub-member",
-            params={},
             body=body,
         )
 
@@ -2376,9 +2361,9 @@ class BybitClient(BaseModel):
         transfer/query-transfer-coin-list
         Parameters:
         :param fromAccountType: No description.
-            Type:str
+            Type: str
         :param toAccountType: No description.
-            Type:str.
+            Type: str.
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
@@ -2406,7 +2391,6 @@ class BybitClient(BaseModel):
         return self._request(
             method="POST",
             path="/v5/asset/transfer/inter-transfer",
-            params={},
             body=body,
         )
 
@@ -2425,7 +2409,6 @@ class BybitClient(BaseModel):
         return self._request(
             method="POST",
             path="/v5/asset/transfer/universal-transfer",
-            params={},
             body=body,
         )
 
@@ -2441,7 +2424,6 @@ class BybitClient(BaseModel):
         return self._request(
             method="GET",
             path="/v5/asset/withdraw/query-record",
-            params={},
         )
 
     def post_asset_withdraw_create(
@@ -2456,9 +2438,7 @@ class BybitClient(BaseModel):
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
-        return self._request(
-            method="POST", path="/v5/asset/withdraw/create", params={}, body=body
-        )
+        return self._request(method="POST", path="/v5/asset/withdraw/create", body=body)
 
     def post_asset_withdraw_cancel(
         self,
@@ -2472,6 +2452,4 @@ class BybitClient(BaseModel):
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
-        return self._request(
-            method="POST", path="/v5/asset/withdraw/cancel", params={}, body=body
-        )
+        return self._request(method="POST", path="/v5/asset/withdraw/cancel", body=body)
