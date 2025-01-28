@@ -1,6 +1,6 @@
 [project]
 name = "crypto-pandas"
-version = "0.1.1"
+version = "0.1.6"
 description = "Library to facilitate working with Pandas and REST APIs."
 authors = [
     {name = "lucas", email = "lucas.jamar@carpentrix.com"}

@@ -15,7 +15,7 @@ numeric_columns = {
 }
 
 
-def binance_response_to_dict(data: dict) -> dict:
+def response_to_dict(data: dict) -> dict:
     for key, value in data.items():
         if key in datetime_columns:
             data[key] = pd.Timestamp(value, unit="ms")
@@ -24,9 +24,7 @@ def binance_response_to_dict(data: dict) -> dict:
     return data
 
 
-def binance_response_to_dataframe(
-    data: list, column_names: list = None
-) -> pd.DataFrame:
+def response_to_dataframe(data: list, column_names: list = None) -> pd.DataFrame:
     df = pd.DataFrame(data)
     if column_names:
         df.columns = column_names

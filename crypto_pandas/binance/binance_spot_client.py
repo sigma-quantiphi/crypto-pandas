@@ -4,8 +4,8 @@ from typing import Any, Dict, List, Union
 import requests
 
 from crypto_pandas.binance.binance_pandas import (
-    binance_response_to_dataframe,
-    binance_response_to_dict,
+    response_to_dataframe,
+    response_to_dict,
 )
 from crypto_pandas.binance.binance_requests import prepare_requests_parameters
 from crypto_pandas.binance.column_names import klines_column_names
@@ -19,7 +19,7 @@ class BinanceSpotClient(BaseModel):
     :param api_key: The API Key for authentication.
     """
 
-    env: str = Field(default="paper", description="The API Key for authentication")
+    env: str = Field(default="paper", description="The API env (`prod` or `paper`)")
     api_key: SecretStr = Field(
         default=None, description="The API Key for authentication"
     )
@@ -27,9 +27,9 @@ class BinanceSpotClient(BaseModel):
     @property
     def base_url(self) -> str:
         return (
-            "https://api.binance.com/"
+            "https://api.binance.com"
             if self.env == "prod"
-            else "https://testnet.binance.vision/"
+            else "https://testnet.binance.vision"
         )
 
     def _request(
@@ -65,9 +65,9 @@ class BinanceSpotClient(BaseModel):
         try:
             data = response.json()
             if isinstance(data, list):
-                data = binance_response_to_dataframe(data, column_names=column_names)
+                data = response_to_dataframe(data, column_names=column_names)
             if isinstance(data, dict):
-                data = binance_response_to_dict(data)
+                data = response_to_dict(data)
             return data
         except requests.exceptions.HTTPError as errh:
             print("Http Error:", errh)
@@ -229,8 +229,8 @@ API documents:
         self,
         symbol: str,
         fromId: int = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         limit: int = None,
     ) -> Dict[str, Any]:
         """
@@ -265,8 +265,8 @@ API documents:
         self,
         symbol: str,
         interval: str,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         timeZone: str = None,
         limit: int = None,
     ) -> Dict[str, Any]:
@@ -306,8 +306,8 @@ API documents:
         self,
         symbol: str,
         interval: str,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         timeZone: str = None,
         limit: int = None,
     ) -> Dict[str, Any]:
@@ -955,8 +955,8 @@ API documents:
         timestamp: int,
         signature: str,
         orderId: int = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         limit: int = None,
         recvWindow: int = None,
     ) -> Dict[str, Any]:
@@ -1501,8 +1501,8 @@ API documents:
         timestamp: int,
         signature: str,
         fromId: int = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         limit: int = None,
         recvWindow: int = None,
     ) -> Dict[str, Any]:
@@ -1758,8 +1758,8 @@ API documents:
         timestamp: int,
         signature: str,
         orderId: int = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         fromId: int = None,
         limit: int = None,
         recvWindow: int = None,
@@ -1885,8 +1885,8 @@ API documents:
         symbol: str,
         timestamp: int,
         signature: str,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         fromAllocationId: int = None,
         limit: int = None,
         orderId: int = None,
@@ -2016,8 +2016,8 @@ API documents:
         signature: str,
         isolatedSymbol: str = None,
         txId: int = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         current: int = None,
         size: int = None,
         recvWindow: int = None,
@@ -2074,8 +2074,8 @@ API documents:
         signature: str,
         optionalAsset: str = None,
         getCrossMargingTransferHistoryType: str = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         current: int = None,
         size: int = None,
         isolatedSymbol: str = None,
@@ -2373,8 +2373,8 @@ API documents:
         signature: str,
         optionalAsset: str = None,
         isolatedSymbol: str = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         current: int = None,
         size: int = None,
         archived: str = None,
@@ -2427,8 +2427,8 @@ API documents:
         self,
         timestamp: int,
         signature: str,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         isolatedSymbol: str = None,
         current: int = None,
         size: int = None,
@@ -2580,8 +2580,8 @@ API documents:
         signature: str,
         isIsolatedMargin: str = None,
         orderId: int = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         limit: int = None,
         recvWindow: int = None,
     ) -> Dict[str, Any]:
@@ -2820,8 +2820,8 @@ API documents:
         isIsolatedMargin: str = None,
         symbol: str = None,
         fromId: str = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         limit: int = None,
         recvWindow: int = None,
     ) -> Dict[str, Any]:
@@ -2909,8 +2909,8 @@ API documents:
         timestamp: int,
         signature: str,
         isIsolatedMargin: str = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         fromId: int = None,
         limit: int = None,
         recvWindow: int = None,
@@ -3286,8 +3286,8 @@ API documents:
         timestamp: int,
         signature: str,
         vipLevel: int = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         recvWindow: int = None,
     ) -> Dict[str, Any]:
         """
@@ -3516,8 +3516,8 @@ API documents:
         signature: str,
         current: int = None,
         size: int = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         recvWindow: int = None,
     ) -> Dict[str, Any]:
         """
@@ -3597,8 +3597,8 @@ API documents:
         optionalAsset: str = None,
         symbol: str = None,
         type_: str = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         fromId: int = None,
         limit: int = None,
         recvWindow: int = None,
@@ -4091,8 +4091,8 @@ API documents:
         type_: str,
         timestamp: int,
         signature: str,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         limit: int = None,
         recvWindow: int = None,
     ) -> Dict[str, Any]:
@@ -4258,8 +4258,8 @@ API documents:
         signature: str,
         optionalCoin: str = None,
         status: int = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         offset: int = None,
         limit: int = None,
         recvWindow: int = None,
@@ -4313,8 +4313,8 @@ API documents:
         optionalCoin: str = None,
         withdrawOrderId: str = None,
         status: int = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         offset: int = None,
         limit: int = None,
         recvWindow: int = None,
@@ -4465,8 +4465,8 @@ API documents:
         timestamp: int,
         signature: str,
         accountType: str = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         recvWindow: int = None,
     ) -> Dict[str, Any]:
         """
@@ -4573,8 +4573,8 @@ API documents:
         timestamp: int,
         signature: str,
         optionalAsset: str = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         limit: int = None,
         recvWindow: int = None,
     ) -> Dict[str, Any]:
@@ -4681,8 +4681,8 @@ API documents:
         univTransferType: str,
         timestamp: int,
         signature: str,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         current: int = None,
         size: int = None,
         fromSymbol: str = None,
@@ -4898,8 +4898,8 @@ API documents:
 
     def get_sapi_asset_convert_transfer_query_by_page(
         self,
-        startTime: int,
-        endTime: int,
+        startTime: pd.Timestamp,
+        endTime: pd.Timestamp,
         timestamp: int,
         signature: str,
         tranId: int = None,
@@ -4954,8 +4954,8 @@ API documents:
 
     def get_sapi_asset_ledger_transfer_cloud_mining_query_by_page(
         self,
-        startTime: int,
-        endTime: int,
+        startTime: pd.Timestamp,
+        endTime: pd.Timestamp,
         timestamp: int,
         signature: str,
         tranId: int = None,
@@ -5105,7 +5105,7 @@ API documents:
             },
         )
 
-    def get_sapi_sub_account_list_(
+    def get_sapi_sub_account_list(
         self,
         timestamp: int,
         signature: str,
@@ -5155,8 +5155,8 @@ API documents:
         signature: str,
         optionalSubAccountFromEmail: str = None,
         optionalSubAccountToEmail: str = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         page: int = None,
         limit: int = None,
         recvWindow: int = None,
@@ -5207,8 +5207,8 @@ API documents:
         futuresType: int,
         timestamp: int,
         signature: str,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         page: int = None,
         limit: int = None,
         recvWindow: int = None,
@@ -5420,8 +5420,8 @@ API documents:
         signature: str,
         optionalCoin: str = None,
         status: int = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         limit: int = None,
         offset: int = None,
         recvWindow: int = None,
@@ -5544,8 +5544,8 @@ API documents:
     def get_sapi_asset_custody_transfer_history(
         self,
         email: str,
-        startTime: int,
-        endTime: int,
+        startTime: pd.Timestamp,
+        endTime: pd.Timestamp,
         asset: str,
         timestamp: int,
         signature: str,
@@ -5597,7 +5597,7 @@ API documents:
             },
         )
 
-    def get_sapi_capital_deposit_address_list_(
+    def get_sapi_capital_deposit_address_list(
         self,
         coin: str,
         timestamp: int,
@@ -5661,7 +5661,7 @@ API documents:
             },
         )
 
-    def get_sapi_capital_withdraw_address_list_(
+    def get_sapi_capital_withdraw_address_list(
         self,
     ) -> Dict[str, Any]:
         """
@@ -6096,8 +6096,8 @@ API documents:
         signature: str,
         optionalAsset: str = None,
         type_: int = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         limit: int = None,
         recvWindow: int = None,
     ) -> Dict[str, Any]:
@@ -6146,8 +6146,8 @@ API documents:
         optionalSubAccountFromEmail: str = None,
         optionalSubAccountToEmail: str = None,
         clientTranId: str = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         page: int = None,
         limit: int = None,
         recvWindow: int = None,
@@ -6528,8 +6528,8 @@ API documents:
         type_: str,
         timestamp: int,
         signature: str,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         limit: int = None,
         recvWindow: int = None,
     ) -> Dict[str, Any]:
@@ -6575,8 +6575,8 @@ API documents:
         email: str,
         timestamp: int,
         signature: str,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         page: int = None,
         limit: int = None,
         transfers: str = None,
@@ -6631,8 +6631,8 @@ API documents:
         email: str,
         timestamp: int,
         signature: str,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         page: int = None,
         limit: int = None,
         transfers: str = None,
@@ -6832,8 +6832,8 @@ API documents:
         transferFunctionAccountType: str,
         timestamp: int,
         signature: str,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         page: int = None,
         limit: int = None,
         recvWindow: int = None,
@@ -7262,8 +7262,8 @@ API documents:
         transactionType: int,
         timestamp: int,
         signature: str,
-        beginTime: int = None,
-        endTime: int = None,
+        beginTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         page: int = None,
         rows: int = None,
         recvWindow: int = None,
@@ -7311,8 +7311,8 @@ API documents:
         transactionType: int,
         timestamp: int,
         signature: str,
-        beginTime: int = None,
-        endTime: int = None,
+        beginTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         page: int = None,
         rows: int = None,
         recvWindow: int = None,
@@ -7355,7 +7355,7 @@ API documents:
             },
         )
 
-    def get_sapi_lending_project_list_(
+    def get_sapi_lending_project_list(
         self,
         fixedAndActivityProductType: str,
         timestamp: int,
@@ -7447,7 +7447,7 @@ API documents:
             },
         )
 
-    def get_sapi_lending_project_position_list_(
+    def get_sapi_lending_project_position_list(
         self,
         asset: str,
         timestamp: int,
@@ -7593,7 +7593,7 @@ API documents:
             },
         )
 
-    def get_sapi_mining_worker_list_(
+    def get_sapi_mining_worker_list(
         self,
         algo: str,
         userName: str,
@@ -7645,7 +7645,7 @@ API documents:
             },
         )
 
-    def get_sapi_mining_payment_list_(
+    def get_sapi_mining_payment_list(
         self,
         algo: str,
         userName: str,
@@ -7757,7 +7757,7 @@ API documents:
             },
         )
 
-    def get_sapi_mining_hash_transfer_config_details_list_(
+    def get_sapi_mining_hash_transfer_config_details_list(
         self,
         timestamp: int,
         signature: str,
@@ -7961,7 +7961,7 @@ API documents:
             },
         )
 
-    def get_sapi_mining_statistics_user_list_(
+    def get_sapi_mining_statistics_user_list(
         self,
         algo: str,
         userName: str,
@@ -8091,7 +8091,7 @@ API documents:
         startTimeReq: int,
         timestamp: int,
         signature: str,
-        endTime: int = None,
+        endTime: pd.Timestamp = None,
         current: int = None,
         size: int = None,
         recvWindow: int = None,
@@ -8139,8 +8139,8 @@ API documents:
         dataType: str,
         timestamp: int,
         signature: str,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         recvWindow: int = None,
     ) -> Dict[str, Any]:
         """
@@ -8363,8 +8363,8 @@ API documents:
         signature: str,
         optionalSymbol: str = None,
         optionalSide: str = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         page: int = None,
         smallPageSize: str = None,
         recvWindow: int = None,
@@ -8567,8 +8567,8 @@ API documents:
         side: str,
         timestamp: int,
         signature: str,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         page: int = None,
         smallPageSize: str = None,
         recvWindow: int = None,
@@ -8787,8 +8787,8 @@ API documents:
         asset: str,
         timestamp: int,
         signature: str,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         size: int = None,
         recvWindow: int = None,
     ) -> Dict[str, Any]:
@@ -9105,8 +9105,8 @@ API documents:
         signature: str,
         optionalBlvtTokenName: str = None,
         id_: int = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         limit: int = None,
         recvWindow: int = None,
     ) -> Dict[str, Any]:
@@ -9189,8 +9189,8 @@ API documents:
         signature: str,
         optionalBlvtTokenName: str = None,
         id_: int = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         limit: int = None,
         recvWindow: int = None,
     ) -> Dict[str, Any]:
@@ -9405,8 +9405,8 @@ API documents:
         signature: str,
         orderId: int = None,
         loanCoin: str = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         current: int = None,
         limit: int = None,
         recvWindow: int = None,
@@ -9721,8 +9721,8 @@ API documents:
         signature: str,
         optionalAsset: str = None,
         type_: str = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         limit: int = None,
         recvWindow: int = None,
     ) -> Dict[str, Any]:
@@ -9825,8 +9825,8 @@ API documents:
         orderId: int = None,
         loanCoin: str = None,
         collateralCoin: str = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         current: int = None,
         limit: int = None,
         recvWindow: int = None,
@@ -9973,8 +9973,8 @@ API documents:
         orderId: int = None,
         loanCoin: str = None,
         collateralCoin: str = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         current: int = None,
         limit: int = None,
         recvWindow: int = None,
@@ -10069,8 +10069,8 @@ API documents:
         orderId: int = None,
         loanCoin: str = None,
         collateralCoin: str = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         current: int = None,
         limit: int = None,
         recvWindow: int = None,
@@ -10364,8 +10364,8 @@ API documents:
         signature: str,
         loanCoin: str = None,
         collateralCoin: str = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         current: int = None,
         limit: int = None,
         recvWindow: int = None,
@@ -10468,8 +10468,8 @@ API documents:
         signature: str,
         loanCoin: str = None,
         collateralCoin: str = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         current: int = None,
         limit: int = None,
         recvWindow: int = None,
@@ -10564,8 +10564,8 @@ API documents:
         signature: str,
         loanCoin: str = None,
         collateralCoin: str = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         current: int = None,
         limit: int = None,
         recvWindow: int = None,
@@ -10678,8 +10678,8 @@ API documents:
         self,
         timestamp: int,
         signature: str,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         limit: int = None,
         recvWindow: int = None,
     ) -> Dict[str, Any]:
@@ -11008,8 +11008,8 @@ API documents:
 
     def get_sapi_convert_trade_flow(
         self,
-        startTime: int,
-        endTime: int,
+        startTime: pd.Timestamp,
+        endTime: pd.Timestamp,
         timestamp: int,
         signature: str,
         limit: int = None,
@@ -11050,8 +11050,8 @@ API documents:
         self,
         timestamp: int,
         signature: str,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         page: int = None,
         recvWindow: int = None,
     ) -> Dict[str, Any]:
@@ -11091,8 +11091,8 @@ API documents:
         orderType: int,
         timestamp: int,
         signature: str,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         limit50: int = None,
         page: int = None,
         recvWindow: int = None,
@@ -11138,8 +11138,8 @@ API documents:
         self,
         timestamp: int,
         signature: str,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         limit50: int = None,
         page: int = None,
         recvWindow: int = None,
@@ -11182,8 +11182,8 @@ API documents:
         self,
         timestamp: int,
         signature: str,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         limit50: int = None,
         page: int = None,
         recvWindow: int = None,
@@ -11462,7 +11462,7 @@ API documents:
             },
         )
 
-    def get_sapi_lending_auto_invest_target_asset_list_(
+    def get_sapi_lending_auto_invest_target_asset_list(
         self,
         timestamp: int,
         signature: str,
@@ -11502,7 +11502,7 @@ API documents:
             },
         )
 
-    def get_sapi_lending_auto_invest_target_asset_roi_list_(
+    def get_sapi_lending_auto_invest_target_asset_roi_list(
         self,
         targetAsset: str,
         hisRoiType: str,
@@ -11566,7 +11566,7 @@ API documents:
             },
         )
 
-    def get_sapi_lending_auto_invest_source_asset_list_(
+    def get_sapi_lending_auto_invest_source_asset_list(
         self,
         usageType: str,
         timestamp: int,
@@ -11616,7 +11616,7 @@ API documents:
         planType: str,
         subscriptionAmount: float,
         subscriptionCycle: str,
-        subscriptionStartTime: int,
+        subscriptionStartTime: pd.Timestamp,
         sourceAsset: str,
         details: List[Any],
         timestamp: int,
@@ -11691,7 +11691,7 @@ API documents:
         planId: int,
         subscriptionAmount: float,
         subscriptionCycle: str,
-        subscriptionStartTime: int,
+        subscriptionStartTime: pd.Timestamp,
         sourceAsset: str,
         timestamp: int,
         signature: str,
@@ -11786,7 +11786,7 @@ API documents:
             },
         )
 
-    def get_sapi_lending_auto_invest_plan_list_(
+    def get_sapi_lending_auto_invest_plan_list(
         self,
         planType: str,
         timestamp: int,
@@ -11854,13 +11854,13 @@ API documents:
             },
         )
 
-    def get_sapi_lending_auto_invest_history_list_(
+    def get_sapi_lending_auto_invest_history_list(
         self,
         timestamp: int,
         signature: str,
         planId: int = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         targetAsset: float = None,
         planType: str = None,
         size: int = None,
@@ -12115,8 +12115,8 @@ API documents:
         requestId: int,
         timestamp: int,
         signature: str,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         current: int = None,
         asset: str = None,
         size: int = None,
@@ -12166,8 +12166,8 @@ API documents:
         self,
         timestamp: int,
         signature: str,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         current: int = None,
         size: int = None,
         recvWindow: int = None,
@@ -12278,8 +12278,8 @@ API documents:
         self,
         timestamp: int,
         signature: str,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         current: int = None,
         size: int = None,
         recvWindow: int = None,
@@ -12322,8 +12322,8 @@ API documents:
         self,
         timestamp: int,
         signature: str,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         current: int = None,
         size: int = None,
         recvWindow: int = None,
@@ -12366,8 +12366,8 @@ API documents:
         self,
         timestamp: int,
         signature: str,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         current: int = None,
         size: int = None,
         recvWindow: int = None,
@@ -12438,8 +12438,8 @@ API documents:
         self,
         timestamp: int,
         signature: str,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         current: int = None,
         size: int = None,
         recvWindow: int = None,
@@ -12542,8 +12542,8 @@ API documents:
         self,
         timestamp: int,
         signature: str,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         current: int = None,
         size: int = None,
         recvWindow: int = None,
@@ -12586,8 +12586,8 @@ API documents:
         self,
         timestamp: int,
         signature: str,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         current: int = None,
         size: int = None,
         recvWindow: int = None,
@@ -12630,8 +12630,8 @@ API documents:
         self,
         timestamp: int,
         signature: str,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         current: int = None,
         size: int = None,
         recvWindow: int = None,
@@ -12726,7 +12726,7 @@ API documents:
             },
         )
 
-    def get_sapi_simple_earn_flexible_list_(
+    def get_sapi_simple_earn_flexible_list(
         self,
         timestamp: int,
         signature: str,
@@ -12766,7 +12766,7 @@ API documents:
             },
         )
 
-    def get_sapi_simple_earn_locked_list_(
+    def get_sapi_simple_earn_locked_list(
         self,
         timestamp: int,
         signature: str,
@@ -13101,8 +13101,8 @@ API documents:
         productId: str = None,
         purchaseId: str = None,
         asset: str = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         current: int = None,
         size: int = None,
         recvWindow: int = None,
@@ -13156,8 +13156,8 @@ API documents:
         signature: str,
         purchaseId: str = None,
         asset: str = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         current: int = None,
         size: int = None,
         recvWindow: int = None,
@@ -13207,8 +13207,8 @@ API documents:
         productId: str = None,
         redeemId: str = None,
         asset: str = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         current: int = None,
         size: int = None,
     ) -> Dict[str, Any]:
@@ -13253,8 +13253,8 @@ API documents:
         positionId: str = None,
         redeemId: str = None,
         asset: str = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         current: int = None,
         size: int = None,
         recvWindow: int = None,
@@ -13307,8 +13307,8 @@ API documents:
         type_: str,
         productId: str = None,
         asset: str = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
     ) -> Dict[str, Any]:
         """
         Get Flexible Rewards History (USER_DATA)
@@ -13344,8 +13344,8 @@ API documents:
         signature: str,
         positionId: str = None,
         asset: str = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         size: int = None,
         recvWindow: int = None,
     ) -> Dict[str, Any]:
@@ -13639,8 +13639,8 @@ API documents:
         productId: str,
         timestamp: int,
         signature: str,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         current: int = None,
         size: int = None,
         recvWindow: int = None,
@@ -13687,8 +13687,8 @@ API documents:
         timestamp: int,
         signature: str,
         productId: str = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
         current: int = None,
         size: int = None,
         recvWindow: int = None,
@@ -13730,7 +13730,7 @@ API documents:
             },
         )
 
-    def get_sapi_dci_product_list_(
+    def get_sapi_dci_product_list(
         self,
         optionType: str,
         exercisedCoin: str,

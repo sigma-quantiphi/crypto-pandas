@@ -4,8 +4,8 @@ from typing import Any, Dict, Union
 import requests
 
 from crypto_pandas.binance.binance_pandas import (
-    binance_response_to_dataframe,
-    binance_response_to_dict,
+    response_to_dataframe,
+    response_to_dict,
 )
 from crypto_pandas.binance.binance_requests import prepare_requests_parameters
 from crypto_pandas.binance.column_names import klines_column_names
@@ -19,7 +19,7 @@ class BinanceFuturesClient(BaseModel):
     :param api_key: The API Key for authentication.
     """
 
-    env: str = Field(default="paper", description="The API Key for authentication")
+    env: str = Field(default="paper", description="The API env (`prod` or `paper`)")
     api_key: SecretStr = Field(
         default=None, description="The API Key for authentication"
     )
@@ -27,7 +27,7 @@ class BinanceFuturesClient(BaseModel):
     @property
     def base_url(self) -> str:
         return (
-            "https://fapi.binance.com/"
+            "https://fapi.binance.com"
             if self.env == "prod"
             else "https://testnet.binancefuture.com"
         )
@@ -65,9 +65,9 @@ class BinanceFuturesClient(BaseModel):
         try:
             data = response.json()
             if isinstance(data, list):
-                data = binance_response_to_dataframe(data, column_names=column_names)
+                data = response_to_dataframe(data, column_names=column_names)
             if isinstance(data, dict):
-                data = binance_response_to_dict(data)
+                data = response_to_dict(data)
             return data
         except requests.exceptions.HTTPError as errh:
             print("Http Error:", errh)
@@ -211,8 +211,8 @@ class BinanceFuturesClient(BaseModel):
         symbol: str,
         limit: int = None,
         fromId: int = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
     ) -> Dict[str, Any]:
         """
         Compressed/Aggregate Trades
@@ -247,8 +247,8 @@ class BinanceFuturesClient(BaseModel):
         symbol: str,
         interval: str,
         limit: int = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
     ) -> Dict[str, Any]:
         """
         Kline/Candlestick Data
@@ -303,8 +303,8 @@ class BinanceFuturesClient(BaseModel):
         self,
         symbol: str,
         limit: int = None,
-        startTime: int = None,
-        endTime: int = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
     ) -> Dict[str, Any]:
         """
         Funding Rate History
