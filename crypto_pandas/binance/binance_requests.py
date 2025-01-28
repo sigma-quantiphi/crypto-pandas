@@ -3,4 +3,4 @@ def prepare_requests_parameters(params: dict) -> dict:
     for x in ["startTime", "endTime", "transferDate"]:
         if x in params:
             params[x] = int(params[x].timestamp() * 1000)
-        return params
+    return params

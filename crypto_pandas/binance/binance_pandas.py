@@ -23,7 +23,10 @@ def binance_response_to_dict(data: dict) -> dict:
             data[key] = float(value)
     return data
 
-def binance_response_to_dataframe(data: list, column_names: list = None) -> pd.DataFrame:
+
+def binance_response_to_dataframe(
+    data: list, column_names: list = None
+) -> pd.DataFrame:
     df = pd.DataFrame(data)
     if column_names:
         df.columns = column_names

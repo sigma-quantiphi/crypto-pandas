@@ -1,9 +1,12 @@
 import pandas as pd
 from pydantic import BaseModel, Field, SecretStr
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Union
 import requests
 
-from crypto_pandas.binance.binance_pandas import binance_response_to_dataframe, binance_response_to_dict
+from crypto_pandas.binance.binance_pandas import (
+    binance_response_to_dataframe,
+    binance_response_to_dict,
+)
 from crypto_pandas.binance.binance_requests import prepare_requests_parameters
 from crypto_pandas.binance.column_names import klines_column_names
 
@@ -35,7 +38,7 @@ class BinanceSpotClient(BaseModel):
         path: str,
         params: Dict[str, Any] = None,
         body: Dict[str, Any] = None,
-        column_names: list = None
+        column_names: list = None,
     ) -> Union[str, Dict[str, Any], pd.DataFrame]:
         """
         Internal method to make API requests.
@@ -296,7 +299,7 @@ API documents:
                 "timeZone": timeZone,
                 "limit": limit,
             },
-            column_names=klines_column_names
+            column_names=klines_column_names,
         )
 
     def get_api_ui_klines(
@@ -337,7 +340,7 @@ API documents:
                 "timeZone": timeZone,
                 "limit": limit,
             },
-            column_names=klines_column_names
+            column_names=klines_column_names,
         )
 
     def get_api_avg_price(
