@@ -1,5 +1,7 @@
 import pandas as pd
 
+from crypto_pandas.binance.column_names import klines_column_names
+
 datetime_columns = {
     "fundingTime",
     "openTime",
@@ -8,7 +10,7 @@ datetime_columns = {
     "time",
     "timestamp",
     "updateTime",
-    "workingTime"
+    "workingTime",
 }
 numeric_columns = {
     "fundingRate",
@@ -65,6 +67,10 @@ def response_to_dataframe(data: list, column_names: list = None) -> pd.DataFrame
     if column_names:
         df.columns = column_names
     return preprocess_dataframe(df)
+
+
+def klines_to_dataframe(data: list) -> pd.DataFrame:
+    return response_to_dataframe(data, column_names=klines_column_names)
 
 
 def depth_to_dataframe(data: dict) -> pd.DataFrame:

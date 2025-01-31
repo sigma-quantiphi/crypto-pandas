@@ -10,7 +10,10 @@ def sign_parameters(secret: str, params: dict) -> dict:
     params["signature"] = generate_signature(secret, query_string)
     return params
 
-def prepare_and_sign_parameters(secret: str, params: dict = None, recv_window: int = 5000) -> dict:
+
+def prepare_and_sign_parameters(
+    secret: str, params: dict = None, recv_window: int = 5000
+) -> dict:
     if params is not None:
         params = prepare_requests_parameters(params)
         params["recvWindow"] = recv_window

@@ -20,8 +20,6 @@ trades = client.get_api_avg_price(symbol="BTCUSDT")
 print(trades)
 trades = client.get_api_ticker_24hr()
 print(trades)
-trades = client.get_sapi_v4_sub_account_assets(
-    email=""
-)
+trades = client.get_sapi_v4_sub_account_assets(email="")
 print(trades)
 breakpoint()
