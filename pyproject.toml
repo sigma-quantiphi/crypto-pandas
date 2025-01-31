@@ -1,7 +1,7 @@
 [project]
 name = "crypto-pandas"
-version = "0.1.6"
-description = "Library to facilitate working with Pandas and REST APIs."
+version = "0.1.8"
+description = "Library to to work with crypto exchanges using Pandas DataFrame."
 authors = [
     {name = "lucas", email = "lucas.jamar@carpentrix.com"}
 ]

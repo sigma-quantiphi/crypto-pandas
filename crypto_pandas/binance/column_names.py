@@ -12,3 +12,13 @@ klines_column_names = [
     "takerBuyQuoteAssetVolume",
     "ignore",
 ]
+agg_trades_columns = [
+    "tradeId",
+    "price",
+    "qty",
+    "firstTradeId",
+    "lastTradeId",
+    "timestamp",
+    "isBuyerMaker",
+    "ignore",
+]

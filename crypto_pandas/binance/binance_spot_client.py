@@ -1,28 +1,31 @@
+from dataclasses import dataclass, field
+
 import pandas as pd
-from pydantic import BaseModel, Field, SecretStr
 from typing import Any, Dict, List, Union
 import requests
 
 from crypto_pandas.binance.binance_pandas import (
     response_to_dataframe,
     response_to_dict,
+    depth_to_dataframe,
 )
 from crypto_pandas.binance.binance_requests import prepare_requests_parameters
-from crypto_pandas.binance.column_names import klines_column_names
+from crypto_pandas.binance.column_names import klines_column_names, agg_trades_columns
 
 
-class BinanceSpotClient(BaseModel):
+@dataclass
+class BinanceSpotClient:
     """
     A client for interacting with the Binance Spot API.
 
     :param env: The API env (`prod` or `paper`).
     :param api_key: The API Key for authentication.
+    :param secret: The API Key for authentication.
     """
 
-    env: str = Field(default="paper", description="The API env (`prod` or `paper`)")
-    api_key: SecretStr = Field(
-        default=None, description="The API Key for authentication"
-    )
+    env: str = field(repr=False)
+    api_key: str = field(repr=False)
+    secret: str = field(repr=False)
 
     @property
     def base_url(self) -> str:
@@ -153,7 +156,7 @@ API documents:
         self,
         symbol: str,
         limit: int = None,
-    ) -> Dict[str, Any]:
+    ) -> pd.DataFrame:
         """
         Order Book
         Parameters:
@@ -164,7 +167,7 @@ API documents:
         :returns: Order book
         :raises: Any exceptions raised by the `requests` library.
         """
-        return self._request(
+        data = self._request(
             method="GET",
             path="/api/v3/depth",
             params={
@@ -172,12 +175,13 @@ API documents:
                 "limit": limit,
             },
         )
+        return depth_to_dataframe(data)
 
     def get_api_trades(
         self,
         symbol: str,
         limit: int = None,
-    ) -> Dict[str, Any]:
+    ) -> pd.DataFrame:
         """
         Recent Trades List
         Parameters:
@@ -202,7 +206,7 @@ API documents:
         symbol: str,
         limit: int = None,
         fromId: int = None,
-    ) -> Dict[str, Any]:
+    ) -> pd.DataFrame:
         """
         Old Trade Lookup
         Parameters:
@@ -232,7 +236,7 @@ API documents:
         startTime: pd.Timestamp = None,
         endTime: pd.Timestamp = None,
         limit: int = None,
-    ) -> Dict[str, Any]:
+    ) -> pd.DataFrame:
         """
         Compressed/Aggregate Trades List
         Parameters:
@@ -259,6 +263,7 @@ API documents:
                 "endTime": endTime,
                 "limit": limit,
             },
+            column_names=agg_trades_columns,
         )
 
     def get_api_klines(
@@ -269,7 +274,7 @@ API documents:
         endTime: pd.Timestamp = None,
         timeZone: str = None,
         limit: int = None,
-    ) -> Dict[str, Any]:
+    ) -> pd.DataFrame:
         """
         Kline/Candlestick Data
         Parameters:
@@ -310,7 +315,7 @@ API documents:
         endTime: pd.Timestamp = None,
         timeZone: str = None,
         limit: int = None,
-    ) -> Dict[str, Any]:
+    ) -> pd.DataFrame:
         """
         UIKlines
         Parameters:
@@ -346,7 +351,7 @@ API documents:
     def get_api_avg_price(
         self,
         symbol: str,
-    ) -> Dict[str, Any]:
+    ) -> pd.DataFrame:
         """
         Current Average Price
         Parameters:
@@ -363,12 +368,12 @@ API documents:
             },
         )
 
-    def get_api_ticker__24hr(
+    def get_api_ticker_24hr(
         self,
         optionalSymbol: str = None,
         arraySymbols: str = None,
         tickerType: str = None,
-    ) -> Dict[str, Any]:
+    ) -> pd.DataFrame:
         """
                 24hr Ticker Price Change Statistics
                 Parameters:
@@ -398,7 +403,7 @@ API documents:
         arraySymbols: str = None,
         timeZone: str = None,
         tickerType: str = None,
-    ) -> Dict[str, Any]:
+    ) -> pd.DataFrame:
         """
                 Trading Day Ticker
                 Parameters:
@@ -429,7 +434,7 @@ API documents:
         self,
         optionalSymbol: str = None,
         arraySymbols: str = None,
-    ) -> Dict[str, Any]:
+    ) -> pd.DataFrame:
         """
         Symbol Price Ticker
         Parameters:
@@ -453,7 +458,7 @@ API documents:
         self,
         optionalSymbol: str = None,
         arraySymbols: str = None,
-    ) -> Dict[str, Any]:
+    ) -> pd.DataFrame:
         """
         Symbol Order Book Ticker
         Parameters:
@@ -479,7 +484,7 @@ API documents:
         arraySymbols: str = None,
         windowSize: str = None,
         type_: str = None,
-    ) -> Dict[str, Any]:
+    ) -> pd.DataFrame:
         """
                 Rolling window price change statistics
                 Parameters:
@@ -11538,7 +11543,7 @@ API documents:
             },
         )
 
-    def get_sapi_lending_auto_invest_all__asset(
+    def get_sapi_lending_auto_invest_all_asset(
         self,
         timestamp: int,
         signature: str,

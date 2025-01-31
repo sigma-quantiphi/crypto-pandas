@@ -1,6 +1,13 @@
 import pandas as pd
 
-datetime_columns = {"fundingTime", "openTime", "closeTime", "transferDate"}
+datetime_columns = {
+    "fundingTime",
+    "openTime",
+    "closeTime",
+    "transferDate",
+    "time",
+    "timestamp",
+}
 numeric_columns = {
     "fundingRate",
     "markPrice",
@@ -12,6 +19,23 @@ numeric_columns = {
     "quoteAssetVolume",
     "takerBuyBaseAssetVolume",
     "takerBuyQuoteAssetVolume",
+    "price",
+    "qty",
+    "quoteQty",
+    "priceChange",
+    "priceChangePercent",
+    "weightedAvgPrice",
+    "prevClosePrice",
+    "lastPrice",
+    "lastQty",
+    "bidPrice",
+    "bidQty",
+    "askPrice",
+    "askQty",
+    "openPrice",
+    "highPrice",
+    "lowPrice",
+    "quoteVolume",
 }
 
 
@@ -24,10 +48,7 @@ def response_to_dict(data: dict) -> dict:
     return data
 
 
-def response_to_dataframe(data: list, column_names: list = None) -> pd.DataFrame:
-    df = pd.DataFrame(data)
-    if column_names:
-        df.columns = column_names
+def preprocess_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     datetime_columns_to_convert = [x for x in df.columns if x in datetime_columns]
     df[datetime_columns_to_convert] = df[datetime_columns_to_convert].apply(
         pd.to_datetime, unit="ms"
@@ -35,3 +56,19 @@ def response_to_dataframe(data: list, column_names: list = None) -> pd.DataFrame
     numeric_columns_to_convert = [x for x in df.columns if x in numeric_columns]
     df[numeric_columns_to_convert] = df[numeric_columns_to_convert].apply(pd.to_numeric)
     return df
+
+
+def response_to_dataframe(data: list, column_names: list = None) -> pd.DataFrame:
+    df = pd.DataFrame(data)
+    if column_names:
+        df.columns = column_names
+    return preprocess_dataframe(df)
+
+
+def depth_to_dataframe(data: pd.DataFrame) -> pd.DataFrame:
+    asks = pd.DataFrame(data=data["asks"], columns=["price", "qty"])
+    bids = pd.DataFrame(data=data["asks"], columns=["price", "qty"])
+    asks["side"] = "ask"
+    bids["side"] = "bid"
+    data = pd.concat([bids, asks], ignore_index=True)
+    return preprocess_dataframe(data)

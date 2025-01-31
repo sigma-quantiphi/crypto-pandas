@@ -117,9 +117,7 @@ def orderbook_response_to_dataframe(data: dict) -> pd.DataFrame:
 
 
 def market_tickers_response_to_dataframe(data: dict) -> pd.DataFrame:
-    df = pd.json_normalize(
-        data=data["result"], record_path="list", meta=["category"]
-    )
+    df = pd.json_normalize(data=data["result"], record_path="list", meta=["category"])
     return preprocess_dataframe(df)
 
 

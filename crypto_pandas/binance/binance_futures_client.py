@@ -331,7 +331,7 @@ class BinanceFuturesClient(BaseModel):
             },
         )
 
-    def get_fapi_ticker__24hr(
+    def get_fapi_ticker_24hr(
         self,
         symbol: str = None,
     ) -> Dict[str, Any]:

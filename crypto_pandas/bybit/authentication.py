@@ -1,12 +1,12 @@
 import base64
 
 import time
-import hashlib
-import hmac
 
 from Crypto.Hash import SHA256
 from Crypto.PublicKey import RSA
 from Crypto.Signature import PKCS1_v1_5
+
+from crypto_pandas.hmac_authentication import generate_signature
 
 
 def auth(
@@ -27,12 +27,9 @@ def auth(
         signature = SHA256.new(param_str.encode("utf-8"))
         signature = base64.b64encode(
             PKCS1_v1_5.new(RSA.importKey(api_secret)).sign(signature)
-        )
-        signature = signature.decode()
+        ).decode()
     else:
-        signature = hmac.new(
-            bytes(api_secret, "utf-8"), param_str.encode("utf-8"), hashlib.sha256
-        ).hexdigest()
+        signature = generate_signature(api_secret, param_str)
     headers = {
         "X-BAPI-API-KEY": api_key,
         "X-BAPI-SIGN": signature,

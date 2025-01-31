@@ -10,7 +10,8 @@ from crypto_pandas.bybit.bybit_pandas import (
     market_kline_response_to_dataframe,
     market_mark_price_kline_response_to_dataframe,
     account_wallet_balance_response_to_dataframe,
-    orderbook_response_to_dataframe, market_tickers_response_to_dataframe,
+    orderbook_response_to_dataframe,
+    market_tickers_response_to_dataframe,
 )
 
 
@@ -400,7 +401,6 @@ class BybitClient(BaseModel):
         )
         return market_tickers_response_to_dataframe(data)
 
-
     def get_market_funding_history(
         self,
         category: str = None,
@@ -725,6 +725,8 @@ class BybitClient(BaseModel):
             Type: str
         :param orderLinkId: No description.
             Type: str
+        :param category: No description.
+            Type: str
         :param orders: Request body.
             Type: pd.DataFrame.
         :returns: Successful response
@@ -757,7 +759,8 @@ class BybitClient(BaseModel):
         timeInForce: str = None,
         positionIdx: str = None,
         orderLinkId: str = None,
-        body: dict = None,
+        category: str = None,
+        orders: pd.DataFrame = None,
     ) -> Dict[str, Any]:
         """
         amend-batch
@@ -776,8 +779,10 @@ class BybitClient(BaseModel):
             Type: str
         :param orderLinkId: No description.
             Type: str
-        :param body: Request body.
-            Type: dict.
+        :param category: No description.
+            Type: str
+        :param orders: Request body.
+            Type: pd.DataFrame.
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
@@ -793,7 +798,10 @@ class BybitClient(BaseModel):
                 "positionIdx": positionIdx,
                 "orderLinkId": orderLinkId,
             },
-            body=body,
+            body={
+                "category": category,
+                "request": orders.to_dict("records"),
+            },
         )
 
     def post_order_cancel_batch(
@@ -805,7 +813,8 @@ class BybitClient(BaseModel):
         timeInForce: str = None,
         positionIdx: str = None,
         orderLinkId: str = None,
-        body: dict = None,
+        category: str = None,
+        orders: pd.DataFrame = None,
     ) -> Dict[str, Any]:
         """
         cancel-batch
@@ -824,8 +833,10 @@ class BybitClient(BaseModel):
             Type: str
         :param orderLinkId: No description.
             Type: str
-        :param body: Request body.
-            Type: dict.
+        :param category: No description.
+            Type: str
+        :param orders: Request body.
+            Type: pd.DataFrame.
         :returns: Successful response
         :raises: Any exceptions raised by the `requests` library.
         """
@@ -841,7 +852,10 @@ class BybitClient(BaseModel):
                 "positionIdx": positionIdx,
                 "orderLinkId": orderLinkId,
             },
-            body=body,
+            body={
+                "category": category,
+                "request": orders.to_dict("records"),
+            },
         )
 
     def post_order_amend(
