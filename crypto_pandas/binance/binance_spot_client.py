@@ -18,14 +18,15 @@ class BinanceSpotClient:
     """
     A client for interacting with the Binance Spot API.
 
-    :param env: The API env (`prod` or `paper`).
     :param api_key: The API Key for authentication.
     :param secret: The API Key for authentication.
+    :param env: The API env (`prod` or `testnet`).
     """
 
-    env: str = field(repr=False)
     api_key: str = field(repr=False)
     secret: str = field(repr=False)
+    env: str = field(default="testnet")
+    recv_window: int = 5000
 
     @property
     def base_url(self) -> str:
@@ -58,9 +59,12 @@ class BinanceSpotClient:
             "url": f"{self.base_url}{path}",
         }
         if self.api_key:
-            request_args["headers"] = {"Authorization": f"Bearer {self.api_key}"}
+            request_args["headers"] = {"X-MBX-APIKEY": self.api_key}
         if params is not None:
             request_args["params"] = prepare_requests_parameters(params)
+            request_args["params"]["recvWindow"] = self.recv_window
+        else:
+            request_args["params"] = {"recvWindow": self.recv_window}
         if body is not None:
             request_args["json"] = body
         response = requests.request(**request_args)
@@ -7074,21 +7078,15 @@ API documents:
     def get_sapi_v4_sub_account_assets(
         self,
         email: str,
-        timestamp: int,
-        signature: str,
-        recvWindow: int = None,
+        # timestamp: int,
+        # signature: str,
+        # recvWindow: int = None,
     ) -> Dict[str, Any]:
         """
         Query Sub-account Assets (For Master Account)
         Parameters:
         :param email:
             Type: str
-        :param timestamp: UTC timestamp in ms
-            Type: int
-        :param signature: Signature
-            Type: str
-        :param recvWindow: The value cannot be greater than 60000
-            Type: int.
         :returns: Sub account balances
         :raises: Any exceptions raised by the `requests` library.
         """
@@ -7097,9 +7095,9 @@ API documents:
             path="/sapi/v4/sub-account/assets",
             params={
                 "email": email,
-                "timestamp": timestamp,
-                "signature": signature,
-                "recvWindow": recvWindow,
+                # "timestamp": timestamp,
+                # "signature": signature,
+                # "recvWindow": recvWindow,
             },
         )
 
