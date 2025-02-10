@@ -1,6 +1,6 @@
 import pandas as pd
 
-from ccxt_pandas.preprocessing import preprocess_dataframe
+from crypto_pandas.preprocessing import preprocess_dataframe
 
 
 def orders_to_dataframe(data: list) -> pd.DataFrame:

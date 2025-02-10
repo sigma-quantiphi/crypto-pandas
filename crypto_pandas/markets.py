@@ -2,7 +2,11 @@ from typing import Union
 
 import pandas as pd
 
-from ccxt_pandas.preprocessing import preprocess_dataframe, response_to_dataframe
+from crypto_pandas.preprocessing import (
+    response_to_dataframe,
+    preprocess_dataframe,
+    expand_dict_columns,
+)
 
 
 def depth_to_dataframe(data: Union[dict, list]) -> pd.DataFrame:
@@ -30,3 +34,22 @@ def ohlcv_to_dataframe(data: list) -> pd.DataFrame:
         "volume",
     ]
     return response_to_dataframe(data, column_names=column_names)
+
+
+def signed_price(data: pd.DataFrame) -> pd.Series:
+    return (2 * (data["side"] == "asks") - 1) * data["price"]
+
+
+def sort_depth(data: pd.DataFrame, by_exchange: bool = False) -> pd.DataFrame:
+    data["signed_price"] = signed_price(data)
+    sort_columns = ["symbol", "side", "signed_price"]
+    if by_exchange:
+        sort_columns = ["exchange"] + sort_columns
+    return data.sort_values(sort_columns, ignore_index=True)
+
+
+def market_to_dataframe(data: dict) -> pd.DataFrame:
+    data = list(data.values())
+    data = pd.DataFrame(data).drop(columns=["info"])
+    data = expand_dict_columns(data)
+    return preprocess_dataframe(data)

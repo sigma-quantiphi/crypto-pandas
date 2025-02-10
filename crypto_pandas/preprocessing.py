@@ -15,7 +15,9 @@ def expand_dict_columns(data: pd.DataFrame) -> pd.DataFrame:
     columns_list = [data.drop(columns=dict_columns).copy()]
     for dict_column in dict_columns:
         exploded_column = pd.json_normalize(data[dict_column])
-        exploded_column.columns = [f"{dict_column}.{x}" for x in exploded_column.columns]
+        exploded_column.columns = [
+            f"{dict_column}.{x}" for x in exploded_column.columns
+        ]
         columns_list.append(exploded_column.copy())
     return pd.concat(columns_list, axis=1)
 
