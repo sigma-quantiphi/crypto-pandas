@@ -2,9 +2,9 @@ from typing import Union
 
 import pandas as pd
 
-from crypto_pandas.preprocessing import (
+from crypto_pandas.ccxt.preprocessing import (
     response_to_dataframe,
-    preprocess_dataframe,
+    preprocess_dataframe_ccxt,
     expand_dict_columns,
 )
 
@@ -20,8 +20,9 @@ def depth_to_dataframe(data: Union[dict, list]) -> pd.DataFrame:
         )
         df["side"] = x
         dfs.append(df)
-    data = pd.concat(dfs, ignore_index=True).rename(columns={0: "price", 1: "qty"})
-    return preprocess_dataframe(data)
+    if dfs:
+        data = pd.concat(dfs, ignore_index=True).rename(columns={0: "price", 1: "qty"})
+        return preprocess_dataframe_ccxt(data)
 
 
 def ohlcv_to_dataframe(data: list) -> pd.DataFrame:
@@ -52,4 +53,4 @@ def market_to_dataframe(data: dict) -> pd.DataFrame:
     data = list(data.values())
     data = pd.DataFrame(data).drop(columns=["info"])
     data = expand_dict_columns(data)
-    return preprocess_dataframe(data)
+    return preprocess_dataframe_ccxt(data)

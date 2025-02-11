@@ -1,6 +1,6 @@
 import pandas as pd
 
-from crypto_pandas.preprocessing import preprocess_dataframe
+from crypto_pandas.ccxt.preprocessing import preprocess_dataframe_ccxt
 
 
 def orders_to_dataframe(data: list) -> pd.DataFrame:
@@ -38,4 +38,4 @@ def orders_to_dataframe(data: list) -> pd.DataFrame:
     orders = pd.DataFrame(data=data)
     if not trades.empty:
         orders = orders.merge(trades, how="outer")
-    return preprocess_dataframe(orders)
+    return preprocess_dataframe_ccxt(orders)
