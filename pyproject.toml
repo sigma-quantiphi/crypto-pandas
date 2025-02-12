@@ -1,6 +1,6 @@
 [project]
 name = "crypto-pandas"
-version = "0.1.22"
+version = "0.1.24"
 description = "Library to to work with crypto exchanges using Pandas DataFrame."
 authors = [
     {name = "lucas", email = "lucas.jamar@carpentrix.com"}
@@ -11,6 +11,7 @@ requires-python = ">=3.10"
 dependencies = [
     "pandas[performance] (>=2.2.3,<3.0.0)",
     "ccxt (>=4.4.57,<5.0.0)",
+    "grequests (>=0.7.0,<0.8.0)",
 ]
 
 [project.urls]
@@ -19,7 +20,7 @@ repository = "https://github.com/lucasjamar/crypto-pandas"
 documentation = "https://github.com/lucasjamar/crypto-pandas"
 
 [tool.poetry]
-exclude = ["binder/*", "examples/*", "tests/*"]
+exclude = ["binder/*", "examples/*", "tests/*", ".env"]
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

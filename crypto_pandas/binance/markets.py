@@ -1,6 +1,9 @@
 import pandas as pd
-
-from crypto_pandas.binance.preprocessing import response_to_dataframe
+from typing import Union
+from crypto_pandas.binance.preprocessing import (
+    response_to_dataframe,
+    preprocess_dataframe_binance,
+)
 
 klines_column_names = [
     "openTime",
@@ -32,10 +35,17 @@ def klines_to_dataframe(data: list) -> pd.DataFrame:
     return response_to_dataframe(data, column_names=klines_column_names)
 
 
-def depth_to_dataframe(data: dict) -> pd.DataFrame:
-    asks = pd.DataFrame(data=data["asks"], columns=["price", "qty"])
-    bids = pd.DataFrame(data=data["bids"], columns=["price", "qty"])
-    asks["side"] = "ask"
-    bids["side"] = "bid"
-    data = pd.concat([bids, asks], ignore_index=True)
-    return preprocess_dataframe(data)
+def depth_to_dataframe(data: Union[dict, list]) -> pd.DataFrame:
+    dfs = []
+    for x in ["asks", "bids"]:
+        df = pd.json_normalize(
+            data=data,
+            record_path=x,
+            meta=["symbol", "timestamp", "datetime", "nonce", "exchange"],
+            errors="ignore",
+        )
+        df["side"] = x
+        dfs.append(df)
+    if dfs:
+        data = pd.concat(dfs, ignore_index=True).rename(columns={0: "price", 1: "qty"})
+        return preprocess_dataframe_binance(data)
