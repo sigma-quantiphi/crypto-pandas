@@ -1,6 +1,6 @@
 from urllib.parse import urlencode
 import time
-from crypto_pandas.utils.requests import generate_signature
+from crypto_pandas.utils.requests import generate_signature, prepare_requests_parameters
 
 date_time_to_int_keys = {
     "startTime",
@@ -16,29 +16,22 @@ def prepare_requests_parameters_binance(data: dict) -> dict:
     )
 
 
+def encode_params(params: dict, special: bool = False) -> str:
+    if special:
+        return urlencode(params).replace("%40", "@").replace("%27", "%22")
+    else:
+        return urlencode(params, True).replace("%40", "@")
+
+
 def prepare_and_sign_parameters(
     secret: str, params: dict = None, recv_window: int = 5000
-) -> dict:
+) -> str:
     if params:
         params = prepare_requests_parameters_binance(params)
-        params["recvWindow"] = recv_window
     else:
-        params = {"recvWindow": recv_window}
+        params = {}
+    params["recvWindow"] = recv_window
     params["timestamp"] = int(time.time() * 1000)
-    query_string = urlencode(params)
+    query_string = encode_params(params, special=True)
     params["signature"] = generate_signature(secret, query_string)
-    return params
-
-
-def auth_request_binance(
-    api_key: str, secret: str, params: dict = None, recv_window: int = 5000
-) -> dict:
-    params = prepare_and_sign_parameters(
-        secret=secret, params=params, recv_window=recv_window
-    )
-    return {
-        "params": params,
-        "headers": {
-            "X-MBX-APIKEY": api_key,
-        },
-    }
+    return encode_params(params, special=True)

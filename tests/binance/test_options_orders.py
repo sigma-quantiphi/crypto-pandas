@@ -1,3 +1,5 @@
+import time
+
 from dotenv import dotenv_values
 
 from crypto_pandas.binance.options_client import BinanceOptionsClient
@@ -34,8 +36,8 @@ symbols["quantity"] = 0.01
 symbols["price"] = 5
 symbols["timeInForce"] = "GTC"
 
-response = client.send_batch_orders(orders=symbols)
+response = client.post_batch_orders(orders=symbols)
 print(response)
-response = client.cancel_all_orders_by_underlying(underlying=underlying)
+time.sleep(10)
+response = client.delete_all_options_orders_by_underlying(underlying=underlying)
 print(response)
-breakpoint()

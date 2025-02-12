@@ -7,17 +7,6 @@ def timestamp_to_int(timestamp: pd.Timestamp) -> int:
     return int(timestamp.timestamp() * 1000)
 
 
-def prepare_requests_parameters(
-    params: dict,
-    date_time_to_int_keys: set = None,
-) -> dict:
-    params = {k: v for k, v in params.items() if v is not None}
-    for x in date_time_to_int_keys:
-        if x in params:
-            params[x] = timestamp_to_int(params[x])
-    return params
-
-
 def preprocess_dict(
     data: dict, int_datetime_columns: set, str_datetime_columns: set
 ) -> dict:

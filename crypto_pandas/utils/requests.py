@@ -3,6 +3,19 @@ import hashlib
 import hmac
 from urllib.parse import urlencode
 
+from crypto_pandas.utils.utils import timestamp_to_int
+
+
+def prepare_requests_parameters(
+    params: dict,
+    date_time_to_int_keys: set = None,
+) -> dict:
+    params = {k: v for k, v in params.items() if v is not None}
+    for x in date_time_to_int_keys:
+        if x in params:
+            params[x] = timestamp_to_int(params[x])
+    return params
+
 
 def generate_signature(api_secret: str, query_string: str) -> str:
     """Signs request using HMAC-SHA256"""

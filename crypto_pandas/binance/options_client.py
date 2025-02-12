@@ -2,20 +2,24 @@ from dataclasses import dataclass, field
 
 import pandas as pd
 from typing import Any, Dict, Union
+import grequests
+import requests
 
 from pandas import DataFrame
 
-import requests
 from crypto_pandas.binance.preprocessing import (
     preprocess_dataframe_binance,
     response_to_dataframe,
+)
+from crypto_pandas.binance.options import (
+    options_orders_to_dict,
 )
 
 
 @dataclass
 class BinanceOptionsClient:
     """
-    A client for interacting with the Binance Spot API.
+    A client for interacting with the Binance Options API.
 
     :param api_key: The API Key for authentication.
     :param secret: The API secret for authentication.
@@ -26,8 +30,8 @@ class BinanceOptionsClient:
 
     def _request(
         self,
-        method: str,
         path: str,
+        method: str = "GET",
         params: Dict[str, Any] = None,
         requires_auth: bool = False,
     ) -> Union[list, dict]:
@@ -41,17 +45,16 @@ class BinanceOptionsClient:
         :return: The JSON response from the API.
         """
         request_args = {
-            "method": method,
             "url": f"https://eapi.binance.com/{path}",
-            "params": params,
+            "method": method,
         }
         if requires_auth:
-            request_args = {
-                **request_args,
-                **auth_request_binance(
-                    api_key=self.api_key, secret=self.secret, params=params
-                ),
+            request_args["params"] = prepare_and_sign_parameters(secret=self.secret, params=params)
+            request_args["headers"] = {
+                "X-MBX-APIKEY": self.api_key,
             }
+        elif params:
+            request_args["params"] = params
         response = requests.request(**request_args)
         response.raise_for_status()
         try:
@@ -75,7 +78,6 @@ class BinanceOptionsClient:
         :raises: Any exceptions raised by the `requests` library.
         """
         data = self._request(
-            method="GET",
             path="eapi/v1/exchangeInfo",
         )
         data = pd.json_normalize(
@@ -94,7 +96,6 @@ class BinanceOptionsClient:
         :raises: Any exceptions raised by the `requests` library.
         """
         data = self._request(
-            method="GET",
             path="eapi/v1/mark",
         )
         return response_to_dataframe(data)
@@ -107,12 +108,35 @@ class BinanceOptionsClient:
         :raises: Any exceptions raised by the `requests` library.
         """
         orders = {"orders": options_orders_to_dict(orders)}
-        breakpoint()
         return self._request(
-            method="POST", path="eapi/v1/batchOrders", params=orders, requires_auth=True
+            path="eapi/v1/batchOrders", method="POST", params=orders, requires_auth=True
         )
 
-    def delete_all_orders_by_underlying(self, underlying: str) -> Dict[str, Any]:
+    def delete_multiple_options_orders(
+        self, symbol: str, orderIds: list = None, clientOrderIds: list = None
+    ) -> Dict[str, Any]:
+        """
+        Delete all orders by underlying.
+        :param symbol: Underlying asset of orders.
+        :param orderIds: orderIds.
+        :param clientOrderIds: clientOrderIds.
+        :returns: OK
+        :raises: Any exceptions raised by the `requests` library.
+        """
+        return self._request(
+            path="eapi/v1/batchOrders",
+            method="DELETE",
+            params={
+                "symbol": symbol,
+                "orderIds": orderIds,
+                "clientOrderIds": clientOrderIds,
+            },
+            requires_auth=True,
+        )
+
+    def delete_all_options_orders_by_underlying(
+        self, underlying: str
+    ) -> Dict[str, Any]:
         """
         Delete all orders by underlying.
         :param underlying: Underlying asset of orders.
@@ -120,8 +144,22 @@ class BinanceOptionsClient:
         :raises: Any exceptions raised by the `requests` library.
         """
         return self._request(
-            method="DELETE",
             path="eapi/v1/allOpenOrdersByUnderlying",
+            method="DELETE",
             params={"underlying": underlying},
+            requires_auth=True,
+        )
+
+    def delete_all_options_orders_on_symbol(self, symbol: str) -> Dict[str, Any]:
+        """
+        Delete all orders by underlying.
+        :param symbol: Option trading pair, e.g BTC-200730-9000-C
+        :returns: OK
+        :raises: Any exceptions raised by the `requests` library.
+        """
+        return self._request(
+            path="eapi/v1/allOpenOrders",
+            method="DELETE",
+            params={"symbol": symbol},
             requires_auth=True,
         )
