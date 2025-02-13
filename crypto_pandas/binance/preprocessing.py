@@ -2,71 +2,87 @@ import pandas as pd
 from crypto_pandas.utils.pandas_utils import preprocess_dataframe
 
 int_datetime_columns = {
+    "closeTime",
+    "expirationTimestamp",
+    "expiryDate",
     "fundingTime",
     "openTime",
-    "closeTime",
-    "transferDate",
     "time",
     "timestamp",
+    "transferDate",
     "updateTime",
     "workingTime",
-    "expiryDate",
-    "expirationTimestamp",
 }
 date_time_to_int_keys = {
-    "startTime",
-    "endTime",
     "beginTime",
+    "endTime",
+    "startTime",
     "subscriptionStartTime",
 }
 numeric_columns = {
-    "fundingRate",
-    "markPrice",
-    "open",
-    "high",
-    "low",
-    "close",
-    "volume",
-    "quoteAssetVolume",
-    "takerBuyBaseAssetVolume",
-    "takerBuyQuoteAssetVolume",
-    "price",
-    "qty",
-    "quoteQty",
-    "priceChange",
-    "priceChangePercent",
-    "weightedAvgPrice",
-    "prevClosePrice",
-    "lastPrice",
-    "lastQty",
-    "bidPrice",
-    "bidQty",
+    "askIV",
     "askPrice",
     "askQty",
-    "openPrice",
-    "highPrice",
-    "lowPrice",
-    "quoteVolume",
-    "freeze",
-    "withdrawing",
-    "free",
-    "locked",
-    "markPrice",
     "bidIV",
-    "askIV",
-    "markIV",
+    "bidPrice",
+    "bidQty",
+    "breakEvenPrice",
+    "close",
     "delta",
-    "theta",
+    "entryPrice",
+    "free",
+    "freeze",
+    "fundingRate",
     "gamma",
-    "vega",
+    "high",
+    "highPrice",
     "highPriceLimit",
-    "lowPriceLimit",
-    "riskFreeInterest",
-    "strikePrice",
-    "realStrikePrice",
     "indexPrice",
+    "isolatedMargin",
+    "lastPrice",
+    "lastQty",
+    "leverage",
+    "locked",
+    "low",
+    "lowPrice",
+    "lowPriceLimit",
+    "markIV",
+    "markPrice",
+    "markValue",
+    "maxQty",
+    "notionalValue",
+    "open",
+    "openPrice",
+    "positionAmt",
+    "positionCost",
+    "prevClosePrice",
+    "price",
+    "priceChange",
+    "priceChangePercent",
+    "qty",
+    "quantity",
+    "quoteAssetVolume",
+    "quoteQty",
+    "quoteVolume",
+    "realStrikePrice",
+    "reducibleQty",
+    "riskFreeInterest",
+    "ror",
+    "strikePrice",
     "sumOpenInterest",
     "sumOpenInterestUsd",
+    "takerBuyBaseAssetVolume",
+    "takerBuyQuoteAssetVolume",
+    "theta",
+    "unRealizedProfit",
+    "unrealizedPNL",
+    "vega",
+    "volume",
+    "weightedAvgPrice",
+    "withdrawing",
+}
+str_bool_columns = {
+    "isAutoAddMargin",
 }
 
 
@@ -76,7 +92,10 @@ def preprocess_dict_binance(data: dict) -> dict:
 
 def preprocess_dataframe_binance(data: pd.DataFrame) -> pd.DataFrame:
     return preprocess_dataframe(
-        data, int_datetime_columns=int_datetime_columns, numeric_columns=numeric_columns
+        data,
+        int_datetime_columns=int_datetime_columns,
+        numeric_columns=numeric_columns,
+        str_bool_columns=str_bool_columns,
     )
 
 
@@ -84,4 +103,13 @@ def response_to_dataframe(data: list, column_names: list = None) -> pd.DataFrame
     data = pd.DataFrame(data)
     if column_names:
         data.columns = column_names
+    return preprocess_dataframe_binance(data)
+
+
+def exchange_info_to_dataframe(data: list, record_path: str = "optionSymbols") -> pd.DataFrame:
+    data = pd.json_normalize(
+        data=data,
+        record_path=record_path,
+        meta=["timezone", "serverTime", "rateLimits"],
+    )
     return preprocess_dataframe_binance(data)

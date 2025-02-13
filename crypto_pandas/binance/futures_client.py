@@ -9,11 +9,11 @@ from pandas import DataFrame
 
 from crypto_pandas.binance.preprocessing import (
     preprocess_dict_binance,
+    preprocess_dataframe_binance,
     response_to_dataframe,
-    exchange_info_to_dataframe,
 )
-from crypto_pandas.binance.orders import (
-    orders_to_dict,
+from crypto_pandas.binance.options import (
+    options_orders_to_dict,
 )
 from crypto_pandas.binance.requests import (
     prepare_and_sign_parameters,
@@ -21,7 +21,7 @@ from crypto_pandas.binance.requests import (
 
 
 @dataclass
-class BinanceOptionsClient:
+class BinanceFuturesClient:
     """
     A client for interacting with the Binance Options API.
 
@@ -49,7 +49,7 @@ class BinanceOptionsClient:
         :return: The JSON response from the API.
         """
         request_args = {
-            "url": f"https://eapi.binance.com/{path}",
+            "url": f"https://fapi.binance.com/{path}",
             "method": method,
         }
         if requires_auth:
@@ -87,7 +87,7 @@ class BinanceOptionsClient:
         :raises: Any exceptions raised by the `requests` library.
         """
         data = self._request(
-            path="eapi/v1/exerciseHistory",
+            path="fapi/v1/exerciseHistory",
             params={
                 "symbol": symbol,
             },
@@ -103,9 +103,14 @@ class BinanceOptionsClient:
         :raises: Any exceptions raised by the `requests` library.
         """
         data = self._request(
-            path="eapi/v1/exchangeInfo",
+            path="fapi/v1/exchangeInfo",
         )
-        return exchange_info_to_dataframe(data, record_path="optionSymbols")
+        data = pd.json_normalize(
+            data=data,
+            record_path=["optionSymbols"],
+            meta=["timezone", "serverTime", "rateLimits"],
+        )
+        return preprocess_dataframe_binance(data)
 
     def get_historical_exercise_records(
         self,
@@ -128,7 +133,7 @@ class BinanceOptionsClient:
         :raises: Any exceptions raised by the `requests` library.
         """
         data = self._request(
-            path="eapi/v1/exerciseHistory",
+            path="fapi/v1/exerciseHistory",
             params={
                 "underlying": underlying,
                 "startTime": startTime,
@@ -152,7 +157,7 @@ class BinanceOptionsClient:
         :raises: Any exceptions raised by the `requests` library.
         """
         data = self._request(
-            path="eapi/v1/expiration",
+            path="fapi/v1/expiration",
             params={
                 "underlying": underlying,
                 "expiration": expiration,
@@ -174,7 +179,7 @@ class BinanceOptionsClient:
         :raises: Any exceptions raised by the `requests` library.
         """
         data = self._request(
-            path="eapi/v1/openInterest",
+            path="fapi/v1/openInterest",
             params={
                 "symbol": symbol,
                 "limit": limit,
@@ -196,7 +201,7 @@ class BinanceOptionsClient:
         :raises: Any exceptions raised by the `requests` library.
         """
         data = self._request(
-            path="eapi/v1/blockTrades",
+            path="fapi/v1/blockTrades",
             params={
                 "symbol": symbol,
                 "limit": limit,
@@ -216,7 +221,7 @@ class BinanceOptionsClient:
         :raises: Any exceptions raised by the `requests` library.
         """
         data = self._request(
-            path="eapi/v1/index",
+            path="fapi/v1/index",
             params={
                 "underlying": underlying,
             },
@@ -243,7 +248,7 @@ class BinanceOptionsClient:
         :raises: Any exceptions raised by the `requests` library.
         """
         data = self._request(
-            path="eapi/v1/klines",
+            path="fapi/v1/klines",
             params={
                 "symbol": symbol,
                 "interval": interval,
@@ -270,7 +275,7 @@ class BinanceOptionsClient:
         :raises: Any exceptions raised by the `requests` library.
         """
         data = self._request(
-            path="eapi/v1/historicalTrades",
+            path="fapi/v1/historicalTrades",
             params={
                 "symbol": symbol,
                 "fromId": fromId,
@@ -289,7 +294,7 @@ class BinanceOptionsClient:
         :raises: Any exceptions raised by the `requests` library.
         """
         data = self._request(
-            path="eapi/v1/mark",
+            path="fapi/v1/mark",
         )
         return response_to_dataframe(data)
 
@@ -303,7 +308,7 @@ class BinanceOptionsClient:
         :raises: Any exceptions raised by the `requests` library.
         """
         data = self._request(
-            path="eapi/v1/account",
+            path="fapi/v1/account",
             requires_auth=True,
         )
         return response_to_dataframe(data)
@@ -328,7 +333,7 @@ class BinanceOptionsClient:
         :raises: Any exceptions raised by the `requests` library.
         """
         data = self._request(
-            path="eapi/v1/bill",
+            path="fapi/v1/bill",
             params={
                 "currency": currency,
                 "recordId": recordId,
@@ -350,7 +355,7 @@ class BinanceOptionsClient:
         :raises: Any exceptions raised by the `requests` library.
         """
         data = self._request(
-            path="eapi/v1/income/asyn/id",
+            path="fapi/v1/income/asyn/id",
             params={"downloadId": downloadId},
             requires_auth=True,
         )
@@ -386,7 +391,7 @@ class BinanceOptionsClient:
         :raises: Any exceptions raised by the `requests` library.
         """
         return self._request(
-            path="eapi/v1/order",
+            path="fapi/v1/order",
             method="POST",
             params={
                 "symbol": symbol,
@@ -411,9 +416,9 @@ class BinanceOptionsClient:
         :returns: OK
         :raises: Any exceptions raised by the `requests` library.
         """
-        orders = {"orders": orders_to_dict(orders)}
+        orders = {"orders": options_orders_to_dict(orders)}
         data = self._request(
-            path="eapi/v1/batchOrders", method="POST", params=orders, requires_auth=True
+            path="fapi/v1/batchOrders", method="POST", params=orders, requires_auth=True
         )
         return response_to_dataframe(data)
 
@@ -429,7 +434,7 @@ class BinanceOptionsClient:
         :raises: Any exceptions raised by the `requests` library.
         """
         return self._request(
-            path="eapi/v1/batchOrders",
+            path="fapi/v1/batchOrders",
             method="DELETE",
             params={
                 "symbol": symbol,
@@ -451,7 +456,7 @@ class BinanceOptionsClient:
         :raises: Any exceptions raised by the `requests` library.
         """
         return self._request(
-            path="eapi/v1/batchOrders",
+            path="fapi/v1/batchOrders",
             method="DELETE",
             params={
                 "symbol": symbol,
@@ -471,7 +476,7 @@ class BinanceOptionsClient:
         :raises: Any exceptions raised by the `requests` library.
         """
         return self._request(
-            path="eapi/v1/allOpenOrdersByUnderlying",
+            path="fapi/v1/allOpenOrdersByUnderlying",
             method="DELETE",
             params={"underlying": underlying},
             requires_auth=True,
@@ -485,7 +490,7 @@ class BinanceOptionsClient:
         :raises: Any exceptions raised by the `requests` library.
         """
         return self._request(
-            path="eapi/v1/allOpenOrders",
+            path="fapi/v1/allOpenOrders",
             method="DELETE",
             params={"symbol": symbol},
             requires_auth=True,
@@ -512,7 +517,7 @@ class BinanceOptionsClient:
         :raises: Any exceptions raised by the `requests` library.
         """
         data = self._request(
-            path="eapi/v1/order",
+            path="fapi/v1/order",
             params={
                 "symbol": symbol,
                 "orderId": orderId,
@@ -544,7 +549,7 @@ class BinanceOptionsClient:
         :raises: Any exceptions raised by the `requests` library.
         """
         data = self._request(
-            path="eapi/v1/historyOrders",
+            path="fapi/v1/historyOrders",
             params={
                 "symbol": symbol,
                 "orderId": orderId,
@@ -576,7 +581,7 @@ class BinanceOptionsClient:
         :raises: Any exceptions raised by the `requests` library.
         """
         data = self._request(
-            path="eapi/v1/openOrders",
+            path="fapi/v1/openOrders",
             params={
                 "symbol": symbol,
                 "orderId": orderId,
@@ -596,7 +601,7 @@ class BinanceOptionsClient:
         :raises: Any exceptions raised by the `requests` library.
         """
         data = self._request(
-            path="eapi/v1/position",
+            path="fapi/v3/positionRisk",
             params={"symbol": symbol},
             requires_auth=True,
         )

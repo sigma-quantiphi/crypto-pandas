@@ -20,7 +20,7 @@ def encode_params(params: dict, special: bool = False) -> str:
     if special:
         return urlencode(params).replace("%40", "@").replace("%27", "%22")
     else:
-        return urlencode(params, True).replace("%40", "@")
+        return urlencode(params, doseq=True).replace("%40", "@")
 
 
 def prepare_and_sign_parameters(

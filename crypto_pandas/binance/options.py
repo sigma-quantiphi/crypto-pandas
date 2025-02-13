@@ -13,25 +13,3 @@ def get_options_orderbooks(symbols: list[str]) -> pd.DataFrame:
     data = grequests.map(rs)
     data = [{**x.json(), "symbol": symbol} for x, symbol in zip(data, symbols)]
     return depth_to_dataframe(data)
-
-
-possible_options_columns = [
-    "symbol",
-    "side",
-    "quantity",
-    "price",
-    "timeInForce",
-    "reduceOnly",
-    "postOnly",
-    "newOrderRespType",
-    "clientOrderId",
-    "isMmp",
-]
-
-
-def options_orders_to_dict(orders: pd.DataFrame) -> list:
-    columns = [x for x in possible_options_columns if x in orders.columns]
-    data = orders[columns].copy()
-    data["type"] = "LIMIT"
-    data[["quantity", "price"]] = data[["quantity", "price"]].astype(str)
-    return data.to_dict("records")
