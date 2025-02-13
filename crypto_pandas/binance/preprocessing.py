@@ -11,6 +11,7 @@ int_datetime_columns = {
     "updateTime",
     "workingTime",
     "expiryDate",
+    "expirationTimestamp",
 }
 date_time_to_int_keys = {
     "startTime",
@@ -62,6 +63,10 @@ numeric_columns = {
     "lowPriceLimit",
     "riskFreeInterest",
     "strikePrice",
+    "realStrikePrice",
+    "indexPrice",
+    "sumOpenInterest",
+    "sumOpenInterestUsd",
 }
 
 
