@@ -15,7 +15,9 @@ from crypto_pandas.binance.preprocessing import (
 from crypto_pandas.binance.options import (
     options_orders_to_dict,
 )
-
+from crypto_pandas.binance.requests import (
+    prepare_and_sign_parameters,
+)
 
 @dataclass
 class BinanceOptionsClient:
@@ -590,7 +592,7 @@ class BinanceOptionsClient:
         )
         return response_to_dataframe(data)
 
-    def get_position(self, symbol: str) -> DataFrame:
+    def get_position(self, symbol: Union[str, list] = None) -> DataFrame:
         """
         Get current position information.
         :param symbol: Option trading pair, e.g BTC-200730-9000-C
