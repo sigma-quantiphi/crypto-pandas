@@ -19,6 +19,7 @@ from crypto_pandas.binance.requests import (
     prepare_and_sign_parameters,
 )
 
+
 @dataclass
 class BinanceOptionsClient:
     """
