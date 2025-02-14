@@ -20,7 +20,7 @@ possible_order_columns = mandatory_order_columns + [
 
 
 def orders_to_dict(
-    orders: pd.DataFrame, quantity_tick_size: int = 2, price_tick_size: int = 3
+    orders: pd.DataFrame, quantity_tick_size: int = 2, price_tick_size: int = 2
 ) -> list:
     columns = orders.columns
     check_missing_element(mandatory_order_columns, columns)

@@ -42,7 +42,8 @@ def create_buy_and_sell_orders(
     orders: pd.DataFrame, sides: tuple = ("BUY", "SELL")
 ) -> pd.DataFrame:
     dfs = []
+    data = orders.copy()
     for side in sides:
-        orders["side"] = side
-        dfs.append(orders.copy())
+        data["side"] = side
+        dfs.append(data.copy())
     return pd.concat(dfs)

@@ -475,7 +475,7 @@ class BinanceOptionsClient:
             params={"underlying": underlying},
             requires_auth=True,
         )
-        return response_to_dataframe(data)
+        return data
 
     def delete_all_options_orders_on_symbol(self, symbol: str) -> DataFrame:
         """
