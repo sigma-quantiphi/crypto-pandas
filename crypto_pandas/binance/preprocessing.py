@@ -3,10 +3,14 @@ from crypto_pandas.utils.pandas_utils import preprocess_dataframe
 
 int_datetime_columns = {
     "closeTime",
+    "createTime",
+    "deliveryDate",
     "expirationTimestamp",
     "expiryDate",
     "fundingTime",
+    "nextFundingTime",
     "openTime",
+    "serverTime",
     "time",
     "timestamp",
     "transferDate",
@@ -23,6 +27,7 @@ numeric_columns = {
     "askIV",
     "askPrice",
     "askQty",
+    "avgPrice",
     "bidIV",
     "bidPrice",
     "bidQty",
@@ -30,6 +35,8 @@ numeric_columns = {
     "close",
     "delta",
     "entryPrice",
+    "estimatedSettlePrice",
+    "executedQty",
     "free",
     "freeze",
     "fundingRate",
@@ -38,7 +45,9 @@ numeric_columns = {
     "highPrice",
     "highPriceLimit",
     "indexPrice",
+    "interestRate",
     "isolatedMargin",
+    "lastFundingRate",
     "lastPrice",
     "lastQty",
     "leverage",
@@ -106,10 +115,16 @@ def response_to_dataframe(data: list, column_names: list = None) -> pd.DataFrame
     return preprocess_dataframe_binance(data)
 
 
-def exchange_info_to_dataframe(data: list, record_path: str = "optionSymbols") -> pd.DataFrame:
-    data = pd.json_normalize(
+def exchange_info_to_dataframe(
+    data: list, record_path: str = "symbols"
+) -> pd.DataFrame:
+    meta = ["timezone", "serverTime", "rateLimits"]
+    if record_path == "symbols":
+        meta.append("exchangeFilters")
+    df = pd.json_normalize(
         data=data,
         record_path=record_path,
-        meta=["timezone", "serverTime", "rateLimits"],
+        meta=meta,
     )
-    return preprocess_dataframe_binance(data)
+    df.columns = [x.replace(f"{record_path}.", "") for x in df.columns]
+    return preprocess_dataframe_binance(df)

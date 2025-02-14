@@ -441,7 +441,7 @@ class BinanceOptionsClient:
 
     def delete_multiple_options_orders(
         self, symbol: str, orderIds: list = None, clientOrderIds: list = None
-    ) -> Dict[str, Any]:
+    ) -> DataFrame:
         """
         Delete all orders by underlying.
         :param symbol: Underlying asset of orders.
@@ -450,7 +450,7 @@ class BinanceOptionsClient:
         :returns: OK
         :raises: Any exceptions raised by the `requests` library.
         """
-        return self._request(
+        data = self._request(
             path="eapi/v1/batchOrders",
             method="DELETE",
             params={
@@ -460,36 +460,37 @@ class BinanceOptionsClient:
             },
             requires_auth=True,
         )
+        return response_to_dataframe(data)
 
-    def delete_all_options_orders_by_underlying(
-        self, underlying: str
-    ) -> Dict[str, Any]:
+    def delete_all_options_orders_by_underlying(self, underlying: str) -> DataFrame:
         """
         Delete all orders by underlying.
         :param underlying: Underlying asset of orders.
         :returns: OK
         :raises: Any exceptions raised by the `requests` library.
         """
-        return self._request(
+        data = self._request(
             path="eapi/v1/allOpenOrdersByUnderlying",
             method="DELETE",
             params={"underlying": underlying},
             requires_auth=True,
         )
+        return response_to_dataframe(data)
 
-    def delete_all_options_orders_on_symbol(self, symbol: str) -> Dict[str, Any]:
+    def delete_all_options_orders_on_symbol(self, symbol: str) -> DataFrame:
         """
         Delete all orders by underlying.
         :param symbol: Option trading pair, e.g BTC-200730-9000-C
         :returns: OK
         :raises: Any exceptions raised by the `requests` library.
         """
-        return self._request(
+        data = self._request(
             path="eapi/v1/allOpenOrders",
             method="DELETE",
             params={"symbol": symbol},
             requires_auth=True,
         )
+        return response_to_dataframe(data)
 
     def get_single_order(
         self,

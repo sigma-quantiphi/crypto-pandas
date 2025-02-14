@@ -7,7 +7,9 @@ def check_missing_element(required: list, values: list) -> None:
         raise ValueError(f"Missing: {missing_values}")
 
 
-def check_str_or_list_in_list(parameters: Union[str, list[str]], possible_values: set) -> None:
+def check_str_or_list_in_list(
+    parameters: Union[str, list[str]], possible_values: set
+) -> None:
     if isinstance(parameters, str):
         parameters = list(parameters)
     wrong_parameters = [item for item in parameters if not item in possible_values]
@@ -15,7 +17,9 @@ def check_str_or_list_in_list(parameters: Union[str, list[str]], possible_values
         raise ValueError(f"{wrong_parameters} are not one {possible_values}")
 
 
-def check_number_in_range(parameters: Union[str, list[str]], possible_values: set) -> None:
+def check_number_in_range(
+    parameters: Union[str, list[str]], possible_values: set
+) -> None:
     if isinstance(parameters, str):
         parameters = list(parameters)
     wrong_parameters = [item for item in parameters if not item in possible_values]

@@ -1,4 +1,5 @@
 from functools import wraps
+from typing import Any
 
 import pandas as pd
 
@@ -80,6 +81,7 @@ def load_date_range_chunks(
 
 
 def expand_dict_columns(data: pd.DataFrame) -> pd.DataFrame:
+    data = data.reset_index(drop=True)
     dict_columns = [
         x for x in data.columns if all(data[x].apply(lambda y: isinstance(y, dict)))
     ]
@@ -91,3 +93,10 @@ def expand_dict_columns(data: pd.DataFrame) -> pd.DataFrame:
         ]
         columns_list.append(exploded_column.copy())
     return pd.concat(columns_list, axis=1)
+
+
+def print_markdown(message: Any) -> None:
+    if isinstance(message, pd.DataFrame):
+        print(message.to_markdown(index=False))
+    else:
+        print(message)
