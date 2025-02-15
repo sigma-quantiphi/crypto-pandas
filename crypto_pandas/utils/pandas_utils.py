@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 
@@ -47,3 +48,11 @@ def create_buy_and_sell_orders(
         data["side"] = side
         dfs.append(data.copy())
     return pd.concat(dfs)
+
+
+def floor_series(data: pd.Series, digits: int = 0) -> pd.Series:
+    return np.floor(data * 10**digits) / 10**digits
+
+
+def ceil_series(data: pd.Series, digits: int = 0) -> pd.Series:
+    return np.ceil(data * 10**digits) / 10**digits

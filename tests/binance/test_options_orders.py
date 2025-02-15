@@ -2,7 +2,7 @@ import time
 
 from dotenv import dotenv_values
 
-from crypto_pandas.binance.options_client import BinanceOptionsClient
+from crypto_pandas.binance.options.options_client import BinanceOptionsClient
 
 config = dotenv_values(".env")
 underlying = "BTCUSDT"

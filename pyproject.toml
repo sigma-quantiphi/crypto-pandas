@@ -1,6 +1,6 @@
 [project]
 name = "crypto-pandas"
-version = "0.1.35"
+version = "0.1.38"
 description = "Library to to work with crypto exchanges using Pandas DataFrame."
 authors = [
     {name = "Lucas Jamar", email = "lucas.jamar@carpentrix.com"}
@@ -9,7 +9,7 @@ license = "Apache-2.0"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "pandas[performance, tabulate] (>=2.2.3,<3.0.0)",
+    "pandas[output-formatting, performance] (>=2.2.3,<3.0.0)",
     "ccxt (>=4.4.57,<5.0.0)",
     "grequests (>=0.7.0,<0.8.0)",
 ]

@@ -8,13 +8,17 @@ def timestamp_to_int(timestamp: pd.Timestamp) -> int:
     return int(timestamp.timestamp() * 1000)
 
 
+def date_time_column_to_int(data: pd.Series) -> int:
+    return (data.astype(int) / 1e6).astype(int)
+
+
 def preprocess_dict(
-    data: dict, int_datetime_columns: set, str_datetime_columns: set
+    data: dict, int_datetime_columns: set = None, str_datetime_columns: set = None
 ) -> dict:
     for key, value in data.items():
-        if key in int_datetime_columns:
+        if int_datetime_columns and (key in int_datetime_columns):
             data[key] = pd.Timestamp(value, unit="ms")
-        elif key in str_datetime_columns:
+        elif str_datetime_columns and (key in str_datetime_columns):
             data[key] = pd.Timestamp(value)
     return data
 
@@ -95,8 +99,24 @@ def expand_dict_columns(data: pd.DataFrame) -> pd.DataFrame:
     return pd.concat(columns_list, axis=1)
 
 
+def now() -> pd.Timestamp:
+    return pd.Timestamp.now(tz="UTC")
+
+
 def print_markdown(message: Any) -> None:
     if isinstance(message, pd.DataFrame):
         print(message.to_markdown(index=False))
     else:
         print(message)
+
+
+def time_logger(func):
+    def wrapper(*args, **kwargs):
+        start_time = now()
+        result = func(*args, **kwargs)
+        end_time = now()
+        elapsed_time = end_time - start_time
+        print(f"{end_time}: Function {func.__name__} executed in {elapsed_time}.")
+        return result
+
+    return wrapper

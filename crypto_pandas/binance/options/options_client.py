@@ -13,7 +13,7 @@ from crypto_pandas.binance.preprocessing import (
     exchange_info_to_dataframe,
 )
 from crypto_pandas.binance.orders import (
-    orders_to_dict,
+    options_orders_to_dict,
 )
 from crypto_pandas.binance.requests import (
     prepare_and_sign_parameters,
@@ -29,8 +29,8 @@ class BinanceOptionsClient:
     :param secret: The API secret for authentication.
     """
 
-    api_key: str = field(repr=False)
-    secret: str = field(repr=False)
+    api_key: str = field(default=None, repr=False)
+    secret: str = field(default=None, repr=False)
 
     def _request(
         self,
@@ -38,7 +38,8 @@ class BinanceOptionsClient:
         method: str = "GET",
         params: Dict[str, Any] = None,
         requires_auth: bool = False,
-    ) -> Union[list, dict]:
+        return_json: bool = True,
+    ) -> Union[list, dict, requests.Response]:
         """
         Internal method to make API requests.
 
@@ -46,6 +47,7 @@ class BinanceOptionsClient:
         :param path: Path of the API endpoint.
         :param params: Query parameters for the request.
         :param requires_auth: If the endpoint requires authentication.
+        :param return_json: If to return JSON or raw response
         :return: The JSON response from the API.
         """
         request_args = {
@@ -64,8 +66,9 @@ class BinanceOptionsClient:
         response = requests.request(**request_args)
         response.raise_for_status()
         try:
-            data = response.json()
-            return data
+            if return_json:
+                response = response.json()
+            return response
         except requests.exceptions.HTTPError as errh:
             print("Http Error:", errh)
         except requests.exceptions.ConnectionError as errc:
@@ -74,6 +77,21 @@ class BinanceOptionsClient:
             print("Timeout Error:", errt)
         except requests.exceptions.RequestException as err:
             print("Something Else:", err)
+
+    def get_server_time(
+        self,
+    ) -> dict:
+        """
+        Test connectivity to the Rest API and get the current server time.
+
+        :returns: OK
+        :raises: Any exceptions raised by the `requests` library.
+        """
+        data = self._request(path="eapi/v1/time", return_json=False)
+        used_weight_1m = int(data.headers.get("x-mbx-used-weight-1m"))
+        data = data.json()
+        data["usedWeight1m"] = used_weight_1m
+        return preprocess_dict_binance(data)
 
     def get_24hr_ticker_price_change_statistics(
         self,
@@ -411,9 +429,11 @@ class BinanceOptionsClient:
         :returns: OK
         :raises: Any exceptions raised by the `requests` library.
         """
-        orders = {"orders": orders_to_dict(orders)}
         data = self._request(
-            path="eapi/v1/batchOrders", method="POST", params=orders, requires_auth=True
+            path="eapi/v1/batchOrders",
+            method="POST",
+            params={"orders": options_orders_to_dict(orders)},
+            requires_auth=True,
         )
         return response_to_dataframe(data)
 
@@ -462,7 +482,7 @@ class BinanceOptionsClient:
         )
         return response_to_dataframe(data)
 
-    def delete_all_options_orders_by_underlying(self, underlying: str) -> DataFrame:
+    def delete_all_options_orders_by_underlying(self, underlying: str) -> dict:
         """
         Delete all orders by underlying.
         :param underlying: Underlying asset of orders.
@@ -477,7 +497,7 @@ class BinanceOptionsClient:
         )
         return data
 
-    def delete_all_options_orders_on_symbol(self, symbol: str) -> DataFrame:
+    def delete_all_options_orders_on_symbol(self, symbol: str) -> dict:
         """
         Delete all orders by underlying.
         :param symbol: Option trading pair, e.g BTC-200730-9000-C
@@ -490,7 +510,7 @@ class BinanceOptionsClient:
             params={"symbol": symbol},
             requires_auth=True,
         )
-        return response_to_dataframe(data)
+        return data
 
     def get_single_order(
         self,

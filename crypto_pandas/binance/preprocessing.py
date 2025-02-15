@@ -1,4 +1,5 @@
 import pandas as pd
+from crypto_pandas.utils.utils import preprocess_dict
 from crypto_pandas.utils.pandas_utils import preprocess_dataframe
 
 int_datetime_columns = {
@@ -101,7 +102,7 @@ def preprocess_dict_binance(data: dict) -> dict:
 
 def preprocess_dataframe_binance(data: pd.DataFrame) -> pd.DataFrame:
     return preprocess_dataframe(
-        data,
+        data=data,
         int_datetime_columns=int_datetime_columns,
         numeric_columns=numeric_columns,
         str_bool_columns=str_bool_columns,
