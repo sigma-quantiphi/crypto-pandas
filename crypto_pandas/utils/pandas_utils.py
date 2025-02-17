@@ -2,6 +2,10 @@ import numpy as np
 import pandas as pd
 
 
+def date_time_column_to_int(data: pd.Series) -> int:
+    return (data.astype(int) / 1e6).astype(int)
+
+
 def preprocess_dataframe(
     data: pd.DataFrame,
     int_datetime_columns: set = None,

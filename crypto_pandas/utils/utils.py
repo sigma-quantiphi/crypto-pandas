@@ -1,4 +1,5 @@
 from functools import wraps
+from itertools import pairwise
 from typing import Any
 
 import pandas as pd
@@ -8,31 +9,20 @@ def timestamp_to_int(timestamp: pd.Timestamp) -> int:
     return int(timestamp.timestamp() * 1000)
 
 
-def date_time_column_to_int(data: pd.Series) -> int:
-    return (data.astype(int) / 1e6).astype(int)
-
-
 def preprocess_dict(
-    data: dict, int_datetime_columns: set = None, str_datetime_columns: set = None
+    data: dict,
+    int_datetime_columns: set = None,
+    str_datetime_columns: set = None,
+    str_float_columns: set = None,
 ) -> dict:
     for key, value in data.items():
         if int_datetime_columns and (key in int_datetime_columns):
             data[key] = pd.Timestamp(value, unit="ms")
         elif str_datetime_columns and (key in str_datetime_columns):
             data[key] = pd.Timestamp(value)
+        elif str_float_columns and (key in str_float_columns):
+            data[key] = float(value)
     return data
-
-
-def calculate_end_date(
-    start_date: pd.Timestamp,
-    limit: int = 1000,
-    timeframe: str = "1h",
-    add_one_timeframe: bool = False,
-) -> pd.Timestamp:
-    if add_one_timeframe:
-        limit += 1
-    end_date = start_date + limit * pd.Timedelta(timeframe)
-    return end_date
 
 
 def calculate_intervals(
@@ -41,47 +31,6 @@ def calculate_intervals(
     timeframe: str = "1h",
 ) -> int:
     return int((end_date - start_date) / pd.Timedelta(timeframe))
-
-
-def load_date_range_chunks(
-    append: bool = True,
-    from_time_key: str = "from_time",
-    to_time_key: str = "to_time",
-    timeframe_key: str = "timeframe",
-):
-
-    def date_range_wrapper(func):
-
-        @wraps(func)
-        def wrapper(*args, **kwargs):
-            start_time = kwargs[from_time_key]
-            to_time = kwargs[to_time_key]
-            limit = kwargs.get("limit", 1000)
-            kwargs.pop(from_time_key)
-            kwargs.pop(to_time_key)
-            results = []
-            while start_time < to_time:
-                end_time = calculate_end_date(
-                    start_date=start_time,
-                    limit=limit,
-                    timeframe=kwargs[timeframe_key],
-                )
-                end_time = min(end_time, to_time)
-                kwargs["since"] = timestamp_to_int(start_time)
-                kwargs["limit"] = calculate_intervals(
-                    start_time, end_time, kwargs[timeframe_key]
-                )
-                result = func(*args, **kwargs)
-                if append:
-                    results.append(result)
-                else:
-                    results += result
-                start_time = end_time
-            return results
-
-        return wrapper
-
-    return date_range_wrapper
 
 
 def expand_dict_columns(data: pd.DataFrame) -> pd.DataFrame:

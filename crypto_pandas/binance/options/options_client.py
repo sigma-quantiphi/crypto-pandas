@@ -5,12 +5,13 @@ from typing import Any, Dict, Union
 import grequests
 import requests
 
-from pandas import DataFrame
-
 from crypto_pandas.binance.preprocessing import (
     preprocess_dict_binance,
-    response_to_dataframe,
+    response_to_dataframe_binance,
+)
+from crypto_pandas.binance.markets import (
     exchange_info_to_dataframe,
+    depth_to_dataframe,
 )
 from crypto_pandas.binance.orders import (
     options_orders_to_dict,
@@ -38,7 +39,6 @@ class BinanceOptionsClient:
         method: str = "GET",
         params: Dict[str, Any] = None,
         requires_auth: bool = False,
-        return_json: bool = True,
     ) -> Union[list, dict, requests.Response]:
         """
         Internal method to make API requests.
@@ -47,10 +47,9 @@ class BinanceOptionsClient:
         :param path: Path of the API endpoint.
         :param params: Query parameters for the request.
         :param requires_auth: If the endpoint requires authentication.
-        :param return_json: If to return JSON or raw response
         :return: The JSON response from the API.
         """
-        request_args = {
+        request_args: Dict[str, Any] = {
             "url": f"https://eapi.binance.com/{path}",
             "method": method,
         }
@@ -64,19 +63,12 @@ class BinanceOptionsClient:
         elif params:
             request_args["params"] = params
         response = requests.request(**request_args)
-        response.raise_for_status()
-        try:
-            if return_json:
-                response = response.json()
-            return response
-        except requests.exceptions.HTTPError as errh:
-            print("Http Error:", errh)
-        except requests.exceptions.ConnectionError as errc:
-            print("Error Connecting:", errc)
-        except requests.exceptions.Timeout as errt:
-            print("Timeout Error:", errt)
-        except requests.exceptions.RequestException as err:
-            print("Something Else:", err)
+        if response.status_code == 200:
+            if "x-mbx-used-weight-1m" in response.headers:
+                self.used_weight_1m = int(response.headers.get("x-mbx-used-weight-1m"))
+            return response.json()
+        else:
+            response.raise_for_status()
 
     def get_server_time(
         self,
@@ -87,16 +79,13 @@ class BinanceOptionsClient:
         :returns: OK
         :raises: Any exceptions raised by the `requests` library.
         """
-        data = self._request(path="eapi/v1/time", return_json=False)
-        used_weight_1m = int(data.headers.get("x-mbx-used-weight-1m"))
-        data = data.json()
-        data["usedWeight1m"] = used_weight_1m
+        data = self._request(path="eapi/v1/time")
         return preprocess_dict_binance(data)
 
     def get_24hr_ticker_price_change_statistics(
         self,
-        symbol: str,
-    ) -> DataFrame:
+        symbol: str = None,
+    ) -> pd.DataFrame:
         """
         24-hour rolling window price change statistics.
 
@@ -105,16 +94,16 @@ class BinanceOptionsClient:
         :raises: Any exceptions raised by the `requests` library.
         """
         data = self._request(
-            path="eapi/v1/exerciseHistory",
+            path="eapi/v1/ticker",
             params={
                 "symbol": symbol,
             },
         )
-        return response_to_dataframe(data)
+        return response_to_dataframe_binance(data)
 
     def get_exchange_info(
         self,
-    ) -> DataFrame:
+    ) -> pd.DataFrame:
         """
         Get exchange info.
         :returns: OK
@@ -131,7 +120,7 @@ class BinanceOptionsClient:
         startTime: pd.Timestamp = None,
         endTime: pd.Timestamp = None,
         limit: int = None,
-    ) -> DataFrame:
+    ) -> pd.DataFrame:
         """
         Get historical exercise records.
 
@@ -154,35 +143,59 @@ class BinanceOptionsClient:
                 "limit": limit,
             },
         )
-        return response_to_dataframe(data)
+        return response_to_dataframe_binance(data)
 
     def get_open_interest(
         self,
-        underlying: str,
-        expiration: str,
-    ) -> DataFrame:
+        underlyingAsset: str,
+        expiration: Union[str, pd.Timestamp],
+    ) -> pd.DataFrame:
         """
         Get recent market trades
 
-        :param underlying: underlying asset, e.g ETH/BTC
+        :param underlyingAsset: underlying asset, e.g ETH/BTC
         :param expiration: expiration date, e.g 221225
         :returns: OK
         :raises: Any exceptions raised by the `requests` library.
         """
+        if not isinstance(expiration, str):
+            expiration = expiration.strftime("%y%m%d")
         data = self._request(
-            path="eapi/v1/expiration",
+            path="eapi/v1/openInterest",
             params={
-                "underlying": underlying,
+                "underlyingAsset": underlyingAsset,
                 "expiration": expiration,
             },
         )
-        return response_to_dataframe(data)
+        return response_to_dataframe_binance(data)
+
+    def get_order_book(
+        self,
+        symbol: str,
+        limit: int = None,
+    ) -> pd.DataFrame:
+        """
+        Check orderbook depth on specific symbol
+
+        :param symbol: Option trading pair, e.g BTC-200730-9000-C
+        :param limit: Default:100 Max:1000.Optional value:[10, 20, 50, 100, 500, 1000]
+        :returns: OK
+        :raises: Any exceptions raised by the `requests` library.
+        """
+        data = self._request(
+            path="eapi/v1/depth",
+            params={
+                "symbol": symbol,
+                "limit": limit,
+            },
+        )
+        return depth_to_dataframe(data)
 
     def get_recent_trades_list(
         self,
-        symbol: str = None,
+        symbol: str,
         limit: int = None,
-    ) -> DataFrame:
+    ) -> pd.DataFrame:
         """
         Get recent market trades
 
@@ -192,19 +205,19 @@ class BinanceOptionsClient:
         :raises: Any exceptions raised by the `requests` library.
         """
         data = self._request(
-            path="eapi/v1/openInterest",
+            path="eapi/v1/trades",
             params={
                 "symbol": symbol,
                 "limit": limit,
             },
         )
-        return response_to_dataframe(data)
+        return response_to_dataframe_binance(data)
 
     def get_recent_block_trades(
         self,
         symbol: str = None,
         limit: int = None,
-    ) -> DataFrame:
+    ) -> pd.DataFrame:
         """
         Get recent block trades
 
@@ -220,7 +233,7 @@ class BinanceOptionsClient:
                 "limit": limit,
             },
         )
-        return response_to_dataframe(data)
+        return response_to_dataframe_binance(data)
 
     def get_symbol_price_ticker(
         self,
@@ -243,12 +256,12 @@ class BinanceOptionsClient:
 
     def get_klines(
         self,
-        symbol: str = None,
-        interval: str = None,
+        symbol: str,
+        interval: str,
         startTime: pd.Timestamp = None,
         endTime: pd.Timestamp = None,
         limit: int = None,
-    ) -> DataFrame:
+    ) -> pd.DataFrame:
         """
         Kline/candlestick bars for an option symbol. Klines are uniquely identified by their open time.
 
@@ -270,14 +283,14 @@ class BinanceOptionsClient:
                 "limit": limit,
             },
         )
-        return response_to_dataframe(data)
+        return response_to_dataframe_binance(data)
 
     def get_historical_trades(
         self,
         symbol: str = None,
         fromId: str = None,
         limit: int = 500,
-    ) -> DataFrame:
+    ) -> pd.DataFrame:
         """
         Get older market historical trades.
 
@@ -295,25 +308,21 @@ class BinanceOptionsClient:
                 "limit": limit,
             },
         )
-        return response_to_dataframe(data)
+        return response_to_dataframe_binance(data)
 
-    def get_mark(
-        self,
-    ) -> DataFrame:
+    def get_mark(self, symbol: str = None) -> pd.DataFrame:
         """
         Get mark data.
 
         :returns: OK
         :raises: Any exceptions raised by the `requests` library.
         """
-        data = self._request(
-            path="eapi/v1/mark",
-        )
-        return response_to_dataframe(data)
+        data = self._request(path="eapi/v1/mark", params={"symbol": symbol})
+        return response_to_dataframe_binance(data)
 
     def get_account_info(
         self,
-    ) -> DataFrame:
+    ) -> dict:
         """
         Get current account information.
 
@@ -324,7 +333,9 @@ class BinanceOptionsClient:
             path="eapi/v1/account",
             requires_auth=True,
         )
-        return response_to_dataframe(data)
+        data["asset"] = response_to_dataframe_binance(data["asset"])
+        data["greek"] = response_to_dataframe_binance(data["greek"])
+        return preprocess_dict_binance(data)
 
     def get_account_funding_flow(
         self,
@@ -332,8 +343,8 @@ class BinanceOptionsClient:
         recordId: int = None,
         startTime: pd.Timestamp = None,
         endTime: pd.Timestamp = None,
-        limit: int = 1000,
-    ) -> DataFrame:
+        limit: int = None,
+    ) -> pd.DataFrame:
         """
         Query account funding flows.
 
@@ -356,7 +367,29 @@ class BinanceOptionsClient:
             },
             requires_auth=True,
         )
-        return response_to_dataframe(data)
+        return response_to_dataframe_binance(data)
+
+    def get_download_id_for_option_transaction_history(
+        self,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
+    ) -> dict:
+        """
+        Get download id for option transaction history
+        :param startTime: Start Time
+        :param endTime: End Time
+        :returns: OK
+        :raises: Any exceptions raised by the `requests` library.
+        """
+        data = self._request(
+            path="eapi/v1/income/asyn",
+            params={
+                "startTime": startTime,
+                "endTime": endTime,
+            },
+            requires_auth=True,
+        )
+        return preprocess_dict_binance(data)
 
     def get_option_transaction_history_download_link_by_id(
         self, downloadId: str
@@ -388,7 +421,7 @@ class BinanceOptionsClient:
         isMmp: str = None,
     ) -> Dict[str, Any]:
         """
-        Test Connectivity.
+        Send a new order.
         :param symbol: Option trading pair, e.g BTC-200730-9000-C
         :param side: direction: SELL, BUY
         :param quantity: Order Quantity
@@ -422,9 +455,9 @@ class BinanceOptionsClient:
             requires_auth=True,
         )
 
-    def post_batch_orders(self, orders: pd.DataFrame) -> DataFrame:
+    def post_batch_orders(self, orders: pd.DataFrame) -> pd.DataFrame:
         """
-        Test Connectivity.
+        Send multiple option orders.
         :param orders: Pandas DataFrame of orders.
         :returns: OK
         :raises: Any exceptions raised by the `requests` library.
@@ -435,21 +468,21 @@ class BinanceOptionsClient:
             params={"orders": options_orders_to_dict(orders)},
             requires_auth=True,
         )
-        return response_to_dataframe(data)
+        return response_to_dataframe_binance(data)
 
     def delete_options_order(
         self, symbol: str, orderId: list = None, clientOrderId: list = None
     ) -> Dict[str, Any]:
         """
-        Delete all orders by underlying.
+        Cancel an active order.
         :param symbol: Underlying asset of orders.
         :param orderId: orderIds.
         :param clientOrderId: clientOrderIds.
         :returns: OK
         :raises: Any exceptions raised by the `requests` library.
         """
-        return self._request(
-            path="eapi/v1/batchOrders",
+        data = self._request(
+            path="eapi/v1/order",
             method="DELETE",
             params={
                 "symbol": symbol,
@@ -458,10 +491,11 @@ class BinanceOptionsClient:
             },
             requires_auth=True,
         )
+        return preprocess_dict_binance(data)
 
     def delete_multiple_options_orders(
         self, symbol: str, orderIds: list = None, clientOrderIds: list = None
-    ) -> DataFrame:
+    ) -> pd.DataFrame:
         """
         Delete all orders by underlying.
         :param symbol: Underlying asset of orders.
@@ -480,7 +514,7 @@ class BinanceOptionsClient:
             },
             requires_auth=True,
         )
-        return response_to_dataframe(data)
+        return response_to_dataframe_binance(data)
 
     def delete_all_options_orders_by_underlying(self, underlying: str) -> dict:
         """
@@ -517,7 +551,7 @@ class BinanceOptionsClient:
         symbol: str = None,
         orderId: str = None,
         limit: int = None,
-    ) -> DataFrame:
+    ) -> pd.DataFrame:
         """
         Check an order status.
 
@@ -543,16 +577,16 @@ class BinanceOptionsClient:
             },
             requires_auth=True,
         )
-        return response_to_dataframe(data)
+        return response_to_dataframe_binance(data)
 
     def get_option_order_history(
         self,
-        symbol: str = None,
+        symbol: str,
         orderId: str = None,
         startTime: pd.Timestamp = None,
         endTime: pd.Timestamp = None,
         limit: int = None,
-    ) -> DataFrame:
+    ) -> pd.DataFrame:
         """
         Query all finished orders within 5 days, finished status: CANCELLED FILLED REJECTED.
 
@@ -575,7 +609,7 @@ class BinanceOptionsClient:
             },
             requires_auth=True,
         )
-        return response_to_dataframe(data)
+        return response_to_dataframe_binance(data)
 
     def get_current_open_option_orders(
         self,
@@ -584,10 +618,9 @@ class BinanceOptionsClient:
         startTime: pd.Timestamp = None,
         endTime: pd.Timestamp = None,
         limit: int = None,
-    ) -> DataFrame:
+    ) -> pd.DataFrame:
         """
         Query current all open orders, status: ACCEPTED PARTIALLY_FILLED.
-
         :param symbol: Option trading pair, e.g BTC-200730-9000-C
         :param orderId: Returns the orderId and subsequent orders, the most recent order is returned by default.
         :param startTime: Start Time
@@ -607,9 +640,9 @@ class BinanceOptionsClient:
             },
             requires_auth=True,
         )
-        return response_to_dataframe(data)
+        return response_to_dataframe_binance(data)
 
-    def get_position(self, symbol: Union[str, list] = None) -> DataFrame:
+    def get_position(self, symbol: Union[str, list] = None) -> pd.DataFrame:
         """
         Get current position information.
         :param symbol: Option trading pair, e.g BTC-200730-9000-C
@@ -621,4 +654,63 @@ class BinanceOptionsClient:
             params={"symbol": symbol},
             requires_auth=True,
         )
-        return response_to_dataframe(data)
+        return response_to_dataframe_binance(data)
+
+    def get_exercise_record(
+        self,
+        symbol: str = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
+        limit: int = None,
+    ) -> pd.DataFrame:
+        """
+        Get account exercise records.
+        :param symbol: Option trading pair, e.g BTC-200730-9000-C
+        :param startTime: Start Time
+        :param endTime: End Time
+        :param limit: Number of result sets returned Default:100 Max:1000
+        :returns: OK
+        :raises: Any exceptions raised by the `requests` library.
+        """
+        data = self._request(
+            path="eapi/v1/exerciseRecord",
+            params={
+                "symbol": symbol,
+                "startTime": startTime,
+                "endTime": endTime,
+                "limit": limit,
+            },
+            requires_auth=True,
+        )
+        return response_to_dataframe_binance(data)
+
+    def get_account_trade_list(
+        self,
+        symbol: str = None,
+        fromId: str = None,
+        startTime: pd.Timestamp = None,
+        endTime: pd.Timestamp = None,
+        limit: int = None,
+    ) -> pd.DataFrame:
+        """
+        Get trades for a specific account and symbol.
+        :param symbol: Option trading pair, e.g BTC-200730-9000-C
+        :param fromId: Trade id to fetch from. Default gets most recent trades, e.g 4611875134427365376
+        :param startTime: Start Time
+        :param endTime: End Time
+        :param limit: Default:100 Max:1000
+        :returns: OK
+        :raises: Any exceptions raised by the `requests` library.
+        """
+        data = self._request(
+            path="eapi/v1/userTrades",
+            params={
+                "symbol": symbol,
+                "fromId": fromId,
+                "startTime": startTime,
+                "endTime": endTime,
+                "limit": limit,
+            },
+            requires_auth=True,
+        )
+        return response_to_dataframe_binance(data)

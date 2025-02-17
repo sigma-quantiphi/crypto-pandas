@@ -1,6 +1,6 @@
 import pandas as pd
-from crypto_pandas.utils.utils import date_time_column_to_int
-from crypto_pandas.utils.errors import check_missing_element
+from crypto_pandas.utils.pandas_utils import date_time_column_to_int
+from crypto_pandas.utils.checks import check_missing_element
 
 mandatory_options_columns = [
     "symbol",

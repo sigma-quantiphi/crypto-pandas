@@ -28,7 +28,7 @@ def preprocess_dataframe_ccxt(df: pd.DataFrame) -> pd.DataFrame:
     return expand_dict_columns(df.drop(columns=["info"], errors="ignore"))
 
 
-def response_to_dataframe(data: list, column_names: list = None) -> pd.DataFrame:
+def response_to_dataframe_ccxt(data: list, column_names: list = None) -> pd.DataFrame:
     df = pd.DataFrame(data)
     if column_names:
         df.columns = column_names

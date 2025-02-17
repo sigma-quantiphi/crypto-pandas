@@ -16,7 +16,7 @@ def prepare_requests_parameters_binance(data: dict) -> dict:
     )
 
 
-def encode_params(params: dict, special: bool = False) -> str:
+def _encode_params(params: dict, special: bool = False) -> str:
     if special:
         return urlencode(params).replace("%40", "@").replace("%27", "%22")
     else:
@@ -32,6 +32,6 @@ def prepare_and_sign_parameters(
         params = {}
     params["recvWindow"] = recv_window
     params["timestamp"] = int(time.time() * 1000)
-    query_string = encode_params(params, special=True)
+    query_string = _encode_params(params, special=True)
     params["signature"] = generate_signature(secret, query_string)
-    return encode_params(params, special=True)
+    return _encode_params(params, special=True)

@@ -10,7 +10,7 @@ from pandas import DataFrame
 from crypto_pandas.binance.preprocessing import (
     preprocess_dict_binance,
     preprocess_dataframe_binance,
-    response_to_dataframe,
+    response_to_dataframe_binance,
 )
 from crypto_pandas.binance.options import (
     options_orders_to_dict,
@@ -92,7 +92,7 @@ class BinanceFuturesClient:
                 "symbol": symbol,
             },
         )
-        return response_to_dataframe(data)
+        return response_to_dataframe_binance(data)
 
     def get_exchange_info(
         self,
@@ -141,7 +141,7 @@ class BinanceFuturesClient:
                 "limit": limit,
             },
         )
-        return response_to_dataframe(data)
+        return response_to_dataframe_binance(data)
 
     def get_open_interest(
         self,
@@ -163,7 +163,7 @@ class BinanceFuturesClient:
                 "expiration": expiration,
             },
         )
-        return response_to_dataframe(data)
+        return response_to_dataframe_binance(data)
 
     def get_recent_trades_list(
         self,
@@ -185,7 +185,7 @@ class BinanceFuturesClient:
                 "limit": limit,
             },
         )
-        return response_to_dataframe(data)
+        return response_to_dataframe_binance(data)
 
     def get_recent_block_trades(
         self,
@@ -207,7 +207,7 @@ class BinanceFuturesClient:
                 "limit": limit,
             },
         )
-        return response_to_dataframe(data)
+        return response_to_dataframe_binance(data)
 
     def get_symbol_price_ticker(
         self,
@@ -257,7 +257,7 @@ class BinanceFuturesClient:
                 "limit": limit,
             },
         )
-        return response_to_dataframe(data)
+        return response_to_dataframe_binance(data)
 
     def get_historical_trades(
         self,
@@ -282,7 +282,7 @@ class BinanceFuturesClient:
                 "limit": limit,
             },
         )
-        return response_to_dataframe(data)
+        return response_to_dataframe_binance(data)
 
     def get_mark(
         self,
@@ -296,7 +296,7 @@ class BinanceFuturesClient:
         data = self._request(
             path="fapi/v1/mark",
         )
-        return response_to_dataframe(data)
+        return response_to_dataframe_binance(data)
 
     def get_account_info(
         self,
@@ -311,7 +311,7 @@ class BinanceFuturesClient:
             path="fapi/v1/account",
             requires_auth=True,
         )
-        return response_to_dataframe(data)
+        return response_to_dataframe_binance(data)
 
     def get_account_funding_flow(
         self,
@@ -343,7 +343,7 @@ class BinanceFuturesClient:
             },
             requires_auth=True,
         )
-        return response_to_dataframe(data)
+        return response_to_dataframe_binance(data)
 
     def get_option_transaction_history_download_link_by_id(
         self, downloadId: str
@@ -420,7 +420,7 @@ class BinanceFuturesClient:
         data = self._request(
             path="fapi/v1/batchOrders", method="POST", params=orders, requires_auth=True
         )
-        return response_to_dataframe(data)
+        return response_to_dataframe_binance(data)
 
     def delete_options_order(
         self, symbol: str, orderId: list = None, clientOrderId: list = None
@@ -527,7 +527,7 @@ class BinanceFuturesClient:
             },
             requires_auth=True,
         )
-        return response_to_dataframe(data)
+        return response_to_dataframe_binance(data)
 
     def get_option_order_history(
         self,
@@ -559,7 +559,7 @@ class BinanceFuturesClient:
             },
             requires_auth=True,
         )
-        return response_to_dataframe(data)
+        return response_to_dataframe_binance(data)
 
     def get_current_open_option_orders(
         self,
@@ -591,7 +591,7 @@ class BinanceFuturesClient:
             },
             requires_auth=True,
         )
-        return response_to_dataframe(data)
+        return response_to_dataframe_binance(data)
 
     def get_position(self, symbol: Union[str, list] = None) -> DataFrame:
         """
@@ -605,4 +605,4 @@ class BinanceFuturesClient:
             params={"symbol": symbol},
             requires_auth=True,
         )
-        return response_to_dataframe(data)
+        return response_to_dataframe_binance(data)

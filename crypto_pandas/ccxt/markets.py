@@ -3,7 +3,7 @@ from typing import Union
 import pandas as pd
 
 from crypto_pandas.ccxt.preprocessing import (
-    response_to_dataframe,
+    response_to_dataframe_ccxt,
     preprocess_dataframe_ccxt,
     expand_dict_columns,
 )
@@ -34,7 +34,7 @@ def ohlcv_to_dataframe(data: list) -> pd.DataFrame:
         "close",
         "volume",
     ]
-    return response_to_dataframe(data, column_names=column_names)
+    return response_to_dataframe_ccxt(data, column_names=column_names)
 
 
 def signed_price(data: pd.DataFrame) -> pd.Series:

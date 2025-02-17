@@ -4,6 +4,7 @@ from crypto_pandas.utils.pandas_utils import preprocess_dataframe
 
 int_datetime_columns = {
     "closeTime",
+    "createDate",
     "createTime",
     "deliveryDate",
     "expirationTimestamp",
@@ -25,9 +26,12 @@ date_time_to_int_keys = {
     "subscriptionStartTime",
 }
 numeric_columns = {
+    "amount",
     "askIV",
     "askPrice",
     "askQty",
+    "available",
+    "avgCostTimestampOfLast30d",
     "avgPrice",
     "bidIV",
     "bidPrice",
@@ -38,6 +42,8 @@ numeric_columns = {
     "entryPrice",
     "estimatedSettlePrice",
     "executedQty",
+    "exercisePrice",
+    "equity",
     "free",
     "freeze",
     "fundingRate",
@@ -97,7 +103,11 @@ str_bool_columns = {
 
 
 def preprocess_dict_binance(data: dict) -> dict:
-    return preprocess_dict(data, int_datetime_columns=int_datetime_columns)
+    return preprocess_dict(
+        data=data,
+        int_datetime_columns=int_datetime_columns,
+        str_float_columns=numeric_columns,
+    )
 
 
 def preprocess_dataframe_binance(data: pd.DataFrame) -> pd.DataFrame:
@@ -109,23 +119,8 @@ def preprocess_dataframe_binance(data: pd.DataFrame) -> pd.DataFrame:
     )
 
 
-def response_to_dataframe(data: list, column_names: list = None) -> pd.DataFrame:
-    data = pd.DataFrame(data)
+def response_to_dataframe_binance(data: list, column_names: list = None) -> pd.DataFrame:
+    data = pd.DataFrame(data=data)
     if column_names:
         data.columns = column_names
-    return preprocess_dataframe_binance(data)
-
-
-def exchange_info_to_dataframe(
-    data: list, record_path: str = "symbols"
-) -> pd.DataFrame:
-    meta = ["timezone", "serverTime", "rateLimits"]
-    if record_path == "symbols":
-        meta.append("exchangeFilters")
-    df = pd.json_normalize(
-        data=data,
-        record_path=record_path,
-        meta=meta,
-    )
-    df.columns = [x.replace(f"{record_path}.", "") for x in df.columns]
-    return preprocess_dataframe_binance(df)
+    return preprocess_dataframe_binance(data=data)
