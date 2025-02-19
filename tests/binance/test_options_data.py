@@ -1,12 +1,11 @@
 import pandas as pd
 from dotenv import dotenv_values
-from pendulum import tomorrow
 
 from crypto_pandas.binance.options.options_client import BinanceOptionsClient
 
 today = pd.Timestamp.now()
 tomorrow = today.ceil("1d")
-config = dotenv_values(".env")
+config = dotenv_values("../../.env")
 client = BinanceOptionsClient(
     api_key=config["BINANCE_KEY"], secret=config["BINANCE_SECRET"]
 )

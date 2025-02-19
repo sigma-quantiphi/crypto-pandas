@@ -20,7 +20,8 @@ repository = "https://github.com/lucasjamar/crypto-pandas"
 documentation = "https://github.com/lucasjamar/crypto-pandas"
 
 [tool.poetry]
-exclude = ["binder/*", "examples/*", "tests/*", ".env"]
+include = ["dist/crypto_pandas", "dist/pyarmor_runtime_000000"]
+exclude = ["binder/*", "crypto_pandas/*", "examples/*", "tests/*", ".env"]
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
