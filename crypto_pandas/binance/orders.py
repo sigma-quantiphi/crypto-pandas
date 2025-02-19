@@ -36,13 +36,13 @@ possible_futures_columns = [
 ]
 
 
-def orders_to_dict(
+def prepare_orders(
     orders: pd.DataFrame,
     mandatory_columns: list,
     possible_columns: list,
     quantity_tick_size: int = 2,
     price_tick_size: int = 3,
-) -> list:
+) -> pd.DataFrame:
     columns = orders.columns
     check_missing_element(mandatory_columns, columns)
     columns = [x for x in possible_columns if x in columns]
@@ -56,7 +56,24 @@ def orders_to_dict(
         data["reduceOnly"] = data["reduceOnly"].replace({True: "true", False: "false"})
     if "postOnly" in columns:
         data["postOnly"] = data["postOnly"].replace({True: "true", False: "false"})
-    return data.to_dict("records")
+    return orders
+
+
+def orders_to_dict(
+    orders: pd.DataFrame,
+    mandatory_columns: list,
+    possible_columns: list,
+    quantity_tick_size: int = 2,
+    price_tick_size: int = 3,
+) -> list:
+    orders = prepare_orders(
+        orders=orders,
+        mandatory_columns=mandatory_columns,
+        possible_columns=possible_columns,
+        quantity_tick_size=quantity_tick_size,
+        price_tick_size=price_tick_size,
+    )
+    return orders.to_dict("records")
 
 
 def options_orders_to_dict(orders: pd.DataFrame) -> list:

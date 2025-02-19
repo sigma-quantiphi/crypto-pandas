@@ -119,7 +119,9 @@ def preprocess_dataframe_binance(data: pd.DataFrame) -> pd.DataFrame:
     )
 
 
-def response_to_dataframe_binance(data: list, column_names: list = None) -> pd.DataFrame:
+def response_to_dataframe_binance(
+    data: list, column_names: list = None
+) -> pd.DataFrame:
     data = pd.DataFrame(data=data)
     if column_names:
         data.columns = column_names

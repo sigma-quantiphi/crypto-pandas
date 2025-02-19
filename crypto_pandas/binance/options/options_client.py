@@ -339,7 +339,7 @@ class BinanceOptionsClient:
 
     def get_account_funding_flow(
         self,
-        currency: str = None,
+        currency: str = "USDT",
         recordId: int = None,
         startTime: pd.Timestamp = None,
         endTime: pd.Timestamp = None,
