@@ -4,7 +4,7 @@ from dotenv import dotenv_values
 
 from crypto_pandas.binance.options.options_client import BinanceOptionsClient
 
-config = dotenv_values(".env")
+config = dotenv_values("../../.env")
 underlying = "BTCUSDT"
 client = BinanceOptionsClient(
     api_key=config["BINANCE_KEY"], secret=config["BINANCE_SECRET"]
@@ -34,6 +34,7 @@ symbols = symbols[["symbol"]]
 symbols["side"] = "BUY"
 symbols["quantity"] = 0.01
 symbols["price"] = 5
+symbols["type"] = "LIMIT"
 symbols["timeInForce"] = "GTC"
 
 response = client.post_batch_orders(orders=symbols)

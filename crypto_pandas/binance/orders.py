@@ -1,24 +1,34 @@
 import pandas as pd
 from crypto_pandas.utils.pandas_utils import date_time_column_to_int
-from crypto_pandas.utils.checks import check_missing_element
+from crypto_pandas.utils.checks import (
+    check_missing_column,
+    check_order_types,
+    check_sides,
+)
 
-mandatory_options_columns = [
+# Mandatory and possible columns for options and futures
+mandatory_options_columns = {
     "symbol",
     "side",
     "type",
     "quantity",
     "price",
-]
-possible_options_columns = mandatory_options_columns + [
+}
+possible_options_columns = mandatory_options_columns | {
     "timeInForce",
     "reduceOnly",
     "postOnly",
     "newOrderRespType",
     "clientOrderId",
     "isMmp",
-]
-mandatory_futures_columns = ["symbol", "side", "type", "quantity"]
-possible_futures_columns = [
+}
+mandatory_futures_columns = {
+    "symbol",
+    "side",
+    "type",
+    "quantity",
+}
+possible_futures_columns = mandatory_futures_columns | {
     "positionSide",
     "timeInForce",
     "reduceOnly",
@@ -33,64 +43,60 @@ possible_futures_columns = [
     "priceMatch",
     "selfTradePreventionMode",
     "goodTillDate",
-]
+}
+
+# Allowed values for order parameters
+allowed_sides = {"BUY", "SELL"}
+allowed_options_types = {"LIMIT"}
+allowed_futures_types = {
+    "LIMIT",
+    "MARKET",
+    "STOP_LOSS",
+    "STOP_LOSS_LIMIT",
+    "TAKE_PROFIT",
+    "TAKE_PROFIT_LIMIT",
+    "LIMIT_MAKER",
+}
+allowed_options_time_in_force = {"GTC", "IOC", "FOK"}
+allowed_futures_time_in_force = allowed_options_time_in_force | {"GTD"}
+allowed_options_new_order_resp_type = {"ACK", "RESULT"}
 
 
-def prepare_orders(
+def orders_to_dict(
     orders: pd.DataFrame,
-    mandatory_columns: list,
-    possible_columns: list,
-    quantity_tick_size: int = 2,
-    price_tick_size: int = 3,
-) -> pd.DataFrame:
-    columns = orders.columns
-    check_missing_element(mandatory_columns, columns)
-    columns = [x for x in possible_columns if x in columns]
-    data = orders[columns].copy()
-    data["quantity"] = data["quantity"].apply(lambda x: f"{x:.{quantity_tick_size}f}")
+) -> list:
+    check_sides(orders["side"])
+    data["quantity"] = data.apply(
+        lambda x: format_value(x["quantity"], x["stepSize"]), axis=1
+    )
     if "price" in columns:
-        data["price"] = data["price"].apply(lambda x: f"{x:.{price_tick_size}f}")
+        data["price"] = data.apply(
+            lambda x: format_value(x["price"], x["tickSize"]), axis=1
+        )
     if "goodTillDate" in columns:
         data["goodTillDate"] = date_time_column_to_int(data["goodTillDate"])
     if "reduceOnly" in columns:
         data["reduceOnly"] = data["reduceOnly"].replace({True: "true", False: "false"})
     if "postOnly" in columns:
         data["postOnly"] = data["postOnly"].replace({True: "true", False: "false"})
-    return orders
-
-
-def orders_to_dict(
-    orders: pd.DataFrame,
-    mandatory_columns: list,
-    possible_columns: list,
-    quantity_tick_size: int = 2,
-    price_tick_size: int = 3,
-) -> list:
-    orders = prepare_orders(
-        orders=orders,
-        mandatory_columns=mandatory_columns,
-        possible_columns=possible_columns,
-        quantity_tick_size=quantity_tick_size,
-        price_tick_size=price_tick_size,
-    )
     return orders.to_dict("records")
 
 
 def options_orders_to_dict(orders: pd.DataFrame) -> list:
+    check_missing_column(mandatory_options_columns, orders.columns)
+    check_order_types(orders["type"], allowed_options_types)
+    check_order_types(orders["timeInForce"], allowed_options_time_in_force)
+    columns = [x for x in possible_options_columns if x in orders.columns]
     return orders_to_dict(
-        orders=orders,
-        mandatory_columns=mandatory_options_columns,
-        possible_columns=possible_options_columns,
-        quantity_tick_size=2,
-        price_tick_size=3,
+        orders=orders[columns].copy(),
     )
 
 
 def futures_orders_to_dict(orders: pd.DataFrame) -> list:
+    check_missing_column(mandatory_futures_columns, orders.columns)
+    check_order_types(orders["type"], allowed_futures_types)
+    check_order_types(orders["timeInForce"], allowed_futures_time_in_force)
+    columns = [x for x in possible_futures_columns if x in orders.columns]
     return orders_to_dict(
-        orders=orders,
-        mandatory_columns=mandatory_futures_columns,
-        possible_columns=possible_futures_columns,
-        quantity_tick_size=2,
-        price_tick_size=3,
+        orders=orders[columns].copy(),
     )

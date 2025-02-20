@@ -10,8 +10,8 @@ from crypto_pandas.binance.preprocessing import (
     response_to_dataframe_binance,
 )
 from crypto_pandas.binance.markets import (
-    exchange_info_to_dataframe,
-    depth_to_dataframe,
+    exchange_info_to_dataframe_binance,
+    depth_to_dataframe_binance,
 )
 from crypto_pandas.binance.orders import (
     options_orders_to_dict,
@@ -112,7 +112,7 @@ class BinanceOptionsClient:
         data = self._request(
             path="eapi/v1/exchangeInfo",
         )
-        return exchange_info_to_dataframe(data, record_path="optionSymbols")
+        return exchange_info_to_dataframe_binance(data, record_path="optionSymbols")
 
     def get_historical_exercise_records(
         self,
@@ -189,7 +189,7 @@ class BinanceOptionsClient:
                 "limit": limit,
             },
         )
-        return depth_to_dataframe(data)
+        return depth_to_dataframe_binance(data)
 
     def get_recent_trades_list(
         self,
@@ -497,7 +497,7 @@ class BinanceOptionsClient:
         self, symbol: str, orderIds: list = None, clientOrderIds: list = None
     ) -> pd.DataFrame:
         """
-        Delete all orders by underlying.
+        Cancel multiple orders.
         :param symbol: Underlying asset of orders.
         :param orderIds: orderIds.
         :param clientOrderIds: clientOrderIds.

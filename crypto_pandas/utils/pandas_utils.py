@@ -1,9 +1,21 @@
+from typing import Union
+
 import numpy as np
 import pandas as pd
 
 
 def date_time_column_to_int(data: pd.Series) -> int:
     return (data.astype(int) / 1e6).astype(int)
+
+
+def format_value(value: float, step_size: float = 0.001) -> str:
+    """Rounds the data according to the provided step size"""
+    if step_size >= 1:
+        formatted_value = str(int(round(value / step_size) * step_size))
+    else:
+        decimals = abs(int(np.log10(step_size)))
+        formatted_value = f"{value:.{decimals}f}"
+    return formatted_value
 
 
 def preprocess_dataframe(
@@ -41,6 +53,31 @@ def preprocess_dataframe(
         bool_columns_to_convert = [x for x in data.columns if x in str_bool_columns]
         data[bool_columns_to_convert] = data[bool_columns_to_convert].astype(bool)
     return data
+
+
+possible_depth_meta = ["symbol", "timestamp", "datetime", "nonce", "exchange", "T", "u"]
+
+
+def depth_to_dataframe(data: Union[dict, list]) -> pd.DataFrame:
+    dfs = []
+    if isinstance(data, list):
+        keys = data[0].keys()
+    else:
+        keys = data.keys()
+    meta = [x for x in keys if x in possible_depth_meta]
+    for x in ["asks", "bids"]:
+        df = pd.json_normalize(
+            data=data,
+            record_path=x,
+            meta=meta,
+        )
+        df["side"] = x
+        dfs.append(df)
+    if dfs:
+        data = pd.concat(dfs, ignore_index=True).rename(
+            columns={0: "price", 1: "qty", "T": "timestamp", "u": "updateId"}
+        )
+        return data
 
 
 def create_buy_and_sell_orders(
