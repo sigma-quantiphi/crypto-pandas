@@ -1,6 +1,6 @@
 [project]
 name = "crypto-pandas"
-version = "0.1.44"
+version = "0.2.0"
 description = "Library to to work with crypto exchanges using Pandas DataFrame."
 authors = [
     {name = "Lucas Jamar", email = "lucas.jamar@carpentrix.com"}
@@ -12,6 +12,7 @@ dependencies = [
     "pandas[output-formatting, performance] (>=2.2.3,<3.0.0)",
     "ccxt (>=4.4.57,<5.0.0)",
     "grequests (>=0.7.0,<0.8.0)",
+    "pandera (>=0.22.1,<0.23.0)",
 ]
 
 [project.urls]

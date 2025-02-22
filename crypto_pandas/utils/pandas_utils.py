@@ -1,11 +1,26 @@
-from typing import Union
-
 import numpy as np
 import pandas as pd
 
 
-def date_time_column_to_int(data: pd.Series) -> int:
-    return (data.astype(int) / 1e6).astype(int)
+def date_time_columns_to_int(data: pd.DataFrame) -> pd.DataFrame:
+    columns = data.select_dtypes("datetime").columns
+    data[columns] = data[columns].astype("int64") // 10**6
+    return data
+
+
+def expand_dict_columns(data: pd.DataFrame) -> pd.DataFrame:
+    data = data.reset_index(drop=True)
+    dict_columns = [
+        x for x in data.columns if all(data[x].apply(lambda y: isinstance(y, dict)))
+    ]
+    columns_list = [data.drop(columns=dict_columns).copy()]
+    for dict_column in dict_columns:
+        exploded_column = pd.json_normalize(data[dict_column])
+        exploded_column.columns = [
+            f"{dict_column}.{x}" for x in exploded_column.columns
+        ]
+        columns_list.append(exploded_column.copy())
+    return pd.concat(columns_list, axis=1)
 
 
 def format_value(value: float, step_size: float = 0.001) -> str:
@@ -18,82 +33,16 @@ def format_value(value: float, step_size: float = 0.001) -> str:
     return formatted_value
 
 
-def preprocess_dataframe(
-    data: pd.DataFrame,
-    int_datetime_columns: set = None,
-    str_datetime_columns: set = None,
-    numeric_columns: set = None,
-    str_bool_columns: set = None,
-) -> pd.DataFrame:
-    if int_datetime_columns:
-        datetime_columns_to_convert = [
-            x for x in data.columns if x in int_datetime_columns
-        ]
-        data[datetime_columns_to_convert] = (
-            data[datetime_columns_to_convert]
-            .apply(pd.to_numeric)
-            .apply(pd.to_datetime, unit="ms")
-            .apply(lambda x: x.dt.tz_localize("UTC"))
-        )
-    if str_datetime_columns:
-        datetime_columns_to_convert = [
-            x for x in data.columns if x in str_datetime_columns
-        ]
-        data[datetime_columns_to_convert] = (
-            data[datetime_columns_to_convert]
-            .apply(pd.to_datetime)
-            .apply(lambda x: x.dt.tz_localize("UTC"))
-        )
-    if numeric_columns:
-        numeric_columns_to_convert = [x for x in data.columns if x in numeric_columns]
-        data[numeric_columns_to_convert] = data[numeric_columns_to_convert].apply(
-            pd.to_numeric
-        )
-    if str_bool_columns:
-        bool_columns_to_convert = [x for x in data.columns if x in str_bool_columns]
-        data[bool_columns_to_convert] = data[bool_columns_to_convert].astype(bool)
-    return data
-
-
-possible_depth_meta = ["symbol", "timestamp", "datetime", "nonce", "exchange", "T", "u"]
-
-
-def depth_to_dataframe(data: Union[dict, list]) -> pd.DataFrame:
-    dfs = []
-    if isinstance(data, list):
-        keys = data[0].keys()
-    else:
-        keys = data.keys()
-    meta = [x for x in keys if x in possible_depth_meta]
-    for x in ["asks", "bids"]:
-        df = pd.json_normalize(
-            data=data,
-            record_path=x,
-            meta=meta,
-        )
-        df["side"] = x
-        dfs.append(df)
-    if dfs:
-        data = pd.concat(dfs, ignore_index=True).rename(
-            columns={0: "price", 1: "qty", "T": "timestamp", "u": "updateId"}
-        )
-        return data
-
-
-def create_buy_and_sell_orders(
-    orders: pd.DataFrame, sides: tuple = ("BUY", "SELL")
-) -> pd.DataFrame:
-    dfs = []
+def format_orders(
+    orders: pd.DataFrame,
+) -> list:
     data = orders.copy()
-    for side in sides:
-        data["side"] = side
-        dfs.append(data.copy())
-    return pd.concat(dfs)
-
-
-def floor_series(data: pd.Series, digits: int = 0) -> pd.Series:
-    return np.floor(data * 10**digits) / 10**digits
-
-
-def ceil_series(data: pd.Series, digits: int = 0) -> pd.Series:
-    return np.ceil(data * 10**digits) / 10**digits
+    data = date_time_columns_to_int(data)
+    data["quantity"] = data.apply(
+        lambda x: format_value(x["quantity"], x["stepSize"]), axis=1
+    )
+    if "price" in data.columns:
+        data["price"] = data.apply(
+            lambda x: format_value(x["price"], x["tickSize"]), axis=1
+        )
+    return data.drop(columns=["stepSize", "tickSize"]).to_dict("records")
