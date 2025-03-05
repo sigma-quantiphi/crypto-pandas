@@ -17,7 +17,7 @@ from dataclasses import dataclass
 from typing import Union
 
 import pandas as pd
-from crypto_pandas.utils.pandas_utils import format_orders
+from crypto_pandas.utils.pandas_utils import format_orders, expand_dict_columns
 from pandera.typing import DataFrame
 
 from crypto_pandas.order_schema import OrderSchema
