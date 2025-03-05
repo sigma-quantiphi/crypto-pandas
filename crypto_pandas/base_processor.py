@@ -48,7 +48,10 @@ class BaseProcessor:
 
     order_schema: OrderSchema
     datetime_to_int_fields: tuple = None
-    int_to_datetime_fields: tuple = ("timestamp",)
+    int_to_datetime_fields: tuple = (
+        "time",
+        "timestamp",
+    )
     str_to_datetime_fields: tuple = ("datetime",)
     numeric_fields: tuple = None
     bool_fields: tuple = None
@@ -98,17 +101,14 @@ class BaseProcessor:
             data[datetime_columns_to_convert] = (
                 data[datetime_columns_to_convert]
                 .apply(pd.to_numeric)
-                .apply(pd.to_datetime, unit="ms")
-                .apply(lambda x: x.dt.tz_localize("UTC"))
+                .apply(pd.to_datetime, unit="ms", utc=True)
             )
         if self.str_to_datetime_fields:
             datetime_columns_to_convert = [
                 x for x in columns if x in self.str_to_datetime_fields
             ]
-            data[datetime_columns_to_convert] = (
-                data[datetime_columns_to_convert]
-                .apply(pd.to_datetime)
-                .apply(lambda x: x.dt.tz_localize("UTC"))
+            data[datetime_columns_to_convert] = data[datetime_columns_to_convert].apply(
+                pd.to_datetime, utc=True
             )
         if self.numeric_fields:
             numeric_columns_to_convert = [
@@ -140,11 +140,11 @@ class BaseProcessor:
             data.columns = column_names
         return self.preprocess_dataframe(data)
 
-    # def market_to_dataframe(self, data: dict) -> pd.DataFrame:
-    #     data = list(data.values())
-    #     data = pd.DataFrame(data).drop(columns=["info"])
-    #     data = expand_dict_columns(data)
-    #     return self.preprocess_dataframe(data)
+    def exchange_info_to_dataframe_binance(self, data: dict) -> pd.DataFrame:
+        data = list(data.values())
+        data = pd.DataFrame(data).drop(columns=["info"])
+        data = expand_dict_columns(data)
+        return self.preprocess_dataframe(data)
 
     def orderbook_to_dataframe(self, data: Union[dict, list]) -> pd.DataFrame:
         """
