@@ -8,7 +8,7 @@ def date_time_columns_to_int(data: pd.DataFrame) -> pd.DataFrame:
     return data
 
 
-def expand_dict_columns(data: pd.DataFrame) -> pd.DataFrame:
+def expand_dict_columns(data: pd.DataFrame, separator: str = ".") -> pd.DataFrame:
     data = data.reset_index(drop=True)
     dict_columns = [
         x for x in data.columns if all(data[x].apply(lambda y: isinstance(y, dict)))
@@ -17,7 +17,7 @@ def expand_dict_columns(data: pd.DataFrame) -> pd.DataFrame:
     for dict_column in dict_columns:
         exploded_column = pd.json_normalize(data[dict_column])
         exploded_column.columns = [
-            f"{dict_column}.{x}" for x in exploded_column.columns
+            f"{dict_column}{separator}{x}" for x in exploded_column.columns
         ]
         columns_list.append(exploded_column.copy())
     return pd.concat(columns_list, axis=1)
