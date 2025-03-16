@@ -48,12 +48,32 @@ class BaseProcessor:
 
     order_schema: OrderSchema
     datetime_to_int_fields: tuple = None
-    int_to_datetime_fields: tuple = (
-        "time",
-        "timestamp",
-    )
+    int_to_datetime_fields: tuple = ("time", "timestamp", "updateTime")
     str_to_datetime_fields: tuple = ("datetime",)
-    numeric_fields: tuple = None
+    numeric_fields: tuple = (
+        "availableBalance",
+        "crossUnPnl",
+        "crossWalletBalance",
+        "entryPrice",
+        "free",
+        "freeze",
+        "initialMargin",
+        "leverage",
+        "liquidationPrice",
+        "locked",
+        "maintMargin",
+        "maintenanceMargin",
+        "marginBalance",
+        "markPrice",
+        "maxNotional",
+        "maxWithdrawAmount",
+        "openOrderInitialMargin",
+        "positionAmount",
+        "positionInitialMargin",
+        "unrealizedProfit",
+        "walletBalance",
+        "withdrawing",
+    )
     bool_fields: tuple = None
     ohlcv_fields: tuple = (
         "timestamp",
@@ -145,6 +165,13 @@ class BaseProcessor:
         data = pd.DataFrame(data).drop(columns=["info"])
         data = expand_dict_columns(data)
         return self.preprocess_dataframe(data)
+
+    def sub_account_assets_to_dataframe(self, data: dict) -> pd.DataFrame:
+        return self.response_to_dataframe(data["balances"])
+
+    def sub_account_futures_account_to_dataframe(self, data: dict) -> dict:
+        data["assets"] = self.response_to_dataframe(data["assets"])
+        return self.preprocess_dict(data)
 
     def orderbook_to_dataframe(self, data: Union[dict, list]) -> pd.DataFrame:
         """
