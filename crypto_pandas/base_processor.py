@@ -96,7 +96,7 @@ class BaseProcessor:
         """
         for key, value in data.items():
             if self.int_to_datetime_fields and (key in self.int_to_datetime_fields):
-                data[key] = pd.Timestamp(value, unit="ms")
+                data[key] = pd.Timestamp(float(value), unit="ms")
             elif self.str_to_datetime_fields and (key in self.str_to_datetime_fields):
                 data[key] = pd.Timestamp(value)
             elif self.numeric_fields and (key in self.numeric_fields):
