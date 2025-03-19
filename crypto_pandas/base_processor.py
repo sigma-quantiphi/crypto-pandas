@@ -225,7 +225,9 @@ class BaseProcessor:
             pd.DataFrame: A preprocessed OHLCV DataFrame.
         """
         return expand_dict_columns(
-            data=self.response_to_dataframe(data).drop(columns=["info", "fees"]),
+            data=self.response_to_dataframe(data).drop(
+                columns=["info", "fees"], errors="ignore"
+            ),
             separator="_",
         )
 
