@@ -214,6 +214,21 @@ class BaseProcessor:
         """
         return self.response_to_dataframe(data, column_names=self.ohlcv_fields)
 
+    def own_trades_to_dataframe(self, data: list) -> pd.DataFrame:
+        """
+        Convert OHLCV data into a pandas DataFrame.
+
+        Args:
+            data (list): List containing OHLCV data.
+
+        Returns:
+            pd.DataFrame: A preprocessed OHLCV DataFrame.
+        """
+        return expand_dict_columns(
+            data=self.response_to_dataframe(data).drop(columns=["info", "fees"]),
+            separator="_",
+        )
+
     def orders_to_dataframe(self, data: list) -> pd.DataFrame:
         """
         Convert order data into a pandas DataFrame.
