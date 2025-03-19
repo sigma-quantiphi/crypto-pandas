@@ -160,7 +160,7 @@ class BaseProcessor:
             data.columns = column_names
         return self.preprocess_dataframe(data)
 
-    def exchange_info_to_dataframe_binance(self, data: dict) -> pd.DataFrame:
+    def exchange_info_to_dataframe(self, data: dict) -> pd.DataFrame:
         data = list(data.values())
         data = pd.DataFrame(data).drop(columns=["info"])
         data = expand_dict_columns(data)
