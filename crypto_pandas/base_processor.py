@@ -48,7 +48,7 @@ class BaseProcessor:
 
     order_schema: OrderSchema
     datetime_to_int_fields: tuple = None
-    int_to_datetime_fields: tuple = ("time", "timestamp", "updateTime")
+    int_to_datetime_fields: tuple = ("createTime", "time", "timestamp", "updateTime")
     str_to_datetime_fields: tuple = ("datetime",)
     numeric_fields: tuple = (
         "availableBalance",
