@@ -231,6 +231,14 @@ class BaseProcessor:
             separator="_",
         )
 
+    def balance_to_dataframe(self, data: dict) -> pd.DataFrame:
+        df = pd.DataFrame(data={"symbol": list(data["free"].keys())})
+        for column in ["free", "used", "total"]:
+            df[column] = df["symbol"].map(data[column])
+        df["timestamp"] = data["timestamp"]
+        df["datetime"] = data["datetime"]
+        return self.preprocess_dataframe(df)
+
     def orders_to_dataframe(self, data: list) -> pd.DataFrame:
         """
         Convert order data into a pandas DataFrame.
