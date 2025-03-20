@@ -238,7 +238,7 @@ class BaseProcessor:
         )
 
     def balance_to_dataframe(self, data: dict) -> pd.DataFrame:
-        df = pd.DataFrame(data={"symbol": list(data["free"].keys())})
+        df = pd.DataFrame(data={"symbol": list(data["total"].keys())})
         for column in ["free", "used", "total", "debt"]:
             if column in data:
                 df[column] = df["symbol"].map(data[column])
@@ -249,6 +249,10 @@ class BaseProcessor:
     def margins_balance_to_dataframe(self, data: dict) -> dict:
         data["userAssets"] = self.response_to_dataframe(data["userAssets"])
         return self.preprocess_dict(data)
+
+    def options_position_to_dataframe(self, data: list) -> pd.DataFrame:
+        data = pd.DataFrame(data).drop(columns=["info"])
+        return self.preprocess_dataframe(data)
 
     def orders_to_dataframe(self, data: list) -> pd.DataFrame:
         """
