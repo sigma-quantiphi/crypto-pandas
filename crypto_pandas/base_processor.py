@@ -237,10 +237,11 @@ class BaseProcessor:
             separator="_",
         )
 
-    def spot_balance_to_dataframe(self, data: dict) -> pd.DataFrame:
+    def balance_to_dataframe(self, data: dict) -> pd.DataFrame:
         df = pd.DataFrame(data={"symbol": list(data["free"].keys())})
-        for column in ["free", "used", "total"]:
-            df[column] = df["symbol"].map(data[column])
+        for column in ["free", "used", "total", "debt"]:
+            if column in data:
+                df[column] = df["symbol"].map(data[column])
         df["timestamp"] = data["timestamp"]
         df["datetime"] = data["datetime"]
         return self.preprocess_dataframe(df)
