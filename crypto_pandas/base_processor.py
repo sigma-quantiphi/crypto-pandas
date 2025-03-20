@@ -52,6 +52,7 @@ class BaseProcessor:
     str_to_datetime_fields: tuple = ("datetime",)
     numeric_fields: tuple = (
         "availableBalance",
+        "collateralMarginLevel",
         "crossUnPnl",
         "crossWalletBalance",
         "entryPrice",
@@ -64,12 +65,17 @@ class BaseProcessor:
         "maintMargin",
         "maintenanceMargin",
         "marginBalance",
+        "marginLevel",
         "markPrice",
         "maxNotional",
         "maxWithdrawAmount",
         "openOrderInitialMargin",
         "positionAmount",
         "positionInitialMargin",
+        "totalAssetOfBtc",
+        "totalCollateralValueInUSDT",
+        "totalLiabilityOfBtc",
+        "totalNetAssetOfBtc",
         "unrealizedProfit",
         "walletBalance",
         "withdrawing",
@@ -231,13 +237,17 @@ class BaseProcessor:
             separator="_",
         )
 
-    def balance_to_dataframe(self, data: dict) -> pd.DataFrame:
+    def spot_balance_to_dataframe(self, data: dict) -> pd.DataFrame:
         df = pd.DataFrame(data={"symbol": list(data["free"].keys())})
         for column in ["free", "used", "total"]:
             df[column] = df["symbol"].map(data[column])
         df["timestamp"] = data["timestamp"]
         df["datetime"] = data["datetime"]
         return self.preprocess_dataframe(df)
+
+    def margins_balance_to_dataframe(self, data: dict) -> dict:
+        data["userAssets"] = self.response_to_dataframe(data["userAssets"])
+        return self.preprocess_dict(data)
 
     def orders_to_dataframe(self, data: list) -> pd.DataFrame:
         """
