@@ -156,7 +156,9 @@ class BaseProcessor:
         if self.bool_fields:
             bool_columns_to_convert = [x for x in columns if x in self.bool_fields]
             data[bool_columns_to_convert] = data[bool_columns_to_convert].astype(bool)
-        return data
+        return expand_dict_columns(
+            data.drop(columns=["info"], errors="ignore"), separator="_"
+        )
 
     def response_to_dataframe(
         self, data: list, column_names: tuple = None
@@ -177,9 +179,7 @@ class BaseProcessor:
         return self.preprocess_dataframe(data)
 
     def exchange_info_to_dataframe(self, data: dict) -> pd.DataFrame:
-        data = list(data.values())
-        data = pd.DataFrame(data).drop(columns=["info"])
-        data = expand_dict_columns(data)
+        data = pd.DataFrame(list(data.values()))
         return self.preprocess_dataframe(data)
 
     def sub_account_assets_to_dataframe(self, data: dict) -> pd.DataFrame:
@@ -230,23 +230,6 @@ class BaseProcessor:
         """
         return self.response_to_dataframe(data, column_names=self.ohlcv_fields)
 
-    def own_trades_to_dataframe(self, data: list) -> pd.DataFrame:
-        """
-        Convert OHLCV data into a pandas DataFrame.
-
-        Args:
-            data (list): List containing OHLCV data.
-
-        Returns:
-            pd.DataFrame: A preprocessed OHLCV DataFrame.
-        """
-        return expand_dict_columns(
-            data=self.response_to_dataframe(data).drop(
-                columns=["info", "fees"], errors="ignore"
-            ),
-            separator="_",
-        )
-
     def balance_to_dataframe(self, data: dict) -> pd.DataFrame:
         df = pd.DataFrame(data={"symbol": list(data["total"].keys())})
         for column in ["free", "used", "total", "debt"]:
@@ -259,10 +242,6 @@ class BaseProcessor:
     def margins_balance_to_dataframe(self, data: dict) -> dict:
         data["userAssets"] = self.response_to_dataframe(data["userAssets"])
         return self.preprocess_dict(data)
-
-    def options_position_to_dataframe(self, data: list) -> pd.DataFrame:
-        data = pd.DataFrame(data).drop(columns=["info"])
-        return self.preprocess_dataframe(data)
 
     def orders_to_dataframe(self, data: list) -> pd.DataFrame:
         """
