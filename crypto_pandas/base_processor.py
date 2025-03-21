@@ -157,7 +157,7 @@ class BaseProcessor:
             bool_columns_to_convert = [x for x in columns if x in self.bool_fields]
             data[bool_columns_to_convert] = data[bool_columns_to_convert].astype(bool)
         return expand_dict_columns(
-            data.drop(columns=["info"], errors="ignore"), separator="_"
+            data.drop(columns=["info", "fees"], errors="ignore"), separator="_"
         )
 
     def response_to_dataframe(
