@@ -71,7 +71,6 @@ class BaseProcessor:
         "maintenanceMarginPercentage",
         "marginBalance",
         "marginLevel",
-        "marginMode",
         "marginRatio",
         "markPrice",
         "maxNotional",
