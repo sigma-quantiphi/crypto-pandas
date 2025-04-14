@@ -337,8 +337,9 @@ class BaseProcessor:
         Returns:
             list: List of dictionaries representing orders.
         """
+        if "notional" in orders.columns and "amount" not in orders.columns:
+            orders["amount"] = orders["notional"] / orders["price"]
         if self.conduct_order_checks:
             self.order_schema.validate(orders)
         orders = self.format_values(orders=orders)
-        allowed_columns = self.order_schema.to_schema().columns.keys()
-        return orders[list(allowed_columns)].to_dict("records")
+        return orders.to_dict("records")
