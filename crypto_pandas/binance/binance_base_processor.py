@@ -1,9 +1,11 @@
 from dataclasses import dataclass, field
 
+import numpy as np
 import pandas as pd
 import pandera as pa
 from crypto_pandas.base_processor import BaseProcessor
 from crypto_pandas.order_schema import OrderSchema
+from crypto_pandas.utils.pandas_utils import date_time_columns_to_int
 
 
 class BinanceBaseOrderSchema(OrderSchema):
@@ -185,6 +187,29 @@ class BinanceBaseProcessor(BaseProcessor):
             record_path="balances",
         )
         return self.preprocess_dataframe(data)
+
+    def format_value(self, value: float, step_size: float = 0.001) -> str:
+        """Rounds the data according to the provided step size"""
+        if step_size >= 1:
+            formatted_value = str(int(round(value / step_size) * step_size))
+        else:
+            decimals = abs(int(np.log10(step_size)))
+            formatted_value = f"{value:.{decimals}f}"
+        return formatted_value
+
+    def format_orders(
+        self, orders: pd.DataFrame, quantity_field_name: str = "quantity"
+    ) -> list:
+        data = orders.copy()
+        data = date_time_columns_to_int(data)
+        data[quantity_field_name] = data.apply(
+            lambda x: self.format_value(x[quantity_field_name], x["stepSize"]), axis=1
+        )
+        if "price" in data.columns:
+            data["price"] = data.apply(
+                lambda x: self.format_value(x["price"], x["tickSize"]), axis=1
+            )
+        return data.drop(columns=["stepSize", "tickSize"]).to_dict("records")
 
     def order_to_dataframe(self, data: dict) -> pd.DataFrame:
         data = pd.json_normalize(

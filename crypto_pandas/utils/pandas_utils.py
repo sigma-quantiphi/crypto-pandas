@@ -33,13 +33,11 @@ def format_value(value: float, step_size: float = 0.001) -> str:
     return formatted_value
 
 
-def format_orders(
-    orders: pd.DataFrame,
-) -> list:
+def format_orders(orders: pd.DataFrame, quantity_field_name: str = "quantity") -> list:
     data = orders.copy()
     data = date_time_columns_to_int(data)
-    data["quantity"] = data.apply(
-        lambda x: format_value(x["quantity"], x["stepSize"]), axis=1
+    data[quantity_field_name] = data.apply(
+        lambda x: format_value(x[quantity_field_name], x["stepSize"]), axis=1
     )
     if "price" in data.columns:
         data["price"] = data.apply(

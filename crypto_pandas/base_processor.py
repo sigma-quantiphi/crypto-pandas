@@ -17,7 +17,8 @@ from dataclasses import dataclass
 from typing import Union
 
 import pandas as pd
-from crypto_pandas.utils.pandas_utils import format_orders, expand_dict_columns
+
+from crypto_pandas.utils.pandas_utils import expand_dict_columns
 from pandera.typing import DataFrame
 
 from crypto_pandas.order_schema import OrderSchema
@@ -98,6 +99,7 @@ class BaseProcessor:
         "close",
         "volume",
     )
+    conduct_order_checks: bool = True
 
     def preprocess_dict(self, data: dict) -> dict:
         """
@@ -314,19 +316,29 @@ class BaseProcessor:
         )
         return self.preprocess_dataframe(data)
 
-    def orders_to_dict(self, orders: DataFrame, conduct_checks: bool = True) -> list:
+    def format_values(self, orders: pd.DataFrame) -> pd.DataFrame:
+        orders["price"] = (
+            (orders["price"] / orders["precision_price"]).round()
+            * orders["precision_price"]
+        ).clip(lower=orders["limits_amount.min"], upper=orders["limits_amount.max"])
+        orders["amount"] = (
+            (orders["amount"] / orders["precision_amount"]).round()
+            * orders["precision_amount"]
+        ).clip(lower=orders["limits_price.min"], upper=orders["limits_price.max"])
+        return orders
+
+    def orders_to_dict(self, orders: pd.DataFrame) -> list:
         """
         Convert a DataFrame of orders into a list of dictionaries suitable for API submission.
 
         Args:
             orders (DataFrame): DataFrame containing order data.
-            conduct_checks (bool, optional): Whether to validate the orders using the schema.
 
         Returns:
             list: List of dictionaries representing orders.
         """
-        if conduct_checks:
+        if self.conduct_order_checks:
             self.order_schema.validate(orders)
+        orders = self.format_values(orders=orders)
         allowed_columns = self.order_schema.to_schema().columns.keys()
-        orders = orders[list(allowed_columns)]
-        return format_orders(orders)
+        return orders[list(allowed_columns)].to_dict("records")
