@@ -18,7 +18,7 @@ from typing import Union
 
 import pandas as pd
 
-from crypto_pandas.utils.pandas_utils import expand_dict_columns
+from crypto_pandas.utils.pandas_utils import expand_dict_columns, date_time_columns_to_int, combine_params
 from pandera.typing import DataFrame
 
 from crypto_pandas.order_schema import OrderSchema
@@ -317,6 +317,12 @@ class BaseProcessor:
         return self.preprocess_dataframe(data)
 
     def format_values(self, orders: pd.DataFrame) -> pd.DataFrame:
+        # Determine amount from notional
+        if "notional" in orders.columns and "amount" not in orders.columns:
+            orders["amount"] = orders["notional"] / orders["price"]
+        # Format datetimes
+        orders = date_time_columns_to_int(orders)
+        # Round values appropriately
         orders["price"] = (
             (orders["price"] / orders["precision_price"]).round()
             * orders["precision_price"]
@@ -325,7 +331,11 @@ class BaseProcessor:
             (orders["amount"] / orders["precision_amount"]).round()
             * orders["precision_amount"]
         ).clip(lower=orders["limits_price.min"], upper=orders["limits_price.max"])
-        return orders
+        # Serialize param columns
+        param_cols = orders.columns[orders.columns.str.startswith("params.")]
+        orders['params'] = orders.apply(combine_params, axis=1)
+        return orders.drop(columns=param_cols)
+
 
     def orders_to_dict(self, orders: pd.DataFrame) -> list:
         """
@@ -337,9 +347,8 @@ class BaseProcessor:
         Returns:
             list: List of dictionaries representing orders.
         """
-        if "notional" in orders.columns and "amount" not in orders.columns:
-            orders["amount"] = orders["notional"] / orders["price"]
+        orders = self.format_values(orders=orders)
         if self.conduct_order_checks:
             self.order_schema.validate(orders)
-        orders = self.format_values(orders=orders)
-        return orders.to_dict("records")
+        allowed_columns = self.order_schema.to_schema().columns.keys()
+        return orders[list(allowed_columns)].to_dict("records")

@@ -3,7 +3,10 @@ import pandas as pd
 
 
 def date_time_columns_to_int(data: pd.DataFrame) -> pd.DataFrame:
-    columns = data.select_dtypes("datetime").columns
+    columns = (
+        data.select_dtypes("datetimetz").columns.tolist()
+        + data.select_dtypes("datetime").columns.tolist()
+    )
     data[columns] = data[columns].astype("int64") // 10**6
     return data
 
@@ -22,6 +25,13 @@ def expand_dict_columns(data: pd.DataFrame, separator: str = ".") -> pd.DataFram
         columns_list.append(exploded_column.copy())
     return pd.concat(columns_list, axis=1)
 
+
+def combine_params(row: pd.Series, param_cols: list) -> dict:
+    return {
+        column.replace("params.", ""): row[column]
+        for column in param_cols
+        if pd.notnull(row[column])
+    }
 
 def format_value(value: float, step_size: float = 0.001) -> str:
     """Rounds the data according to the provided step size"""
