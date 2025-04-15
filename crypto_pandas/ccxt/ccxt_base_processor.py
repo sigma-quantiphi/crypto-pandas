@@ -11,6 +11,7 @@ from crypto_pandas.order_schema import OrderSchema
 class CCXTOrderSchema(pa.DataFrameModel):
     """Base schema for CCXT orders."""
 
+    id: str = pa.Field(nullable=True, default=None)
     symbol: str = pa.Field()
     side: str = pa.Field(isin=["buy", "sell"])
     type: str = pa.Field(isin=["limit", "market", "stop_loss", "take_profit"])

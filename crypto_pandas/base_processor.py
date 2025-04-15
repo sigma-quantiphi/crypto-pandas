@@ -324,7 +324,7 @@ class BaseProcessor:
         # Determine amount from notional
         if "notional" in orders.columns and "amount" not in orders.columns:
             orders["amount"] = orders["notional"] / orders["price"]
-        # Format datetimes
+        # Format datetime
         orders = date_time_columns_to_int(orders)
         # Round values appropriately
         orders["price"] = (
