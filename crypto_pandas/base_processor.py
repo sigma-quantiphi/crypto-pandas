@@ -331,11 +331,11 @@ class BaseProcessor:
         orders["price"] = (
             (orders["price"] / orders["precision_price"]).round()
             * orders["precision_price"]
-        ).clip(lower=orders["limits_amount.min"], upper=orders["limits_amount.max"])
+        ).clip(lower=orders["limits_price.min"], upper=orders["limits_price.max"])
         orders["amount"] = (
             (orders["amount"] / orders["precision_amount"]).round()
             * orders["precision_amount"]
-        ).clip(lower=orders["limits_price.min"], upper=orders["limits_price.max"])
+        ).clip(lower=orders["limits_amount.min"], upper=orders["limits_amount.max"])
         # Serialize param columns
         param_cols = orders.columns[orders.columns.str.startswith("params.")]
         orders["params"] = orders.apply(combine_params, axis=1, param_cols=param_cols)
