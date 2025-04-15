@@ -18,7 +18,11 @@ from typing import Union
 
 import pandas as pd
 
-from crypto_pandas.utils.pandas_utils import expand_dict_columns, date_time_columns_to_int, combine_params
+from crypto_pandas.utils.pandas_utils import (
+    expand_dict_columns,
+    date_time_columns_to_int,
+    combine_params,
+)
 from pandera.typing import DataFrame
 
 from crypto_pandas.order_schema import OrderSchema
@@ -333,9 +337,8 @@ class BaseProcessor:
         ).clip(lower=orders["limits_price.min"], upper=orders["limits_price.max"])
         # Serialize param columns
         param_cols = orders.columns[orders.columns.str.startswith("params.")]
-        orders['params'] = orders.apply(combine_params, axis=1)
+        orders["params"] = orders.apply(combine_params, axis=1, param_cols=param_cols)
         return orders.drop(columns=param_cols)
-
 
     def orders_to_dict(self, orders: pd.DataFrame) -> list:
         """

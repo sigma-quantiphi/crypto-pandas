@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from typing import Dict, Any
 
 import pandera as pa
-from pandas import Series
+from pandera.typing import Series
 
 from crypto_pandas.base_processor import BaseProcessor
 from crypto_pandas.order_schema import OrderSchema
