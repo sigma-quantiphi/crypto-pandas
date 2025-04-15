@@ -22,6 +22,7 @@ from crypto_pandas.utils.pandas_utils import (
     expand_dict_columns,
     date_time_columns_to_int,
     combine_params,
+    determine_mandatory_optional_fields_pandera,
 )
 from pandera.typing import DataFrame
 
@@ -353,5 +354,6 @@ class BaseProcessor:
         orders = self.format_values(orders=orders)
         if self.conduct_order_checks:
             self.order_schema.validate(orders)
-        allowed_columns = self.order_schema.to_schema().columns.keys()
-        return orders[list(allowed_columns)].to_dict("records")
+        fields = determine_mandatory_optional_fields_pandera(self.order_schema)
+        fields["optional"] = [x for x in orders.columns if x in fields["optional"]]
+        return orders[fields["mandatory"] + fields["optional"]].to_dict("records")

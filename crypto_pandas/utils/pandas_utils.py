@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import pandera as pa
 
 
 def date_time_columns_to_int(data: pd.DataFrame) -> pd.DataFrame:
@@ -24,6 +25,17 @@ def expand_dict_columns(data: pd.DataFrame, separator: str = ".") -> pd.DataFram
         ]
         columns_list.append(exploded_column.copy())
     return pd.concat(columns_list, axis=1)
+
+
+def determine_mandatory_optional_fields_pandera(model: pa.DataFrameModel) -> dict:
+    schema = model.to_schema()
+    fields = {"mandatory": [], "optional": []}
+    for col_name, col_obj in schema.columns.items():
+        if col_obj.nullable:
+            fields["optional"].append(col_name)
+        else:
+            fields["mandatory"].append(col_name)
+    return fields
 
 
 def combine_params(row: pd.Series, param_cols: list) -> dict:

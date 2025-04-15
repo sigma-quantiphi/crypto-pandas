@@ -17,7 +17,7 @@ class CCXTOrderSchema(pa.DataFrameModel):
     type: str = pa.Field(isin=["limit", "market", "stop_loss", "take_profit"])
     amount: float = pa.Field(gt=0)
     price: float = pa.Field(ge=0, nullable=True, default=None)
-    params: Series[Dict[str, Any]]
+    params: dict = pa.Field(nullable=True, default=None)
 
 
 @dataclass
