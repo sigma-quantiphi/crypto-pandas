@@ -323,15 +323,16 @@ class BaseProcessor:
 
     def format_values(self, orders: pd.DataFrame) -> pd.DataFrame:
         # Determine amount from notional
-        if "notional" in orders.columns and "amount" not in orders.columns:
+        if {"notional", "price"}.issubset(orders.columns)  and "amount" not in orders.columns:
             orders["amount"] = orders["notional"] / orders["price"]
         # Format datetime
         orders = date_time_columns_to_int(orders)
         # Round values appropriately
-        orders["price"] = (
-            (orders["price"] / orders["precision_price"]).round()
-            * orders["precision_price"]
-        ).clip(lower=orders["limits_price.min"], upper=orders["limits_price.max"])
+        if "price" in orders.columns:
+            orders["price"] = (
+                (orders["price"] / orders["precision_price"]).round()
+                * orders["precision_price"]
+            ).clip(lower=orders["limits_price.min"], upper=orders["limits_price.max"])
         orders["amount"] = (
             (orders["amount"] / orders["precision_amount"]).round()
             * orders["precision_amount"]
