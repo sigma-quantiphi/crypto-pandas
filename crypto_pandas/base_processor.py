@@ -56,6 +56,7 @@ class BaseProcessor:
     datetime_to_int_fields: tuple = None
     int_to_datetime_fields: tuple = (
         "createTime",
+        "created",
         "expiry",
         "time",
         "timestamp",
