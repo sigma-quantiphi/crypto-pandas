@@ -54,8 +54,17 @@ class BaseProcessor:
 
     order_schema: OrderSchema
     datetime_to_int_fields: tuple = None
-    int_to_datetime_fields: tuple = ("createTime", "time", "timestamp", "updateTime")
-    str_to_datetime_fields: tuple = ("datetime",)
+    int_to_datetime_fields: tuple = (
+        "createTime",
+        "expiry",
+        "time",
+        "timestamp",
+        "updateTime",
+    )
+    str_to_datetime_fields: tuple = (
+        "datetime",
+        "expiryDatetime",
+    )
     numeric_fields: tuple = (
         "availableBalance",
         "collateral",
@@ -323,7 +332,9 @@ class BaseProcessor:
 
     def format_values(self, orders: pd.DataFrame) -> pd.DataFrame:
         # Determine amount from notional
-        if {"notional", "price"}.issubset(orders.columns)  and "amount" not in orders.columns:
+        if {"notional", "price"}.issubset(
+            orders.columns
+        ) and "amount" not in orders.columns:
             orders["amount"] = orders["notional"] / orders["price"]
         # Format datetime
         orders = date_time_columns_to_int(orders)
