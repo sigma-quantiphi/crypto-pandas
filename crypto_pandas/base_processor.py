@@ -68,6 +68,8 @@ class BaseProcessor:
     )
     numeric_fields: tuple = (
         "availableBalance",
+        "buySellRatio",
+        "buyVol",
         "collateral",
         "collateralMarginLevel",
         "contractSize",
@@ -82,6 +84,8 @@ class BaseProcessor:
         "leverage",
         "liquidationPrice",
         "locked",
+        "longAccount",
+        "longShortRatio",
         "maintMargin",
         "maintenanceMargin",
         "maintenanceMarginPercentage",
@@ -96,6 +100,8 @@ class BaseProcessor:
         "percentage",
         "positionAmount",
         "positionInitialMargin",
+        "sellVol",
+        "shortAccount",
         "totalAssetOfBtc",
         "totalCollateralValueInUSDT",
         "totalLiabilityOfBtc",
