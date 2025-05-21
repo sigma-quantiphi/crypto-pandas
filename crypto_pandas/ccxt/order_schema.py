@@ -3,7 +3,7 @@ from typing import Optional
 import pandera as pa
 
 
-class CCXTOrderSchema(pa.DataFrameModel):
+class OrderSchema(pa.DataFrameModel):
     """Base schema for orders (general for any exchange)."""
 
     id: Optional[str] = pa.Field(nullable=True, default=None)
@@ -13,4 +13,3 @@ class CCXTOrderSchema(pa.DataFrameModel):
     amount: float = pa.Field(gt=0)
     price: Optional[float] = pa.Field(ge=0, nullable=True, default=None)
     params: Optional[dict] = pa.Field(nullable=True, default=None)
-

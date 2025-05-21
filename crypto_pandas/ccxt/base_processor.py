@@ -13,11 +13,12 @@ Attributes:
     possible_depth_meta (list): List of potential metadata fields found in order book depth data.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Union
 
 import pandas as pd
 
+from crypto_pandas.ccxt.order_schema import OrderSchema
 from crypto_pandas.utils.pandas_utils import (
     expand_dict_columns,
     date_time_columns_to_int_str,
@@ -26,13 +27,12 @@ from crypto_pandas.utils.pandas_utils import (
 )
 from pandera.typing import DataFrame
 
-from crypto_pandas.order_schema import OrderSchema
 
 possible_depth_meta = ["symbol", "timestamp", "datetime", "nonce", "exchange", "T", "u"]
 
 
 @dataclass
-class CCXTProcessor:
+class BaseProcessor:
     """
     CCXTProcessor is a parent class for handling preprocessing of API responses into pandas DataFrames.
 
@@ -52,7 +52,7 @@ class CCXTProcessor:
         ohlcv_fields (tuple): Standard OHLCV (Open, High, Low, Close, Volume) column names.
     """
 
-    order_schema: OrderSchema
+    order_schema: OrderSchema = field(default=OrderSchema)
     datetime_to_int_fields: tuple = None
     int_to_datetime_fields: tuple = (
         "createTime",
@@ -67,6 +67,12 @@ class CCXTProcessor:
         "expiryDatetime",
     )
     numeric_fields: tuple = (
+        # "indexPrice",
+        # "bid",
+        # "bidVolume",
+        # "ask",
+        # "askVolume",
+        # "previousClose",
         "availableBalance",
         "buySellRatio",
         "buyVol",
@@ -138,7 +144,7 @@ class CCXTProcessor:
             elif self.str_to_datetime_fields and (key in self.str_to_datetime_fields):
                 data[key] = pd.Timestamp(value)
             elif self.numeric_fields and (key in self.numeric_fields):
-                data[key] = float(value)
+                data[key] = pd.to_numeric(value)
         return data
 
     def preprocess_dataframe(self, data: pd.DataFrame) -> pd.DataFrame:
@@ -213,7 +219,7 @@ class CCXTProcessor:
         df["datetime"] = data["datetime"]
         return self.preprocess_dataframe(df)
 
-    def orderbook_to_dataframe(self, data: Union[dict, list]) -> pd.DataFrame:
+    def order_book_to_dataframe(self, data: Union[dict, list]) -> pd.DataFrame:
         """
         Convert order book data into a pandas DataFrame.
 
@@ -237,7 +243,6 @@ class CCXTProcessor:
             )
             df["side"] = x
             dfs.append(df)
-        breakpoint()
         data = pd.concat(dfs, ignore_index=True).rename(
             columns={0: "price", 1: "qty", "T": "timestamp", "u": "updateId"}
         )
@@ -254,10 +259,6 @@ class CCXTProcessor:
             pd.DataFrame: A preprocessed OHLCV DataFrame.
         """
         return self.response_to_dataframe(data, column_names=self.ohlcv_fields)
-
-    def margins_balance_to_dataframe(self, data: dict) -> dict:
-        data["userAssets"] = self.response_to_dataframe(data["userAssets"])
-        return self.preprocess_dict(data)
 
     def orders_to_dataframe(self, data: list) -> pd.DataFrame:
         """
@@ -304,32 +305,6 @@ class CCXTProcessor:
         if not trades.empty:
             orders = orders.merge(trades, how="outer")
         return self.preprocess_dataframe(orders)
-
-    def order_list_to_dataframe(self, data: dict) -> pd.DataFrame:
-        """
-        Convert a list of orders grouped into a DataFrame.
-
-        Args:
-            data (dict): Dictionary containing grouped orders.
-
-        Returns:
-            pd.DataFrame: A preprocessed grouped orders DataFrame.
-        """
-        data = pd.json_normalize(
-            data=data,
-            meta=[
-                "orderListId",
-                "contingencyType",
-                "listStatusType",
-                "listOrderStatus",
-                "listClientOrderId",
-                "transactionTime",
-                "symbol",
-                "isIsolated",
-            ],
-            record_path="orders",
-        )
-        return self.preprocess_dataframe(data)
 
     def format_values(self, orders: pd.DataFrame) -> pd.DataFrame:
         # Determine amount from notional
