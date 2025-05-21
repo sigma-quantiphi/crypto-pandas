@@ -3,7 +3,7 @@ import pandas as pd
 import pandera as pa
 
 
-def date_time_columns_to_int(data: pd.DataFrame) -> pd.DataFrame:
+def date_time_columns_to_int_str(data: pd.DataFrame) -> pd.DataFrame:
     columns = (
         data.select_dtypes("datetimetz").columns.tolist()
         + data.select_dtypes("datetime").columns.tolist()
@@ -58,7 +58,7 @@ def format_value(value: float, step_size: float = 0.001) -> str:
 
 def format_orders(orders: pd.DataFrame, quantity_field_name: str = "quantity") -> list:
     data = orders.copy()
-    data = date_time_columns_to_int(data)
+    data = date_time_columns_to_int_str(data)
     data[quantity_field_name] = data.apply(
         lambda x: format_value(x[quantity_field_name], x["stepSize"]), axis=1
     )

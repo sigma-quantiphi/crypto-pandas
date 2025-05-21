@@ -20,7 +20,7 @@ import pandas as pd
 
 from crypto_pandas.utils.pandas_utils import (
     expand_dict_columns,
-    date_time_columns_to_int,
+    date_time_columns_to_int_str,
     combine_params,
     determine_mandatory_optional_fields_pandera,
 )
@@ -32,9 +32,9 @@ possible_depth_meta = ["symbol", "timestamp", "datetime", "nonce", "exchange", "
 
 
 @dataclass
-class BaseProcessor:
+class CCXTProcessor:
     """
-    BaseProcessor is a parent class for handling preprocessing of API responses into pandas DataFrames.
+    CCXTProcessor is a parent class for handling preprocessing of API responses into pandas DataFrames.
 
     This class includes methods to:
     - Convert timestamps into datetime objects.
@@ -200,16 +200,18 @@ class BaseProcessor:
             data.columns = column_names
         return self.preprocess_dataframe(data)
 
-    def exchange_info_to_dataframe(self, data: dict) -> pd.DataFrame:
+    def markets_to_dataframe(self, data: dict) -> pd.DataFrame:
         data = pd.DataFrame(list(data.values()))
         return self.preprocess_dataframe(data)
 
-    def sub_account_assets_to_dataframe(self, data: dict) -> pd.DataFrame:
-        return self.response_to_dataframe(data["balances"])
-
-    def sub_account_futures_account_to_dataframe(self, data: dict) -> dict:
-        data["assets"] = self.response_to_dataframe(data["assets"])
-        return self.preprocess_dict(data)
+    def balance_to_dataframe(self, data: dict) -> pd.DataFrame:
+        df = pd.DataFrame(data={"symbol": list(data["total"].keys())})
+        for column in ["free", "used", "total", "debt"]:
+            if column in data:
+                df[column] = df["symbol"].map(data[column])
+        df["timestamp"] = data["timestamp"]
+        df["datetime"] = data["datetime"]
+        return self.preprocess_dataframe(df)
 
     def orderbook_to_dataframe(self, data: Union[dict, list]) -> pd.DataFrame:
         """
@@ -235,6 +237,7 @@ class BaseProcessor:
             )
             df["side"] = x
             dfs.append(df)
+        breakpoint()
         data = pd.concat(dfs, ignore_index=True).rename(
             columns={0: "price", 1: "qty", "T": "timestamp", "u": "updateId"}
         )
@@ -251,15 +254,6 @@ class BaseProcessor:
             pd.DataFrame: A preprocessed OHLCV DataFrame.
         """
         return self.response_to_dataframe(data, column_names=self.ohlcv_fields)
-
-    def balance_to_dataframe(self, data: dict) -> pd.DataFrame:
-        df = pd.DataFrame(data={"symbol": list(data["total"].keys())})
-        for column in ["free", "used", "total", "debt"]:
-            if column in data:
-                df[column] = df["symbol"].map(data[column])
-        df["timestamp"] = data["timestamp"]
-        df["datetime"] = data["datetime"]
-        return self.preprocess_dataframe(df)
 
     def margins_balance_to_dataframe(self, data: dict) -> dict:
         data["userAssets"] = self.response_to_dataframe(data["userAssets"])
@@ -344,7 +338,7 @@ class BaseProcessor:
         ) and "amount" not in orders.columns:
             orders["amount"] = orders["notional"] / orders["price"]
         # Format datetime
-        orders = date_time_columns_to_int(orders)
+        orders = date_time_columns_to_int_str(orders)
         # Round values appropriately
         if "price" in orders.columns:
             orders["price"] = (

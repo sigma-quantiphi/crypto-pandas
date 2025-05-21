@@ -1,14 +1,10 @@
-from dataclasses import dataclass, field
 from typing import Optional
 
 import pandera as pa
 
-from crypto_pandas.base_processor import BaseProcessor
-from crypto_pandas.order_schema import OrderSchema
-
 
 class CCXTOrderSchema(pa.DataFrameModel):
-    """Base schema for CCXT orders."""
+    """Base schema for orders (general for any exchange)."""
 
     id: Optional[str] = pa.Field(nullable=True, default=None)
     symbol: str = pa.Field()
@@ -18,7 +14,3 @@ class CCXTOrderSchema(pa.DataFrameModel):
     price: Optional[float] = pa.Field(ge=0, nullable=True, default=None)
     params: Optional[dict] = pa.Field(nullable=True, default=None)
 
-
-@dataclass
-class CCXTProcessor(BaseProcessor):
-    order_schema: OrderSchema = field(default=CCXTOrderSchema)
