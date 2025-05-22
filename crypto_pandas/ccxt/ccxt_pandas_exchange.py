@@ -359,15 +359,18 @@ class CCXTPandasExchange(Exchange):
         data = self.exchange.fetch_order(id=id, symbol=symbol, params=params)
         return ccxt_processor.preprocess_dict(data)
 
-    def order_preprocessing(self, func):
+    @staticmethod
+    def order_preprocessing(func):
         @wraps(func)
         def wrapper(
+            self,
             symbol: str,
             type: Literal["limit", "market"],
             side: Literal["buy", "sell"],
             amount: float | None = None,
             price: float | None = None,
             notional: float | None = None,
+            *args,
             **kwargs,
         ):
             markets = (
@@ -387,7 +390,7 @@ class CCXTPandasExchange(Exchange):
                         raise ValueError(
                             "Either notional or amount is required for limit order."
                         )
-                    if notional < self.max_order_notional:
+                    if notional > self.max_order_notional:
                         raise ValueError(
                             f"Order notional {notional} larger than limit {self.max_order_notional}"
                         )
@@ -423,18 +426,23 @@ class CCXTPandasExchange(Exchange):
                 self,
                 symbol=symbol,
                 type=type,
+                side=side,
                 amount=amount,
                 price=price,
                 notional=notional,
+                *args,
                 **kwargs,
             )
 
         return wrapper
 
-    def orders_dataframe_preprocessing(self, func):
+    @staticmethod
+    def orders_dataframe_preprocessing(func):
         @wraps(func)
-        def orders_dataframe_wrapper(
+        def wrapper(
+            self,
             orders: pd.DataFrame,
+            *args,
             **kwargs,
         ):
             # Format datetime
@@ -446,13 +454,13 @@ class CCXTPandasExchange(Exchange):
 
             # Limit checks
             if "notional" in orders.columns:
-                if any(orders["notional"] > self.max_order_notional):
+                if orders.eval(f"notional > {self.max_order_notional}").any():
                     errors = orders.query(f"notional > {self.max_order_notional}")
                     raise ValueError(
                         f"Certain orders have notional larger than max notional {self.max_number_of_orders}:\n {errors}"
                     )
             n_orders = len(orders.index)
-            if n_orders <= self.max_number_of_orders:
+            if n_orders > self.max_number_of_orders:
                 raise ValueError(
                     f"Number of orders {n_orders} larger than limit {self.max_number_of_orders}"
                 )
@@ -498,10 +506,11 @@ class CCXTPandasExchange(Exchange):
             return func(
                 self,
                 orders=orders,
+                *args,
                 **kwargs,
             )
 
-        return orders_dataframe_wrapper
+        return wrapper
 
     @order_preprocessing
     def create_order(
@@ -539,6 +548,7 @@ class CCXTPandasExchange(Exchange):
         side: Literal["buy", "sell"],
         amount: float | None = None,
         price: float | None = None,
+        notional: float | None = None,
         params: dict = {},
     ) -> dict:
         data = self.exchange.edit_order(
@@ -565,7 +575,7 @@ class CCXTPandasExchange(Exchange):
         return ccxt_processor.response_to_dataframe(data)
 
     def cancel_orders(
-        self, ids: str, symbol: str | None = None, params: dict = {}
+        self, ids: list[str], symbol: str | None = None, params: dict = {}
     ) -> pd.DataFrame:
         data = self.exchange.cancel_orders(ids=ids, symbol=symbol, params=params)
         return ccxt_processor.response_to_dataframe(data)
@@ -578,6 +588,17 @@ class CCXTPandasExchange(Exchange):
         data = self.exchange.cancel_all_orders(
             symbol=symbol,
             params=params,
+        )
+        return ccxt_processor.response_to_dataframe(data)
+
+    @orders_dataframe_preprocessing
+    def cancel_orders_for_symbols(
+        self,
+        orders: pd.DataFrame,
+        params: dict = {},
+    ) -> pd.DataFrame:
+        data = self.exchange.cancel_orders_for_symbols(
+            orders=orders.to_dict("records"),
         )
         return ccxt_processor.response_to_dataframe(data)
 
