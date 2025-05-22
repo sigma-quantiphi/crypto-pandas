@@ -49,6 +49,12 @@ class CCXTPandasExchange(Exchange):
         data = self.exchange.fetch_balance(params=params)
         return ccxt_processor.balance_to_dataframe(data)
 
+    def fetch_positions_risk(
+        self, symbols: list[str] | None = None, params: dict = {}
+    ) -> pd.DataFrame:
+        data = self.exchange.fetch_positions_risk(symbols=symbols, params=params)
+        return ccxt_processor.response_to_dataframe(data)
+
     def fetch_position(self, symbol: str, params: dict = {}) -> dict:
         data = self.exchange.fetch_position(symbol=symbol, params=params)
         return ccxt_processor.preprocess_dict(data)
