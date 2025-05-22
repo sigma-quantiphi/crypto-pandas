@@ -3,6 +3,25 @@ import pandas as pd
 import pandera as pa
 
 
+def timestamp_to_int(timestamp: int | pd.Timestamp | None) -> int:
+    if isinstance(timestamp, pd.Timestamp):
+        timestamp = int(timestamp.timestamp() * 1000)
+    return timestamp
+
+
+def date_time_fields_to_int_str(data: dict) -> dict:
+    def transform_value(value):
+        if isinstance(value, pd.Timestamp):
+            return str(int(value.timestamp() * 1000))
+        elif isinstance(value, dict):
+            return date_time_fields_to_int_str(value)
+        elif isinstance(value, list):
+            return [transform_value(v) for v in value]
+        return value
+
+    return {key: transform_value(value) for key, value in data.items()}
+
+
 def date_time_columns_to_int_str(data: pd.DataFrame) -> pd.DataFrame:
     columns = (
         data.select_dtypes("datetimetz").columns.tolist()
@@ -44,26 +63,3 @@ def combine_params(row: pd.Series, param_cols: list) -> dict:
         for column in param_cols
         if pd.notnull(row[column])
     }
-
-
-def format_value(value: float, step_size: float = 0.001) -> str:
-    """Rounds the data according to the provided step size"""
-    if step_size >= 1:
-        formatted_value = str(int(round(value / step_size) * step_size))
-    else:
-        decimals = abs(int(np.log10(step_size)))
-        formatted_value = f"{value:.{decimals}f}"
-    return formatted_value
-
-
-def format_orders(orders: pd.DataFrame, quantity_field_name: str = "quantity") -> list:
-    data = orders.copy()
-    data = date_time_columns_to_int_str(data)
-    data[quantity_field_name] = data.apply(
-        lambda x: format_value(x[quantity_field_name], x["stepSize"]), axis=1
-    )
-    if "price" in data.columns:
-        data["price"] = data.apply(
-            lambda x: format_value(x["price"], x["tickSize"]), axis=1
-        )
-    return data.drop(columns=["stepSize", "tickSize"]).to_dict("records")

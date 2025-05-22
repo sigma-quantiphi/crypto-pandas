@@ -21,8 +21,6 @@ import pandas as pd
 from crypto_pandas.ccxt.order_schema import OrderSchema
 from crypto_pandas.utils.pandas_utils import (
     expand_dict_columns,
-    date_time_columns_to_int_str,
-    combine_params,
     determine_mandatory_optional_fields_pandera,
 )
 from pandera.typing import DataFrame
@@ -306,29 +304,6 @@ class BaseProcessor:
             orders = orders.merge(trades, how="outer")
         return self.preprocess_dataframe(orders)
 
-    def format_values(self, orders: pd.DataFrame) -> pd.DataFrame:
-        # Determine amount from notional
-        if {"notional", "price"}.issubset(
-            orders.columns
-        ) and "amount" not in orders.columns:
-            orders["amount"] = orders["notional"] / orders["price"]
-        # Format datetime
-        orders = date_time_columns_to_int_str(orders)
-        # Round values appropriately
-        if "price" in orders.columns:
-            orders["price"] = (
-                (orders["price"] / orders["precision_price"]).round()
-                * orders["precision_price"]
-            ).clip(lower=orders["limits_price.min"], upper=orders["limits_price.max"])
-        orders["amount"] = (
-            (orders["amount"] / orders["precision_amount"]).round()
-            * orders["precision_amount"]
-        ).clip(lower=orders["limits_amount.min"], upper=orders["limits_amount.max"])
-        # Serialize param columns
-        param_cols = orders.columns[orders.columns.str.startswith("params.")]
-        orders["params"] = orders.apply(combine_params, axis=1, param_cols=param_cols)
-        return orders.drop(columns=param_cols)
-
     def orders_to_dict(self, orders: pd.DataFrame) -> list:
         """
         Convert a DataFrame of orders into a list of dictionaries suitable for API submission.
@@ -339,9 +314,8 @@ class BaseProcessor:
         Returns:
             list: List of dictionaries representing orders.
         """
-        orders = self.format_values(orders=orders)
         if self.conduct_order_checks:
             self.order_schema.validate(orders)
         fields = determine_mandatory_optional_fields_pandera(self.order_schema)
         fields["optional"] = [x for x in orders.columns if x in fields["optional"]]
-        return orders[fields["mandatory"] + fields["optional"]].to_dict("records")
+        return orders[fields["mandatory"] + fields["optional"]]

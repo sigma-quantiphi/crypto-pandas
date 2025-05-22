@@ -36,6 +36,13 @@ def test_fetch_balance(exchange):
     assert isinstance(data, pd.DataFrame)
 
 
+def test_fetch_transfers(exchange):
+    data = exchange.fetch_balance()
+    print(data)
+    print(data.dtypes)
+    assert isinstance(data, pd.DataFrame)
+
+
 def test_fetch_currencies(exchange):
     data = exchange.fetch_currencies()
     print(data)
@@ -46,7 +53,6 @@ def test_fetch_currencies(exchange):
 def test_fetch_ticker(exchange):
     data = exchange.fetch_ticker("BTC/USDT:USDT")
     print(data)
-    print(data.dtypes)
     assert isinstance(data, dict)
 
 
@@ -113,19 +119,29 @@ def test_fetch_closed_orders(exchange):
     assert isinstance(data, pd.DataFrame)
 
 
-def test_fetch_order(exchange):
-    try:
-        data = exchange.fetch_order("1912589824", symbol="BNB/USDC:USDC")
-    except Exception:
-        data = pd.DataFrame()
+def test_fetch_greeks(exchange):
+    data = exchange.fetch_greeks()
     print(data)
     print(data.dtypes)
+    assert isinstance(data, pd.DataFrame)
+
+
+def test_fetch_order(exchange):
+    data = exchange.fetch_order("1912589824", symbol="BNB/USDC:USDC")
+    print(data)
     assert isinstance(data, dict)
 
 
 def test_create_order(exchange):
-    # Skip this live test unless using sandbox or mocked exchange
-    pass
+    data = exchange.create_order(
+        symbol="BNB/USDC:USDC",
+        type="limit",
+        side="buy",
+        amount=0.01,
+        price=200,
+    )
+    print(data)
+    assert isinstance(data, dict)
 
 
 def test_cancel_order(exchange):
