@@ -309,7 +309,7 @@ class CCXTPandasExchange(Exchange):
         params: dict = {},
     ) -> pd.DataFrame:
         data = self.exchange.fetch_bids_asks(symbols=symbols, params=params)
-        return ccxt_processor.response_to_dataframe(data)
+        return ccxt_processor.markets_to_dataframe(data)
 
     def fetch_orders(
         self,
