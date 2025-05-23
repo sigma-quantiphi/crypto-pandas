@@ -37,7 +37,7 @@ class CCXTPandasExchange(Exchange):
     order_amount_rounding: Literal["floor", "ceil", "round"] = "round"
     order_price_rounding: Literal["aggressive", "defensive", "round"] = "round"
 
-    def load_markets(self, reload: bool = False, params: dict = {}) -> pd.DataFrame:
+    def load_markets(self, reload: bool = True, params: dict = {}) -> pd.DataFrame:
         @ttl_cache(ttl=self.markets_cache_time)
         def _cached_load_markets():
             return self.exchange.load_markets(reload=reload, params=params)

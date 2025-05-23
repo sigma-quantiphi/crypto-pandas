@@ -14,12 +14,12 @@ async def main():
     data = await exchange.load_markets()
     print(data)
     while n < 5:
-        # order_book = await exchange.watch_ohlcv("BTC/USDT:USDT")
-        # print(order_book)
+        order_book = await exchange.watch_ohlcv("BTC/USDT:USDT")
+        print(order_book)
         bids_asks = await exchange.watch_bids_asks(["BTC/USDT:USDT", "ETH/USDT:USDT"])
         print(bids_asks.dropna(how="all", axis=1))
-        # trades = await exchange.watch_trades("BTC/USDT")
-        # print(trades)
+        trades = await exchange.watch_trades("BTC/USDT")
+        print(trades)
         n += 1
     await exchange.close()
 
