@@ -3,7 +3,7 @@ name = "crypto-pandas"
 version = "0.4.4"
 description = "Library to to work with crypto exchanges using Pandas DataFrame."
 authors = [
-    {name = "Lucas Jamar", email = "lucas.jamar@carpentrix.com"}
+    {name = "Lucas Jamar", email = "lucas.jamar@sqphi.com"}
 ]
 license = "Apache-2.0"
 readme = "README.md"
@@ -15,9 +15,9 @@ dependencies = [
 ]
 
 [project.urls]
-homepage = "https://github.com/lucasjamar/crypto-pandas"
-repository = "https://github.com/lucasjamar/crypto-pandas"
-documentation = "https://github.com/lucasjamar/crypto-pandas"
+homepage = "https://github.com/sigma-quantiphi/crypto-pandas"
+repository = "https://github.com/sigma-quantiphi/crypto-pandas"
+documentation = "https://github.com/sigma-quantiphi/crypto-pandas"
 
 [tool.poetry]
 include = ["crypto_pandas/*"]
