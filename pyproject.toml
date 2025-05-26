@@ -1,6 +1,6 @@
 [project]
 name = "crypto-pandas"
-version = "0.4.6"
+version = "0.4.7"
 description = "Library combining the power of CCXT with Pandas."
 authors = [
     {name = "Lucas Jamar", email = "lucas.jamar@sqphi.com"}
@@ -9,10 +9,10 @@ license = "Apache-2.0"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "pandas[computation, output-formatting, performance] (>=2.2.3,<3.0.0)",
-    "ccxt (>=4.4.0,<5.0.0)",
-    "pandera (>=0.22.1,<0.23.0)",
     "cachetools (>=6.0.0,<7.0.0)",
+    "ccxt (>=4.4.0,<5.0.0)",
+    "pandas[computation, output-formatting, performance] (>=2.2.3,<3.0.0)",
+    "pandera (>=0.22.1,<0.23.0)",
 ]
 
 [project.urls]
@@ -23,6 +23,16 @@ documentation = "https://github.com/sigma-quantiphi/crypto-pandas"
 [tool.poetry]
 include = ["crypto_pandas/*"]
 exclude = ["binder/*", "examples/*", "tests/*", ".env"]
+
+[tool.poetry.dependencies]
+python = ">=3.11"
+
+[tool.poetry.group.docs]
+optional = true
+
+[tool.poetry.group.docs.dependencies]
+sphinx = "^8.2.3"
+furo = "^2024.8.6"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
