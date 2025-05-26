@@ -1,3 +1,7 @@
+## [0.4.0]
+* Introduced `CCXTPandasExchange` and `AsyncCCXTPandasExchange` to enable working with
+`Pandas` in one line of code.
+
 ## [0.2.0]
 * New architecture around classes for Preprocessors.
 

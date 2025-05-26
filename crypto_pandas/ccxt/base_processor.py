@@ -65,12 +65,6 @@ class BaseProcessor:
         "expiryDatetime",
     )
     numeric_fields: tuple = (
-        # "indexPrice",
-        # "bid",
-        # "bidVolume",
-        # "ask",
-        # "askVolume",
-        # "previousClose",
         "availableBalance",
         "buySellRatio",
         "buyVol",

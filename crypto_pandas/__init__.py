@@ -1,7 +1,7 @@
-from crypto_pandas.utils.pandas_trader_dataframe import PandasTraderDataFrameAccessor
-from crypto_pandas.utils.pandas_trader_series import PandasTraderSeriesAccessor
+from crypto_pandas.ccxt.async_ccxt_pandas_exchange import AsyncCCXTPandasExchange
+from crypto_pandas.ccxt.ccxt_pandas_exchange import CCXTPandasExchange
 
 __all__ = [
-    "PandasTraderDataFrameAccessor",
-    "PandasTraderSeriesAccessor",
+    "CCXTPandasExchange",
+    "AsyncCCXTPandasExchange",
 ]
