@@ -156,22 +156,22 @@ class BaseProcessor:
             ]
             data[datetime_columns_to_convert] = (
                 data[datetime_columns_to_convert]
-                .apply(pd.to_numeric)
-                .apply(pd.to_datetime, unit="ms", utc=True)
+                .apply(pd.to_numeric, errors="ignore")
+                .apply(pd.to_datetime, unit="ms", utc=True, errors="ignore")
             )
         if self.str_to_datetime_fields:
             datetime_columns_to_convert = [
                 x for x in columns if x in self.str_to_datetime_fields
             ]
             data[datetime_columns_to_convert] = data[datetime_columns_to_convert].apply(
-                pd.to_datetime, utc=True
+                pd.to_datetime, utc=True, errors="ignore"
             )
         if self.numeric_fields:
             numeric_columns_to_convert = [
                 x for x in columns if x in self.numeric_fields
             ]
             data[numeric_columns_to_convert] = data[numeric_columns_to_convert].apply(
-                pd.to_numeric
+                pd.to_numeric, errors="ignore"
             )
         if self.bool_fields:
             bool_columns_to_convert = [x for x in columns if x in self.bool_fields]
