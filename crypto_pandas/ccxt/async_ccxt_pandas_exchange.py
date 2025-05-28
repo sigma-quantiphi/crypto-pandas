@@ -1,4 +1,8 @@
+import asyncio
+import sys
+
 import ccxt.pro as ccxt
+from ccxt import Exchange
 import pandas as pd
 from dataclasses import dataclass, field
 
@@ -7,9 +11,12 @@ from crypto_pandas.utils.pandas_utils import timestamp_to_int
 
 ccxt_processor = BaseProcessor()
 
+if sys.platform.startswith("win"):
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
 
 @dataclass
-class AsyncCCXTPandasExchange:
+class AsyncCCXTPandasExchange(Exchange):
     exchange: ccxt.Exchange = field(default_factory=ccxt.binance)
 
     async def load_markets(

@@ -1,4 +1,7 @@
-## [0.4.9]
+## [0.4.11]
+* Adding default `WindowsSelectorEventLoopPolicy` to `AsyncCCXTPandasExchange`.
+
+## [0.4.10]
 * Added `fetch_funding_history` method.
 
 ## [0.4.5]
