@@ -136,7 +136,7 @@ class BaseProcessor:
             elif self.str_to_datetime_fields and (key in self.str_to_datetime_fields):
                 data[key] = pd.Timestamp(value)
             elif self.numeric_fields and (key in self.numeric_fields):
-                data[key] = pd.to_numeric(value)
+                data[key] = pd.to_numeric(value, errors="coerce")
         return data
 
     def preprocess_dataframe(self, data: pd.DataFrame) -> pd.DataFrame:
@@ -156,22 +156,22 @@ class BaseProcessor:
             ]
             data[datetime_columns_to_convert] = (
                 data[datetime_columns_to_convert]
-                .apply(pd.to_numeric, errors="ignore")
-                .apply(pd.to_datetime, unit="ms", utc=True, errors="ignore")
+                .apply(pd.to_numeric, errors="coerce")
+                .apply(pd.to_datetime, unit="ms", utc=True, errors="coerce")
             )
         if self.str_to_datetime_fields:
             datetime_columns_to_convert = [
                 x for x in columns if x in self.str_to_datetime_fields
             ]
             data[datetime_columns_to_convert] = data[datetime_columns_to_convert].apply(
-                pd.to_datetime, utc=True, errors="ignore"
+                pd.to_datetime, utc=True, errors="coerce"
             )
         if self.numeric_fields:
             numeric_columns_to_convert = [
                 x for x in columns if x in self.numeric_fields
             ]
             data[numeric_columns_to_convert] = data[numeric_columns_to_convert].apply(
-                pd.to_numeric, errors="ignore"
+                pd.to_numeric, errors="coerce"
             )
         if self.bool_fields:
             bool_columns_to_convert = [x for x in columns if x in self.bool_fields]
