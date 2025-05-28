@@ -65,6 +65,7 @@ class CCXTPandasExchange(Exchange):
         fetch_tickers: Fetch all tickers as a DataFrame.
         fetch_order_book: Fetch order book for a given symbol.
         fetch_ohlcv: Fetch OHLCV (candlestick) data.
+        fetch_funding_history: Fetch historical funding data.
         fetch_funding_rate_history: Fetch historical funding rates.
         fetch_open_interest: Fetch open interest for a given symbol.
         fetch_open_interest_history: Fetch historical open interest.
@@ -356,6 +357,37 @@ class CCXTPandasExchange(Exchange):
             params=params,
         )
         return ccxt_processor.ohlcv_to_dataframe(data)
+
+    def fetch_funding_history(
+        self,
+        symbol: str | None = None,
+        since: int | pd.Timestamp | None = None,
+        limit: int | None = None,
+        params: dict = {},
+    ) -> pd.DataFrame:
+        """
+        Fetch historical funding payment data for a specific symbol or all symbols.
+
+        This method retrieves historical funding payment information from the exchange
+        and converts it to a pandas DataFrame for easy manipulation and analysis.
+
+        Args:
+            symbol (str | None, optional): The trading pair symbol (e.g., 'BTC/USDT').
+                If None, fetches data for all symbols. Defaults to None.
+            since (int | pd.Timestamp | None, optional): The starting timestamp to begin fetching data from.
+                Can be an integer in milliseconds or a pandas Timestamp. Defaults to None.
+            limit (int | None, optional): The maximum number of records to retrieve. If None, the exchange
+                determines the limit. Defaults to None.
+            params (dict, optional): Additional parameters to pass to the API request. Defaults to an empty dictionary.
+
+        Returns:
+            pd.DataFrame: A pandas DataFrame containing the funding payment history
+            with details such as the time, symbol, funding rate, payment amount, and other relevant fields.
+        """
+        data = self.exchange.fetch_funding_rate_history(
+            symbol=symbol, since=timestamp_to_int(since), limit=limit, params=params
+        )
+        return ccxt_processor.response_to_dataframe(data)
 
     def fetch_funding_rate_history(
         self,

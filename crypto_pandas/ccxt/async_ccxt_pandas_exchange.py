@@ -262,6 +262,37 @@ class AsyncCCXTPandasExchange:
         )
         return ccxt_processor.ohlcv_to_dataframe(data)
 
+    async def fetch_funding_history(
+        self,
+        symbol: str | None = None,
+        since: int | pd.Timestamp | None = None,
+        limit: int | None = None,
+        params: dict = {},
+    ) -> pd.DataFrame:
+        """
+        Fetch historical funding payment data for a specific symbol or all symbols.
+
+        This method retrieves historical funding payment information from the exchange
+        and converts it to a pandas DataFrame for easy manipulation and analysis.
+
+        Args:
+            symbol (str | None, optional): The trading pair symbol (e.g., 'BTC/USDT').
+                If None, fetches data for all symbols. Defaults to None.
+            since (int | pd.Timestamp | None, optional): The starting timestamp to begin fetching data from.
+                Can be an integer in milliseconds or a pandas Timestamp. Defaults to None.
+            limit (int | None, optional): The maximum number of records to retrieve. If None, the exchange
+                determines the limit. Defaults to None.
+            params (dict, optional): Additional parameters to pass to the API request. Defaults to an empty dictionary.
+
+        Returns:
+            pd.DataFrame: A pandas DataFrame containing the funding payment history
+            with details such as the time, symbol, funding rate, payment amount, and other relevant fields.
+        """
+        data = await self.exchange.fetch_funding_rate_history(
+            symbol=symbol, since=timestamp_to_int(since), limit=limit, params=params
+        )
+        return ccxt_processor.response_to_dataframe(data)
+
     async def fetch_funding_rate_history(
         self,
         symbol: str | None = None,
@@ -269,16 +300,20 @@ class AsyncCCXTPandasExchange:
         limit: int | None = None,
         params: dict = {},
     ) -> pd.DataFrame:
-        """Fetch historical funding rate data for a specific symbol.
+        """
+        Fetches the funding rate history for a specified trading pair.
 
         Args:
-            symbol (str | None, optional): The trading pair symbol (e.g., 'BTC/USDT'). If None, data for all symbols will be retrieved. Defaults to None.
-            since (int | pd.Timestamp | None, optional): A timestamp (in milliseconds) or pandas.Timestamp to fetch data starting from. Defaults to None.
-            limit (int | None, optional): The maximum number of records to retrieve. Defaults to None.
-            params (dict, optional): Additional parameters to pass to the exchange's API. Defaults to an empty dictionary.
+            symbol (str | None, optional): The trading pair symbol (e.g., 'BTC/USDT') for which to fetch
+                funding rate history. If None, data for all symbols will be fetched. Defaults to None.
+            since (int | pd.Timestamp | None, optional): A starting timestamp (in milliseconds or pandas.Timestamp)
+                for filtering the data. Defaults to None, which fetches data from the earliest available record.
+            limit (int | None, optional): The maximum number of records to fetch. Defaults to None.
+            params (dict, optional): Additional parameters to include in the API request. Defaults to an empty dictionary.
 
         Returns:
-            pd.DataFrame: A pandas DataFrame containing the funding rate history, with columns such as rate, funding time, and more.
+            pd.DataFrame: A pandas DataFrame containing the funding rate history for the specified symbol(s),
+            including fields such as symbol, rate, and timestamp.
         """
         data = await self.exchange.fetch_funding_rate_history(
             symbol=symbol, since=timestamp_to_int(since), limit=limit, params=params
@@ -302,6 +337,28 @@ class AsyncCCXTPandasExchange:
         """
         data = await self.exchange.fetch_open_interest(symbol=symbol, params=params)
         return ccxt_processor.preprocess_dict(data)
+
+    async def fetch_open_interests(
+        self,
+        symbols: list[str],
+        params: dict = {},
+    ) -> pd.DataFrame:
+        """
+        Fetches the open interest data for multiple trading pair symbols.
+
+        Args:
+            symbols (list[str]): A list of trading pair symbols (e.g., ['BTC/USDT', 'ETH/USDT'])
+                for which the open interest data is to be retrieved. Each symbol must be valid
+                for the exchange being queried.
+            params (dict, optional): Additional custom parameters to include in the API request.
+                Defaults to an empty dictionary.
+
+        Returns:
+            pd.DataFrame: A pandas DataFrame containing open interest data for the given
+            symbols, including fields such as symbol, open interest, and timestamp.
+        """
+        data = await self.exchange.fetch_open_interests(symbols=symbols, params=params)
+        return ccxt_processor.response_to_dataframe(data)
 
     async def fetch_open_interest_history(
         self,

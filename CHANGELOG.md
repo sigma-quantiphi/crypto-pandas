@@ -1,3 +1,6 @@
+## [0.4.9]
+* Added `fetch_funding_history` method.
+
 ## [0.4.5]
 * Set default errors to ignore.
 
