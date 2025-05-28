@@ -100,6 +100,7 @@ class BaseProcessor:
         "positionInitialMargin",
         "sellVol",
         "shortAccount",
+        "strike",
         "totalAssetOfBtc",
         "totalCollateralValueInUSDT",
         "totalLiabilityOfBtc",
