@@ -1,3 +1,6 @@
+## [0.5.0]
+* Transformed `orders_dataframe_preprocessing` into standard function to allow simpler use within crypto-pandas-pro.
+
 ## [0.4.11]
 * Adding default `WindowsSelectorEventLoopPolicy` to `AsyncCCXTPandasExchange`.
 

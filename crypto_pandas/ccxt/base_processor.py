@@ -313,4 +313,4 @@ class BaseProcessor:
             self.order_schema.validate(orders)
         fields = determine_mandatory_optional_fields_pandera(self.order_schema)
         fields["optional"] = [x for x in orders.columns if x in fields["optional"]]
-        return orders[fields["mandatory"] + fields["optional"]]
+        return orders[fields["mandatory"] + fields["optional"]].to_dict("records")

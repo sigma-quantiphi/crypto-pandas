@@ -1,5 +1,5 @@
 from functools import wraps
-from typing import Literal
+from typing import Literal, Callable
 
 import ccxt
 import numpy as np
@@ -908,7 +908,7 @@ class CCXTPandasExchange(Exchange):
         return ccxt_processor.preprocess_dict(data)
 
     @staticmethod
-    def order_preprocessing(func):
+    def order_preprocessing(func: Callable):
         """
         A decorator for preprocessing order parameters such as price, amount, and notional
         before creating, editing, or manipulating orders.
@@ -995,96 +995,83 @@ class CCXTPandasExchange(Exchange):
 
         return wrapper
 
-    @staticmethod
-    def orders_dataframe_preprocessing(func):
+    def orders_dataframe_preprocessing(self, orders: pd.DataFrame) -> list:
         """
-        Decorator for preprocessing order data stored in a pandas DataFrame.
-
-        This includes formatting datetime columns, adding derived fields like
-        'notional', and ensuring all values conform to the specified limits.
-
+        Preprocesses a DataFrame containing orders to validate, format, and adjust values.
+    
+        This method ensures proper formatting of datetime fields, calculates notional values
+        if not present, checks for notional and order count limits, and rounds price and
+        amount fields based on the rounding rules and precision constraints of the exchange.
+    
         Args:
-            func (Callable): The function to be wrapped. It must accept the
-                preprocessed DataFrame as a parameter.
-
+            orders (pd.DataFrame): A DataFrame where each row represents an order with fields
+                such as 'symbol', 'amount', 'price', 'side', and optional params.
+    
         Returns:
-            Callable: The decorated function with added preprocessing for the
-            provided DataFrame.
+            list: A list of preprocessed order dictionaries, ready for API submission.
+    
+        Raises:
+            ValueError: If any order exceeds the max notional value, if the number of orders
+                exceeds the max allowed, or if required fields are missing during the preprocessing.
         """
+        # Format datetime
+        orders = date_time_columns_to_int_str(orders)
+        if {"amount", "price"}.issubset(orders.columns):
+            orders["notional"] = orders["amount"] * orders["price"]
+        elif {"notional", "price"}.issubset(orders.columns):
+            orders["amount"] = orders["notional"] / orders["price"]
 
-        @wraps(func)
-        def wrapper(
-            self,
-            orders: pd.DataFrame,
-            *args,
-            **kwargs,
-        ):
-            # Format datetime
-            orders = date_time_columns_to_int_str(orders)
-            if {"amount", "price"}.issubset(orders.columns):
-                orders["notional"] = orders["amount"] * orders["price"]
-            elif {"notional", "price"}.issubset(orders.columns):
-                orders["amount"] = orders["notional"] / orders["price"]
-
-            # Limit checks
-            if "notional" in orders.columns:
-                if orders.eval(f"notional > {self.max_order_notional}").any():
-                    errors = orders.query(f"notional > {self.max_order_notional}")
-                    raise ValueError(
-                        f"Certain orders have notional larger than max notional {self.max_number_of_orders}:\n {errors}"
-                    )
-            n_orders = len(orders.index)
-            if n_orders > self.max_number_of_orders:
+        # Limit checks
+        if "notional" in orders.columns:
+            if orders.eval(f"notional > {self.max_order_notional}").any():
+                errors = orders.query(f"notional > {self.max_order_notional}")
                 raise ValueError(
-                    f"Number of orders {n_orders} larger than limit {self.max_number_of_orders}"
+                    f"Certain orders have notional larger than max notional {self.max_number_of_orders}:\n {errors}"
                 )
+        n_orders = len(orders.index)
+        if n_orders > self.max_number_of_orders:
+            raise ValueError(
+                f"Number of orders {n_orders} larger than limit {self.max_number_of_orders}"
+            )
 
-            markets = self.load_markets()[order_data_columns]
-            orders = orders.merge(markets)
-            # Round values appropriately
-            if "price" in orders.columns:
-                orders["price"] /= orders["precision_price"]
-                orders["price_down"] = np.floor(orders["price"])
-                orders["price_up"] = np.floor(orders["price"])
-                if self.order_price_rounding == "defensive":
-                    orders["price"] = orders["price_down"].where(
-                        orders["side"] == "buy", other=orders["price_up"]
-                    )
-                elif self.order_price_rounding == "aggressive":
-                    orders["price"] = orders["price_up"].where(
-                        orders["side"] == "buy", other=orders["price_down"]
-                    )
-                else:
-                    orders["price"] = orders["price"].round()
-                orders = orders.drop(columns=["price_down", "price_up"])
-                orders["price"] = (orders["price"] * orders["precision_price"]).clip(
-                    lower=orders["limits_price.min"], upper=orders["limits_price.max"]
+        markets = self.load_markets()[order_data_columns]
+        orders = orders.merge(markets)
+        # Round values appropriately
+        if "price" in orders.columns:
+            orders["price"] /= orders["precision_price"]
+            orders["price_down"] = np.floor(orders["price"])
+            orders["price_up"] = np.floor(orders["price"])
+            if self.order_price_rounding == "defensive":
+                orders["price"] = orders["price_down"].where(
+                    orders["side"] == "buy", other=orders["price_up"]
                 )
-            orders["amount"] /= orders["precision_amount"]
-            if self.order_amount_rounding == "floor":
-                orders["amount"] = np.floor(orders["amount"])
-            elif self.order_amount_rounding == "ceil":
-                orders["amount"] = np.ceil(orders["amount"])
+            elif self.order_price_rounding == "aggressive":
+                orders["price"] = orders["price_up"].where(
+                    orders["side"] == "buy", other=orders["price_down"]
+                )
             else:
-                orders["amount"] = orders["amount"].round()
-            orders["amount"] = (orders["amount"] * orders["precision_amount"]).clip(
-                lower=orders["limits_amount.min"], upper=orders["limits_amount.max"]
+                orders["price"] = orders["price"].round()
+            orders = orders.drop(columns=["price_down", "price_up"])
+            orders["price"] = (orders["price"] * orders["precision_price"]).clip(
+                lower=orders["limits_price.min"], upper=orders["limits_price.max"]
             )
+        orders["amount"] /= orders["precision_amount"]
+        if self.order_amount_rounding == "floor":
+            orders["amount"] = np.floor(orders["amount"])
+        elif self.order_amount_rounding == "ceil":
+            orders["amount"] = np.ceil(orders["amount"])
+        else:
+            orders["amount"] = orders["amount"].round()
+        orders["amount"] = (orders["amount"] * orders["precision_amount"]).clip(
+            lower=orders["limits_amount.min"], upper=orders["limits_amount.max"]
+        )
 
-            # Serialize param columns
-            param_cols = orders.columns[orders.columns.str.startswith("params.")]
-            orders["params"] = orders.apply(
-                combine_params, axis=1, param_cols=param_cols
-            )
-            orders = ccxt_processor.orders_to_dict(orders)
-            return func(
-                self,
-                orders=orders,
-                *args,
-                **kwargs,
-            )
-
-        return wrapper
+        # Serialize param columns
+        param_cols = orders.columns[orders.columns.str.startswith("params.")]
+        orders["params"] = orders.apply(
+            combine_params, axis=1, param_cols=param_cols
+        )
+        return ccxt_processor.orders_to_dict(orders)
 
     @order_preprocessing
     def create_order(
@@ -1189,7 +1176,6 @@ class CCXTPandasExchange(Exchange):
         )
         return ccxt_processor.preprocess_dict(data)
 
-    @orders_dataframe_preprocessing
     def create_orders(
         self,
         orders: pd.DataFrame,
@@ -1214,7 +1200,7 @@ class CCXTPandasExchange(Exchange):
             exchange, including details about created orders.
         """
         data = self.exchange.create_orders(
-            orders=orders.to_dict("records"),
+            orders=self.orders_dataframe_preprocessing(orders=orders),
             params=params,
         )
         return ccxt_processor.response_to_dataframe(data)
@@ -1260,7 +1246,6 @@ class CCXTPandasExchange(Exchange):
         )
         return ccxt_processor.response_to_dataframe(data)
 
-    @orders_dataframe_preprocessing
     def cancel_orders_for_symbols(
         self,
         orders: pd.DataFrame,
@@ -1286,11 +1271,10 @@ class CCXTPandasExchange(Exchange):
                 orders, including order ID, status, symbol, and other details.
         """
         data = self.exchange.cancel_orders_for_symbols(
-            orders=orders.to_dict("records"),
+            orders=orders[["id", "symbol"]].to_dict("records"),
         )
         return ccxt_processor.response_to_dataframe(data)
 
-    @orders_dataframe_preprocessing
     def edit_orders(
         self,
         orders: pd.DataFrame,
@@ -1316,7 +1300,7 @@ class CCXTPandasExchange(Exchange):
             ValueError: If preprocessing of the `orders` DataFrame fails due to missing or invalid data fields.
         """
         data = self.exchange.edit_orders(
-            orders=orders.to_dict("records"),
+            orders=self.orders_dataframe_preprocessing(orders=orders),
             params=params,
         )
         return ccxt_processor.response_to_dataframe(data)
