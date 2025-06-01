@@ -384,7 +384,7 @@ class CCXTPandasExchange(Exchange):
             pd.DataFrame: A pandas DataFrame containing the funding payment history
             with details such as the time, symbol, funding rate, payment amount, and other relevant fields.
         """
-        data = self.exchange.fetch_funding_rate_history(
+        data = self.exchange.fetch_funding_history(
             symbol=symbol, since=timestamp_to_int(since), limit=limit, params=params
         )
         return ccxt_processor.response_to_dataframe(data)

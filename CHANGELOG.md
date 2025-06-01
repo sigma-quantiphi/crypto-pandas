@@ -1,3 +1,6 @@
+## [0.5.2]
+* Fixed `fetch_funding_history` API call in both sync and async class.
+
 ## [0.5.0]
 * Transformed `orders_dataframe_preprocessing` into standard function to allow simpler use within crypto-pandas-pro.
 
