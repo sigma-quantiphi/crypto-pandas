@@ -6,15 +6,23 @@ Synchronous usage
 
 .. code-block:: python
 
-   import ccxt
-   from crypto_pandas import CCXTPandasExchange
+    import ccxt
+    from crypto_pandas import CCXTPandasExchange
 
-   exchange = ccxt.binance()
-   pandas_exchange = CCXTPandasExchange(exchange=exchange)
-   ohlcv = pandas_exchange.fetch_ohlcv("BNB/USDT", timeframe="1h", limit=1000)
-   order_book = pandas_exchange.fetch_order_book("BNB/USDT", limit=1000)
-   print(ohlcv.tail())
-   print(order_book.tail())
+    exchange = ccxt.binance({"apiKey": "apiKey", "secret": "secret"})
+    pandas_exchange = CCXTPandasExchange(exchange=exchange)
+    ohlcv = pandas_exchange.fetch_ohlcv("BNB/USDT", timeframe="1h", limit=1000)
+    order_book = pandas_exchange.fetch_order_book("BNB/USDT", limit=1000)
+    print(ohlcv.tail())
+    print(order_book.tail())
+
+    # Example of sending a dataframe of orders
+    orders = pd.DataFrame(data=[
+        {"symbol": "BNB/USDT", "type": "limit", "side": "buy", "price": 650.0, "amount": 1.0},
+        {"symbol": "BNB/USDT", "type": "limit", "side": "sell", "price": 700.0, "amount": 0.5},
+    ])
+    response = pandas_exchange.create_orders(orders=orders)
+    print(response[["id", "clientOrderId", "symbol", "status"]])
 
 .. code-block:: text
 
@@ -31,6 +39,10 @@ Synchronous usage
     1997  643.93  0.046  BNB/USDT       NaT      NaT  14090677334  bids
     1998  643.92  0.042  BNB/USDT       NaT      NaT  14090677334  bids
     1999  643.91  0.153  BNB/USDT       NaT      NaT  14090677334  bids
+
+               id                     clientOrderId         symbol status
+    0  1970147588  x-cvBPrNm99711929c63a7b3c71e1b24  BNB/USDC:USDC   open
+    1  1970147587  x-cvBPrNm9a76fee4e55d0f58862528d  BNB/USDC:USDC   open
 
 Asynchronous usage
 ------------------
