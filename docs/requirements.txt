@@ -1,9 +1,5 @@
 furo
 sphinx
-sphinx-autodoc
-sphinx-autosummary
-sphinx-napoleon
-sphinx-viewcode
 sphinx_copybutton
 sphinx-sitemap
 sphinxext-opengraph
