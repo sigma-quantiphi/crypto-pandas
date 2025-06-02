@@ -2,7 +2,6 @@ import asyncio
 import sys
 
 import ccxt.pro as ccxt
-from ccxt import Exchange
 import pandas as pd
 from dataclasses import dataclass, field
 
@@ -16,7 +15,7 @@ if sys.platform.startswith("win"):
 
 
 @dataclass
-class AsyncCCXTPandasExchange(Exchange):
+class AsyncCCXTPandasExchange:
     exchange: ccxt.Exchange = field(default_factory=ccxt.binance)
 
     async def load_markets(
@@ -1281,7 +1280,3 @@ class AsyncCCXTPandasExchange(Exchange):
             params=params,
         )
         return ccxt_processor.ohlcv_to_dataframe(data)
-
-    async def close(self):
-        """Close websocket connections"""
-        await self.exchange.close()

@@ -9,19 +9,28 @@ Synchronous usage
    import ccxt
    from crypto_pandas import CCXTPandasExchange
 
-   binance = CCXTPandasExchange(exchange=ccxt.binance())
-   df = binance.fetch_ohlcv("BTC/USDT", timeframe="1h", limit=1000)
-   print(df.tail())
+   exchange = ccxt.binance()
+   pandas_exchange = CCXTPandasExchange(exchange=exchange)
+   ohlcv = pandas_exchange.fetch_ohlcv("BNB/USDT", timeframe="1h", limit=1000)
+   order_book = pandas_exchange.fetch_order_book("BNB/USDT", limit=1000)
+   print(ohlcv.tail())
+   print(order_book.tail())
 
 .. code-block:: text
 
-                      open      high       low     close     volume
-   timestamp
-   2025-05-31 20:00  68216  68344.0  68112.0  68297.0   149.07
-   2025-05-31 21:00  68297  68425.0  68205.0  68390.0   172.88
-   2025-05-31 22:00  68390  68510.0  68334.0  68480.0   198.44
-   2025-05-31 23:00  68480  68655.0  68412.0  68620.0   210.66
-   2025-06-01 00:00  68620  68733.0  68545.0  68695.0   190.55
+                        timestamp    open    high     low   close    volume
+    995 2025-06-02 05:00:00+00:00  657.62  658.48  655.71  657.22  2922.537
+    996 2025-06-02 06:00:00+00:00  657.23  658.88  656.30  657.84  4882.567
+    997 2025-06-02 07:00:00+00:00  657.84  659.40  657.73  658.16  8241.973
+    998 2025-06-02 08:00:00+00:00  658.16  658.57  655.36  655.83  4895.569
+    999 2025-06-02 09:00:00+00:00  655.83  655.89  653.22  654.89  4198.651
+
+           price    qty    symbol timestamp datetime        nonce  side
+    1995  643.96  3.226  BNB/USDT       NaT      NaT  14090677334  bids
+    1996  643.95  0.028  BNB/USDT       NaT      NaT  14090677334  bids
+    1997  643.93  0.046  BNB/USDT       NaT      NaT  14090677334  bids
+    1998  643.92  0.042  BNB/USDT       NaT      NaT  14090677334  bids
+    1999  643.91  0.153  BNB/USDT       NaT      NaT  14090677334  bids
 
 Asynchronous usage
 ------------------
@@ -32,21 +41,57 @@ Asynchronous usage
    import ccxt.pro as ccxt
    from crypto_pandas import AsyncCCXTPandasExchange
 
-   exchange = AsyncCCXTPandasExchange(ccxt.binance())
+   exchange = ccxt.binance()
+   pandas_exchange = AsyncCCXTPandasExchange(exchange=exchange)
 
    async def main():
-       df = await exchange.fetch_ohlcv("BTC/USDT", timeframe="1m", limit=500)
-       print(df.tail())
+       ohlcv = await pandas_exchange.fetch_ohlcv("BNB/USDT", timeframe="1m", limit=500)
+       order_book = await pandas_exchange.fetch_order_book("BNB/USDT", limit=500)
+       print(ohlcv.tail())
+       print(order_book.tail())
        exchange.close()
 
    asyncio.run(main())
 
 .. code-block:: text
 
-                      open     high      low    close   volume
-   timestamp
-   2025-06-01 00:04  68670  68690.0  68654.0  68685.0   3.119
-   2025-06-01 00:05  68685  68702.0  68660.0  68674.0   2.742
-   2025-06-01 00:06  68674  68698.0  68650.0  68697.0   3.588
-   2025-06-01 00:07  68697  68725.0  68690.0  68720.0   3.012
-   2025-06-01 00:08  68720  68744.0  68705.0  68730.0   2.994
+                        timestamp    open    high     low   close    volume
+    995 2025-06-02 05:00:00+00:00  657.62  658.48  655.71  657.22  2922.537
+    996 2025-06-02 06:00:00+00:00  657.23  658.88  656.30  657.84  4882.567
+    997 2025-06-02 07:00:00+00:00  657.84  659.40  657.73  658.16  8241.973
+    998 2025-06-02 08:00:00+00:00  658.16  658.57  655.36  655.83  4895.569
+    999 2025-06-02 09:00:00+00:00  655.83  655.89  653.22  654.89  4198.651
+
+           price    qty    symbol timestamp datetime        nonce  side
+    1995  643.96  3.226  BNB/USDT       NaT      NaT  14090677334  bids
+    1996  643.95  0.028  BNB/USDT       NaT      NaT  14090677334  bids
+    1997  643.93  0.046  BNB/USDT       NaT      NaT  14090677334  bids
+    1998  643.92  0.042  BNB/USDT       NaT      NaT  14090677334  bids
+    1999  643.91  0.153  BNB/USDT       NaT      NaT  14090677334  bids
+
+
+Websockets usage
+----------------
+
+.. code-block:: python
+
+   import asyncio
+   import ccxt.pro as ccxt
+
+   async def main():
+       exchange = ccxt.binance({
+           "enableRateLimit": True,
+       })
+       pandas_exchange = AsyncCCXTPandasExchange(exchange=exchange)
+       try:
+           while True:
+               ohlcv = await pandas_exchange.watch_ohlcv("BNB/USDT")
+               order_book = await pandas_exchange.watch_order_book("BNB/USDT")
+               print(ohlcv)
+               print(order_book)
+       except KeyboardInterrupt:
+           print("Websocket connection closed")
+       finally:
+           await exchange.close()
+
+   asyncio.run(main())

@@ -1,3 +1,6 @@
+## [0.6.0]
+* Both CCXTPandasExchange and AsyncCCXTPandasExchange no longer inherit from CCXT Exchange.
+
 ## [0.5.2]
 * Fixed `fetch_funding_history` API call in both sync and async class.
 

@@ -7,7 +7,6 @@ import pandas as pd
 from dataclasses import dataclass, field
 
 from cachetools.func import ttl_cache
-from ccxt import Exchange
 
 from crypto_pandas.ccxt.base_processor import BaseProcessor
 from crypto_pandas.utils.pandas_utils import (
@@ -29,7 +28,7 @@ order_data_columns = [
 
 
 @dataclass
-class CCXTPandasExchange(Exchange):
+class CCXTPandasExchange:
     """
     A wrapper class for a CCXT exchange with extended functionalities using pandas.
 
@@ -97,7 +96,7 @@ class CCXTPandasExchange(Exchange):
         edit_orders: Batch-edit multiple orders.
     """
 
-    exchange: Exchange = field(default_factory=ccxt.binance)
+    exchange: ccxt.Exchange = field(default_factory=ccxt.binance)
     max_order_notional: float = 10_000
     max_number_of_orders: int = 5
     markets_cache_time: int = 86400

@@ -4,8 +4,8 @@
 **crypto-pandas**’s documentation
 ================================================
 
-`crypto-pandas` marries the flexibility of **pandas** with real-time
-cryptocurrency market data fetched via **CCXT**.
+`crypto-pandas` marries the flexibility of **[pandas](https://pandas.pydata.org/)** with real-time
+cryptocurrency market data fetched via **[CCXT](https://github.com/ccxt/ccxt)**.
 
 .. toctree::
    :maxdepth: 2
