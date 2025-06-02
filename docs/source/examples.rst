@@ -77,6 +77,7 @@ Websockets usage
 
    import asyncio
    import ccxt.pro as ccxt
+   from crypto_pandas import AsyncCCXTPandasExchange
 
    async def main():
        exchange = ccxt.binance({
