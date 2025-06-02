@@ -2,11 +2,11 @@
 
 ![Python version](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13-blue.svg)
 [![PyPI version](https://badge.fury.io/py/crypto-pandas.svg)](https://pypi.org/project/crypto-pandas/)
-[![PyPI download](https://img.shields.io/pypi/dm/crypto-pandas.svg)](https://pypi.org/project/crypto-pandas/#files)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/sigma-quantiphi/crypto-pandas/HEAD?labpath=examples)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/sigma-quantiphi/crypto-pandas/blob/main/LICENSE.md)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![Docs](https://readthedocs.org/projects/YOUR_PROJECT_NAME/badge/?version=latest)](https://crypto-pandas.readthedocs.io/en/latest/)
+[![Docs](https://readthedocs.org/projects/crypto-pandas/badge/?version=latest)](https://crypto-pandas.readthedocs.io/en/latest/)
+[![Medium badge](https://img.shields.io/badge/-Follow&nbsp;on&nbsp;Medium-black?style=social&logo=medium)](https://medium.com/@lucasjamar47)
 
 Crypto Pandas is a Python library that simplifies the process of interacting with cryptocurrency exchanges via the CCXT
 library. It focuses on streamlining the process of fetching and cleaning exchange-related data, as well as transforming

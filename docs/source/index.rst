@@ -1,17 +1,23 @@
-.. crypto-pandas documentation master file, created by
-   sphinx-quickstart on Mon May 26 15:34:54 2025.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+.. crypto-pandas documentation master file
 
-crypto-pandas documentation
-===========================
+================================================
+**crypto-pandas**’s documentation
+================================================
 
-Add your content using ``reStructuredText`` syntax. See the
-`reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html>`_
-documentation for details.
-
+`crypto-pandas` marries the flexibility of **pandas** with real-time
+cryptocurrency market data fetched via **CCXT**.
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
+   installation
+   examples
+   api/modules
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`

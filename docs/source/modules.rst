@@ -1,7 +1,14 @@
-crypto_pandas
+.. currentmodule:: crypto_pandas
+
+API reference
 =============
 
-.. toctree::
-   :maxdepth: 4
+Below are the public modules most users will interact with.  The two core
+exchange wrappers live in :pymod:`crypto_pandas.ccxt`.
 
-   crypto_pandas
+.. autosummary::
+   :toctree: .
+   :recursive:
+
+   crypto_pandas.ccxt.ccxt_pandas_exchange
+   crypto_pandas.ccxt.async_ccxt_pandas_exchange
