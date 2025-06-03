@@ -8,40 +8,31 @@
 [![Docs](https://readthedocs.org/projects/crypto-pandas/badge/?version=latest)](https://crypto-pandas.readthedocs.io/en/latest/)
 [![Medium badge](https://img.shields.io/badge/-Follow&nbsp;on&nbsp;Medium-black?style=social&logo=medium)](https://medium.com/@lucasjamar47)
 
-Crypto Pandas is a Python library that simplifies the process of interacting with cryptocurrency exchanges via the CCXT
-library. It focuses on streamlining the process of fetching and cleaning exchange-related data, as well as transforming
-dataframes of orders to send to the exchange.
+Crypto Pandas is a lightweight Python library that fuses the power of [pandas](https://pandas.pydata.org/) with the market-connectivity of [CCXT](https://github.com/ccxt/ccxt/).
+In a single line, it transforms CCXT’s raw JSON into a clean, typed DataFrame, ready for analysis, back-testing, or real-time dashboards.
+The same DataFrame-centric API also lets you create, edit, and cancel live exchange orders directly from pandas DataFrames.
 
 ## Features
 
-- Simplified integration with the CCXT library.
-- Utilities for cleaning and preparing exchange data.
-- Easy transformation of order dataframes for compatibility with cryptocurrency exchanges.
+- Transformation of outputs to pandas DataFrame when applicable.
+- Setting proper data types.
+- Transformation of DataFrame of orders to ensure proper format for exchange:
+  - Determining volume based on notional amount if user prefers providing notional
+  - Rounding and capping of price and volume based on exchange's symbol parameters.
 
 ## Installation
 
-To install Crypto Pandas, you can use `pip`:
+Crypto Pandas can be installed on Python 3.11~3.13:
 
 ```bash
 pip install crypto-pandas
 ```
 
-Make sure you have Python 3.12+ installed. You can check your Python version by running:
-
-```bash
-python --version
-```
-
-If any dependencies are missing, they will be installed automatically.
-
 ## Getting Started
 
-Here’s a quick example of how to use Crypto Pandas to fetch and clean data using CCXT.
-
-### Basic Usage
-
-Crypto-Pandas works near identically to CCXT. Just add `exchange = CCXTPandasExchange(exchange=exchange)`
-and the exchange methods provided by CCXT will be exposed to Crypto-Pandas.
+Crypt -Pandas works near identically to CCXT. Just add `exchange = CCXTPandasExchange(exchange=exchange)`
+and the exchange methods provided by CCXT will be exposed to Crypto Pandas.
+More examples can be found on [Binder](https://mybinder.org/v2/gh/sigma-quantiphi/crypto-pandas/HEAD?urlpath=%2Fdoc%2Ftree%2Fexamples): 
 
 ```python
 import ccxt
@@ -67,6 +58,10 @@ print(response)
 For detailed documentation, visit the [ReadTheDocs](https://crypto-pandas.readthedocs.io/en/latest/) or read the API reference for
 advanced features.
 
+## About Sigma Quantiphi
+[Sigma Quantiphi](https://www.sigmaquantiphi.com/) is a quantitative-engineering firm that builds end-to-end algorithmic-trading systems for the cryptocurrency markets.
+We create open-source, Python-first tools—like crypto-pandas—and deliver turnkey execution, data, and research pipelines that emphasize simplicity, transparency, and rapid deployment.
+
 ## License
 
 This project is licensed under the Apache License. See the `LICENSE` file for more details.
@@ -85,6 +80,5 @@ or fix, and send a pull request.
 ## Support
 
 If you encounter any issues or have questions, feel free to open an issue on
-the [GitHub repository](https://github.com/yourusername/crypto-pandas) or contact us via email at
-support@sqphi.com.
+the [GitHub repository](https://github.com/yourusername/crypto-pandas) or contact us via email at contact@sqphi.com.
 Happy trading! 🚀

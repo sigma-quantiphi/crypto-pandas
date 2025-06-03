@@ -1,9 +1,9 @@
 [project]
 name = "crypto-pandas"
-version = "0.6.0"
+version = "0.6.1"
 description = "Library combining the power of CCXT with Pandas."
 authors = [
-    {name = "Lucas Jamar", email = "lucas.jamar@sqphi.com"}
+    {name = "Sigma Quantiphi", email = "contact@sqphi.com"}
 ]
 license = "Apache-2.0"
 readme = "README.md"
@@ -22,7 +22,7 @@ documentation = "https://github.com/sigma-quantiphi/crypto-pandas"
 
 [tool.poetry]
 include = ["crypto_pandas/*"]
-exclude = ["binder/*", "examples/*", "tests/*", ".env"]
+exclude = ["binder/*", "dist/*", "docs/*", "examples/*", "tests/*", ".env"]
 
 [tool.poetry.group.docs]
 optional = true
