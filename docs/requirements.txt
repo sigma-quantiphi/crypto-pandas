@@ -1,3 +1,4 @@
+crypto-pandas
 furo
 sphinx
 sphinx_copybutton
