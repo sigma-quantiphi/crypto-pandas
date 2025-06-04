@@ -1,3 +1,6 @@
+## [0.6.2]
+* Append `symbol` column to OHLCV to facilitate multi symbols.
+
 ## [0.6.0]
 * Both CCXTPandasExchange and AsyncCCXTPandasExchange no longer inherit from CCXT Exchange.
 

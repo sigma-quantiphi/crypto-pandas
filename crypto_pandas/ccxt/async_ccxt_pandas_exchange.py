@@ -266,7 +266,9 @@ class AsyncCCXTPandasExchange:
             limit=limit,
             params=params,
         )
-        return ccxt_processor.ohlcv_to_dataframe(data)
+        data = ccxt_processor.ohlcv_to_dataframe(data)
+        data["symbol"] = symbol
+        return data
 
     async def fetch_funding_history(
         self,
