@@ -25,7 +25,6 @@ from crypto_pandas.utils.pandas_utils import (
 )
 from pandera.typing import DataFrame
 
-
 possible_depth_meta = ["symbol", "timestamp", "datetime", "nonce", "exchange", "T", "u"]
 
 
@@ -182,7 +181,7 @@ class BaseProcessor:
         )
 
     def response_to_dataframe(
-        self, data: list, column_names: tuple = None
+        self, data: list | dict, column_names: tuple = None
     ) -> pd.DataFrame:
         """
         Convert a list of dictionaries into a pandas DataFrame and preprocess it.
@@ -204,10 +203,22 @@ class BaseProcessor:
         return self.preprocess_dataframe(data)
 
     def balance_to_dataframe(self, data: dict) -> pd.DataFrame:
-        df = pd.DataFrame(data={"symbol": list(data["total"].keys())})
-        for column in ["free", "used", "total", "debt"]:
-            if column in data:
-                df[column] = df["symbol"].map(data[column])
+        if "total" in data:
+            df = pd.DataFrame(data={"symbol": list(data["total"].keys())})
+            for column in ["free", "used", "total", "debt"]:
+                if column in data:
+                    df[column] = df["symbol"].map(data[column])
+        else:
+            df = pd.DataFrame(data={"symbol": data.keys()})
+            df = df.query("~(symbol in ['info', 'timestamp', 'datetime'])")
+            df["base"] = df["symbol"].str.split("/").str[0]
+            df["quote"] = df["symbol"].str.split("/").str[1]
+            for index, row in df.iterrows():
+                for x in ["base", "quote"]:
+                    for column in ["free", "used", "total", "debt"]:
+                        symbol_data = data[row["symbol"]]
+                        if column in symbol_data:
+                            df.loc[index, f"{x}_{column}"] = symbol_data[row[x]][column]
         df["timestamp"] = data["timestamp"]
         df["datetime"] = data["datetime"]
         return self.preprocess_dataframe(df)

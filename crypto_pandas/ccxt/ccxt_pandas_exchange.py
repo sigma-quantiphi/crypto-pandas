@@ -999,18 +999,18 @@ class CCXTPandasExchange:
     def orders_dataframe_preprocessing(self, orders: pd.DataFrame) -> list:
         """
         Preprocesses a DataFrame containing orders to validate, format, and adjust values.
-    
+
         This method ensures proper formatting of datetime fields, calculates notional values
         if not present, checks for notional and order count limits, and rounds price and
         amount fields based on the rounding rules and precision constraints of the exchange.
-    
+
         Args:
             orders (pd.DataFrame): A DataFrame where each row represents an order with fields
                 such as 'symbol', 'amount', 'price', 'side', and optional params.
-    
+
         Returns:
             list: A list of preprocessed order dictionaries, ready for API submission.
-    
+
         Raises:
             ValueError: If any order exceeds the max notional value, if the number of orders
                 exceeds the max allowed, or if required fields are missing during the preprocessing.
@@ -1069,9 +1069,7 @@ class CCXTPandasExchange:
 
         # Serialize param columns
         param_cols = orders.columns[orders.columns.str.startswith("params.")]
-        orders["params"] = orders.apply(
-            combine_params, axis=1, param_cols=param_cols
-        )
+        orders["params"] = orders.apply(combine_params, axis=1, param_cols=param_cols)
         return ccxt_processor.orders_to_dict(orders)
 
     @order_preprocessing

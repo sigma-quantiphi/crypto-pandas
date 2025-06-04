@@ -1,3 +1,6 @@
+## [0.6.3]
+* Added balance parsing for isolated margins.
+
 ## [0.6.2]
 * Append `symbol` column to OHLCV to facilitate multi symbols.
 
