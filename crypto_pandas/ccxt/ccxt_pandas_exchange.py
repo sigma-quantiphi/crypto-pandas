@@ -20,10 +20,10 @@ order_data_columns = [
     "symbol",
     "precision_amount",
     "precision_price",
-    "limits_price_min",
-    "limits_price_max",
-    "limits_amount_min",
-    "limits_amount_max",
+    "limits_price.min",
+    "limits_price.max",
+    "limits_amount.min",
+    "limits_amount.max",
 ]
 
 
