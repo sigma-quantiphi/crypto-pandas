@@ -1,3 +1,6 @@
+## [0.7.0]
+* Use underscore rather than dot for unpacking dict columns.
+
 ## [0.6.3]
 * Added balance parsing for isolated margins.
 

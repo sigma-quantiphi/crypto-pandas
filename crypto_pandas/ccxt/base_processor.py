@@ -210,7 +210,9 @@ class BaseProcessor:
                     df[column] = df["symbol"].map(data[column])
         else:
             df = pd.DataFrame(data={"symbol": data.keys()})
-            df = df.query("~(symbol in ['info', 'timestamp', 'datetime'])")
+            df = df.query("~(symbol in ['info', 'timestamp', 'datetime'])").reset_index(
+                drop=True
+            )
             df["base"] = df["symbol"].str.split("/").str[0]
             df["quote"] = df["symbol"].str.split("/").str[1]
             for index, row in df.iterrows():

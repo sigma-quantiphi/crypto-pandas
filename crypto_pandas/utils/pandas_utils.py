@@ -30,7 +30,7 @@ def date_time_columns_to_int_str(data: pd.DataFrame) -> pd.DataFrame:
     return data
 
 
-def expand_dict_columns(data: pd.DataFrame, separator: str = ".") -> pd.DataFrame:
+def expand_dict_columns(data: pd.DataFrame, separator: str = "_") -> pd.DataFrame:
     data = data.reset_index(drop=True)
     dict_columns = [
         x for x in data.columns if all(data[x].apply(lambda y: isinstance(y, dict)))
