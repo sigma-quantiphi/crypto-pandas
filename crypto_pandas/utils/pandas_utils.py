@@ -2,9 +2,19 @@ import pandas as pd
 import pandera as pa
 
 
-def timestamp_to_int(timestamp: int | pd.Timestamp | dict | None) -> int:
-    if isinstance(timestamp, dict):
-        timestamp = pd.Timestamp.now(tz="UTC") + pd.Timedelta(**timestamp)
+def format_timestamp(timestamp: int | pd.Timestamp | dict | str | None) -> pd.Timestamp:
+    now = pd.Timestamp.now(tz="UTC")
+    if timestamp is None:
+        timestamp = now
+    elif isinstance(timestamp, dict):
+        timestamp = now - pd.DateOffset(**timestamp)
+    elif isinstance(timestamp, str):
+        timestamp = now - pd.Timedelta(timestamp)
+    return timestamp
+
+
+def timestamp_to_int(timestamp: int | pd.Timestamp | dict | str | None) -> int:
+    timestamp = format_timestamp(timestamp)
     if isinstance(timestamp, pd.Timestamp):
         timestamp = int(timestamp.timestamp() * 1000)
     return timestamp

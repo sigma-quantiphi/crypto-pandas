@@ -1,5 +1,9 @@
+## [0.7.3]
+* `since` can now be a str of pdTimedelta
+e.g: `"7d"` to set 7 days ago.
+
 ## [0.7.2]
-* `since` can now be a dict of Timedelta parameters
+* `since` can now be a dict of pd.DateOffset parameters
 e.g: `{"days": -1, "hour": 0, "minute": 0, "seconds": 0}` to set  to yesterday midnight.
 
 ## [0.7.0]
