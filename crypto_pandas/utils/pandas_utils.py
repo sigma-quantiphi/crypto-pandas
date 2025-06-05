@@ -2,7 +2,9 @@ import pandas as pd
 import pandera as pa
 
 
-def timestamp_to_int(timestamp: int | pd.Timestamp | None) -> int:
+def timestamp_to_int(timestamp: int | pd.Timestamp | dict | None) -> int:
+    if isinstance(timestamp, dict):
+        timestamp = pd.Timestamp.now(tz="UTC") + pd.Timedelta(**timestamp)
     if isinstance(timestamp, pd.Timestamp):
         timestamp = int(timestamp.timestamp() * 1000)
     return timestamp

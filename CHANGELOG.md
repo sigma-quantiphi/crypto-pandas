@@ -1,3 +1,7 @@
+## [0.7.2]
+* `since` can now be a dict of Timedelta parameters
+e.g: `{"days": -1, "hour": 0, "minute": 0, "seconds": 0}` to set  to yesterday midnight.
+
 ## [0.7.0]
 * Use underscore rather than dot for unpacking dict columns.
 

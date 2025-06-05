@@ -187,7 +187,7 @@ class CCXTPandasExchange:
     def fetch_transfers(
         self,
         code: str = None,
-        since: int | pd.Timestamp | None = None,
+        since: int | pd.Timestamp | dict | None = None,
         limit: int = None,
         params: dict = {},
     ) -> pd.DataFrame:
@@ -196,7 +196,7 @@ class CCXTPandasExchange:
 
         Args:
             code (str): Currency code to filter transfers (e.g., 'BTC'). Defaults to None.
-            since (int | pd.Timestamp | None): Timestamp to filter from. Can be in milliseconds or as a Timestamp.
+            since (int | pd.Timestamp | dict | None, optional): Timestamp to filter from. Can be in milliseconds or as a Timestamp.
             limit (int): Max number of records to retrieve. Defaults to None.
             params (dict): Extra parameters for the request. Defaults to {}.
 
@@ -211,7 +211,7 @@ class CCXTPandasExchange:
     def fetch_ledger(
         self,
         code: str = None,
-        since: int | pd.Timestamp | None = None,
+        since: int | pd.Timestamp | dict | None = None,
         limit: int = None,
         params: dict = {},
     ) -> pd.DataFrame:
@@ -221,7 +221,7 @@ class CCXTPandasExchange:
         Args:
             code (str, optional): Currency code (e.g., 'BTC') to filter the ledger entries.
                 Defaults to None, which retrieves all currencies.
-            since (int | pd.Timestamp | None, optional): A timestamp or pandas Timestamp indicating the starting date
+            since (int | pd.Timestamp | dict | None, optional): A timestamp or pandas Timestamp indicating the starting date
                 for fetching ledger entries. Should be in milliseconds if integer. Defaults to None, which retrieves
                 all available entries.
             limit (int, optional): The maximum number of ledger records to retrieve.
@@ -240,7 +240,7 @@ class CCXTPandasExchange:
     def fetch_withdrawals(
         self,
         symbol: str = None,
-        since: int | pd.Timestamp | None = None,
+        since: int | pd.Timestamp | dict | None = None,
         limit: int = None,
         params: dict = {},
     ) -> pd.DataFrame:
@@ -250,7 +250,7 @@ class CCXTPandasExchange:
         Args:
             symbol (str, optional): The trading pair symbol (e.g., 'BTC/USDT') to filter withdrawals.
                 Defaults to None, which fetches data for all symbols.
-            since (int | pd.Timestamp | None, optional): A timestamp (in milliseconds) or pandas Timestamp
+            since (int | pd.Timestamp | dict | None, optional): A timestamp (in milliseconds) or pandas Timestamp
                 to fetch data starting from that time. Defaults to None, retrieving the full history.
             limit (int, optional): Maximum number of withdrawal records to retrieve. Defaults to None.
             params (dict, optional): Additional parameters to pass to the API request. Defaults to an empty dictionary.
@@ -331,7 +331,7 @@ class CCXTPandasExchange:
         self,
         symbol: str,
         timeframe: str = "1m",
-        since: int | pd.Timestamp | None = None,
+        since: int | pd.Timestamp | dict | None = None,
         limit: int | None = None,
         params: dict = {},
     ) -> pd.DataFrame:
@@ -341,7 +341,7 @@ class CCXTPandasExchange:
         Args:
             symbol (str): The trading pair symbol (e.g., 'BTC/USDT').
             timeframe (str, optional): Timeframe for the candlestick data (e.g., '1m', '1h'). Defaults to '1m'.
-            since (int | pd.Timestamp | None, optional): Timestamp (in milliseconds) or pandas Timestamp to fetch data starting from. Defaults to None.
+            since (int | pd.Timestamp | dict | None, optional): Timestamp (in milliseconds) or pandas Timestamp to fetch data starting from. Defaults to None.
             limit (int | None, optional): The maximum number of candlestick records to retrieve. Defaults to None.
             params (dict, optional): Additional parameters to pass to the exchange's API. Defaults to an empty dictionary.
 
@@ -362,7 +362,7 @@ class CCXTPandasExchange:
     def fetch_funding_history(
         self,
         symbol: str | None = None,
-        since: int | pd.Timestamp | None = None,
+        since: int | pd.Timestamp | dict | None = None,
         limit: int | None = None,
         params: dict = {},
     ) -> pd.DataFrame:
@@ -375,7 +375,7 @@ class CCXTPandasExchange:
         Args:
             symbol (str | None, optional): The trading pair symbol (e.g., 'BTC/USDT').
                 If None, fetches data for all symbols. Defaults to None.
-            since (int | pd.Timestamp | None, optional): The starting timestamp to begin fetching data from.
+            since (int | pd.Timestamp | dict | None, optional): The starting timestamp to begin fetching data from.
                 Can be an integer in milliseconds or a pandas Timestamp. Defaults to None.
             limit (int | None, optional): The maximum number of records to retrieve. If None, the exchange
                 determines the limit. Defaults to None.
@@ -393,7 +393,7 @@ class CCXTPandasExchange:
     def fetch_funding_rate_history(
         self,
         symbol: str | None = None,
-        since: int | pd.Timestamp | None = None,
+        since: int | pd.Timestamp | dict | None = None,
         limit: int | None = None,
         params: dict = {},
     ) -> pd.DataFrame:
@@ -402,7 +402,7 @@ class CCXTPandasExchange:
 
         Args:
             symbol (str | None, optional): The trading pair symbol (e.g., 'BTC/USDT'). If None, data for all symbols will be retrieved. Defaults to None.
-            since (int | pd.Timestamp | None, optional): Timestamp (in milliseconds) or pandas Timestamp to fetch data starting from. Defaults to None.
+            since (int | pd.Timestamp | dict | None, optional): Timestamp (in milliseconds) or pandas Timestamp to fetch data starting from. Defaults to None.
             limit (int | None, optional): The maximum number of records to retrieve. Defaults to None.
             params (dict, optional): Additional parameters to pass to the exchange's API. Defaults to an empty dictionary.
 
@@ -436,7 +436,7 @@ class CCXTPandasExchange:
         self,
         symbol: str,
         timeframe: str = "1h",
-        since: int | pd.Timestamp | None = None,
+        since: int | pd.Timestamp | dict | None = None,
         limit: int | None = None,
         params: dict = {},
     ) -> pd.DataFrame:
@@ -446,7 +446,7 @@ class CCXTPandasExchange:
         Args:
             symbol (str): The trading pair symbol to fetch open interest data for (e.g., "BTC/USDT").
             timeframe (str): The timeframe to aggregate the data (e.g., "1m", "5m", "1h"). Defaults to "1h".
-            since (int | pd.Timestamp | None): The starting timestamp in milliseconds or a pandas Timestamp.
+            since (int | pd.Timestamp | dict | None, optional): The starting timestamp in milliseconds or a pandas Timestamp.
                 Fetches data from this point onward. Defaults to None.
             limit (int | None): The maximum number of records to retrieve. If None, the exchange determines
                 the limit. Defaults to None.
@@ -481,7 +481,7 @@ class CCXTPandasExchange:
     def fetch_trades(
         self,
         symbol: str,
-        since: int | pd.Timestamp | None = None,
+        since: int | pd.Timestamp | dict | None = None,
         limit: int | None = None,
         params: dict = {},
     ) -> pd.DataFrame:
@@ -490,7 +490,7 @@ class CCXTPandasExchange:
 
         Args:
             symbol (str): The trading pair symbol (e.g., 'BTC/USDT').
-            since (int | pd.Timestamp | None, optional): A timestamp (in milliseconds) or pandas Timestamp
+            since (int | pd.Timestamp | dict | None, optional): A timestamp (in milliseconds) or pandas Timestamp
                 to fetch trades starting from. Defaults to None, which fetches recent trades.
             limit (int | None, optional): The maximum number of trade records to retrieve. Defaults to None.
             params (dict, optional): Additional parameters to send in the API request. Defaults to {}.
@@ -506,7 +506,7 @@ class CCXTPandasExchange:
     def fetch_my_trades(
         self,
         symbol: str | None = None,
-        since: int | pd.Timestamp | None = None,
+        since: int | pd.Timestamp | dict | None = None,
         limit: int | None = None,
         params: dict = {},
     ) -> pd.DataFrame:
@@ -515,7 +515,7 @@ class CCXTPandasExchange:
         Args:
             symbol (str | None, optional): The trading pair symbol (e.g., 'BTC/USDT').
                 If None, fetches trades for all symbols. Defaults to None.
-            since (int | pd.Timestamp | None, optional): A timestamp or pandas.Timestamp
+            since (int | pd.Timestamp | dict | None, optional): A timestamp or pandas.Timestamp
                 to fetch trades starting from. Should be in milliseconds if an integer. Defaults to None.
             limit (int | None, optional): Maximum number of trades to retrieve. Defaults to None.
             params (dict, optional): Additional parameters for the API request. Defaults to {}.
@@ -549,7 +549,7 @@ class CCXTPandasExchange:
     def fetch_liquidations(
         self,
         symbol: str,
-        since: int | pd.Timestamp | None = None,
+        since: int | pd.Timestamp | dict | None = None,
         limit: int = None,
         params: dict = {},
     ) -> pd.DataFrame:
@@ -558,7 +558,7 @@ class CCXTPandasExchange:
 
         Args:
             symbol (str): The trading pair symbol (e.g., 'BTC/USDT').
-            since (int | pd.Timestamp | None, optional): Starting timestamp for fetching liquidations.
+            since (int | pd.Timestamp | dict | None, optional): Starting timestamp for fetching liquidations.
                 Can be provided in milliseconds or as a pandas Timestamp. Defaults to None.
             limit (int, optional): The maximum number of liquidation events to retrieve. Defaults to None.
             params (dict, optional): Additional parameters to be sent with the API request. Defaults to an empty dictionary.
@@ -596,7 +596,7 @@ class CCXTPandasExchange:
         self,
         symbol: str | None = None,
         timeframe: str | None = None,
-        since: int | pd.Timestamp | None = None,
+        since: int | pd.Timestamp | dict | None = None,
         limit: int | None = None,
         params: dict = {},
     ) -> pd.DataFrame:
@@ -608,7 +608,7 @@ class CCXTPandasExchange:
                 If None, fetches data for all available symbols. Defaults to None.
             timeframe (str | None, optional): The aggregation timeframe (e.g., '1m', '1h', '1d').
                 Defaults to None, which uses the exchange's default timeframe.
-            since (int | pd.Timestamp | None, optional): A starting timestamp (in milliseconds)
+            since (int | pd.Timestamp | dict | None, optional): A starting timestamp (in milliseconds)
                 or pandas.Timestamp for fetching data from that time onward. Defaults to None.
             limit (int | None, optional): The maximum number of records to fetch.
                 Defaults to None, allowing the exchange to determine the limit.
@@ -666,7 +666,7 @@ class CCXTPandasExchange:
     def fetch_my_liquidations(
         self,
         symbol: str | None = None,
-        since: int | pd.Timestamp | None = None,
+        since: int | pd.Timestamp | dict | None = None,
         limit: int | None = None,
         params: dict = {},
     ) -> pd.DataFrame:
@@ -676,7 +676,7 @@ class CCXTPandasExchange:
         Args:
             symbol (str | None, optional): The trading pair symbol (e.g., 'BTC/USDT').
                 If None, fetches liquidations for all symbols. Defaults to None.
-            since (int | pd.Timestamp | None, optional): A timestamp or pandas.Timestamp
+            since (int | pd.Timestamp | dict | None, optional): A timestamp or pandas.Timestamp
                 from which to fetch liquidations. Should be in milliseconds if an integer.
                 Defaults to None.
             limit (int | None, optional): Maximum number of liquidation records to retrieve.
@@ -737,7 +737,7 @@ class CCXTPandasExchange:
     def fetch_convert_trade_history(
         self,
         code: str | None = None,
-        since: int | pd.Timestamp | None = None,
+        since: int | pd.Timestamp | dict | None = None,
         limit: int | None = None,
         params: dict = {},
     ) -> pd.DataFrame:
@@ -747,7 +747,7 @@ class CCXTPandasExchange:
         Args:
             code (str | None, optional): The currency code for which to fetch the
                 trade history (e.g., 'BTC'). Defaults to None.
-            since (int | pd.Timestamp | None, optional): The starting timestamp to
+            since (int | pd.Timestamp | dict | None, optional): The starting timestamp to
                 fetch data from. Can be an integer in milliseconds or a pandas
                 Timestamp. Defaults to None.
             limit (int | None, optional): The maximum number of records to fetch.
@@ -787,7 +787,7 @@ class CCXTPandasExchange:
     def fetch_orders(
         self,
         symbol: str | None = None,
-        since: int | pd.Timestamp | None = None,
+        since: int | pd.Timestamp | dict | None = None,
         limit: int | None = None,
         params: dict = {},
     ) -> pd.DataFrame:
@@ -796,7 +796,7 @@ class CCXTPandasExchange:
 
         Args:
             symbol (str | None): Trading pair symbol (e.g., 'BTC/USDT'). Defaults to None, which fetches orders for all symbols.
-            since (int | pd.Timestamp | None): A timestamp (milliseconds or pandas Timestamp) to fetch orders starting from. Defaults to None.
+            since (int | pd.Timestamp | dict | None, optional): A timestamp (milliseconds or pandas Timestamp) to fetch orders starting from. Defaults to None.
             limit (int | None): Maximum number of orders to retrieve. Defaults to None.
             params (dict): Additional parameters for the API request. Defaults to an empty dictionary.
 
@@ -811,7 +811,7 @@ class CCXTPandasExchange:
     def fetch_open_orders(
         self,
         symbol: str | None = None,
-        since: int | pd.Timestamp | None = None,
+        since: int | pd.Timestamp | dict | None = None,
         limit: int | None = None,
         params: dict = {},
     ) -> pd.DataFrame:
@@ -820,7 +820,7 @@ class CCXTPandasExchange:
 
         Args:
             symbol (str | None): Trading pair symbol to filter open orders (e.g., 'BTC/USDT'). Defaults to None, which fetches all open orders.
-            since (int | pd.Timestamp | None): A timestamp (milliseconds or pandas Timestamp) to fetch open orders starting from. Defaults to None.
+            since (int | pd.Timestamp | dict | None, optional): A timestamp (milliseconds or pandas Timestamp) to fetch open orders starting from. Defaults to None.
             limit (int | None): Maximum number of open orders to retrieve. Defaults to None.
             params (dict): Additional parameters for the API request. Defaults to an empty dictionary.
 
@@ -835,7 +835,7 @@ class CCXTPandasExchange:
     def fetch_closed_orders(
         self,
         symbol: str | None = None,
-        since: int | pd.Timestamp | None = None,
+        since: int | pd.Timestamp | dict | None = None,
         limit: int | None = None,
         params: dict = {},
     ) -> pd.DataFrame:
@@ -845,7 +845,7 @@ class CCXTPandasExchange:
         Args:
             symbol (str | None): Trading pair symbol to filter closed orders (e.g., "BTC/USDT").
                 Defaults to None, which fetches all closed orders.
-            since (int | pd.Timestamp | None): Timestamp (in milliseconds or pandas.Timestamp) indicating
+            since (int | pd.Timestamp | dict | None, optional): Timestamp (in milliseconds or pandas.Timestamp) indicating
                 the starting point for fetching closed orders. Defaults to None.
             limit (int | None): Maximum number of closed orders to retrieve.
                 Defaults to None, using the exchange's default limit.
@@ -863,7 +863,7 @@ class CCXTPandasExchange:
     def fetch_canceled_and_closed_orders(
         self,
         symbol: str | None = None,
-        since: int | pd.Timestamp | None = None,
+        since: int | pd.Timestamp | dict | None = None,
         limit: int | None = None,
         params: dict = {},
     ) -> pd.DataFrame:
