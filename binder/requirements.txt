@@ -1,1 +1,3 @@
 crypto-pandas
+matplotlib
+plotly
