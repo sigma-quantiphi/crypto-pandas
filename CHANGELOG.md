@@ -1,4 +1,4 @@
-## [0.7.3]
+## [0.7.4]
 * `since` can now be a str of pdTimedelta
 e.g: `"7d"` to set 7 days ago.
 
