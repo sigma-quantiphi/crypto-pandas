@@ -4,9 +4,7 @@ import pandera as pa
 
 def format_timestamp(timestamp: int | pd.Timestamp | dict | str | None) -> pd.Timestamp:
     now = pd.Timestamp.now(tz="UTC")
-    if timestamp is None:
-        timestamp = now
-    elif isinstance(timestamp, dict):
+    if isinstance(timestamp, dict):
         timestamp = now - pd.DateOffset(**timestamp)
     elif isinstance(timestamp, str):
         timestamp = now - pd.Timedelta(timestamp)

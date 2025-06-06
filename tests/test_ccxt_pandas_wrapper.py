@@ -9,8 +9,8 @@ from crypto_pandas.ccxt.ccxt_pandas_exchange import CCXTPandasExchange
 
 load_dotenv()
 settings = {
-    "apiKey": os.getenv("API_KEY"),
-    "secret": os.getenv("API_SECRET"),
+    # "apiKey": os.getenv("API_KEY"),
+    # "secret": os.getenv("API_SECRET"),
     "options": {
         "defaultType": "future",
     },
@@ -77,7 +77,7 @@ def test_fetch_order_book(exchange):
 
 
 def test_fetch_ohlcv(exchange):
-    data = exchange.fetch_ohlcv(symbol)
+    data = exchange.fetch_ohlcv("BTC/USDT")
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
