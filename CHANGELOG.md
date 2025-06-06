@@ -1,3 +1,6 @@
+## [0.7.5]
+* Keep None since.
+
 ## [0.7.4]
 * `since` can now be a str of pdTimedelta
 e.g: `"7d"` to set 7 days ago.

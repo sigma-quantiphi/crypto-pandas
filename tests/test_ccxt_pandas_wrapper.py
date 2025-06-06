@@ -9,8 +9,8 @@ from crypto_pandas.ccxt.ccxt_pandas_exchange import CCXTPandasExchange
 
 load_dotenv()
 settings = {
-    # "apiKey": os.getenv("API_KEY"),
-    # "secret": os.getenv("API_SECRET"),
+    "apiKey": os.getenv("API_KEY"),
+    "secret": os.getenv("API_SECRET"),
     "options": {
         "defaultType": "future",
     },
