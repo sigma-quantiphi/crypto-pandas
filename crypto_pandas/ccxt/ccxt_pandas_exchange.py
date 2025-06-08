@@ -99,7 +99,7 @@ class CCXTPandasExchange:
     exchange: ccxt.Exchange = field(default_factory=ccxt.binance)
     max_order_notional: float = 10_000
     max_number_of_orders: int = 5
-    markets_cache_time: int = 86400
+    markets_cache_time: int = 3600
     order_amount_rounding: Literal["floor", "ceil", "round"] = "round"
     order_price_rounding: Literal["aggressive", "defensive", "round"] = "round"
 
