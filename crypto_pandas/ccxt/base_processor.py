@@ -58,10 +58,12 @@ class BaseProcessor:
         "time",
         "timestamp",
         "updateTime",
+        "fundingTimestamp",
     )
     str_to_datetime_fields: tuple = (
         "datetime",
         "expiryDatetime",
+        "fundingDatetime",
     )
     numeric_fields: tuple = (
         "availableBalance",

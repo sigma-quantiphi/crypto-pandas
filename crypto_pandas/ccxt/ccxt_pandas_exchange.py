@@ -769,7 +769,7 @@ class CCXTPandasExchange:
 
         """
         data = self.exchange.fetch_funding_rates(symbols=symbols, params=params)
-        return ccxt_processor.response_to_dataframe(data)
+        return ccxt_processor.markets_to_dataframe(data)
 
     def fetch_convert_trade_history(
         self,

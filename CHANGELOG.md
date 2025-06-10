@@ -1,3 +1,6 @@
+## [0.7.11]
+* Fix to `fetch_funding_rates` dataframe output.
+
 ## [0.7.9]
 * Introduced `fetch_trading_fee` and `fetch_trading_fees`.
 
