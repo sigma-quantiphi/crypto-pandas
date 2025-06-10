@@ -42,6 +42,19 @@ def test_fetch_balance(exchange):
     assert isinstance(data, pd.DataFrame)
 
 
+def test_fetch_trading_fee(exchange):
+    data = exchange.fetch_trading_fee(symbol=symbol)
+    print(data)
+    assert isinstance(data, dict)
+
+
+def test_fetch_trading_fees(exchange):
+    data = exchange.fetch_trading_fees()
+    print(data)
+    print(data.dtypes)
+    assert isinstance(data, pd.DataFrame)
+
+
 def test_fetch_transfers(exchange):
     data = exchange.fetch_transfers()
     print(data)

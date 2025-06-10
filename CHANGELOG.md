@@ -1,3 +1,6 @@
+## [0.7.9]
+* Introduced `fetch_trading_fee` and `fetch_trading_fees`.
+
 ## [0.7.7]
 * Fix to rounding should `precision` or `limits` not be present in order creation/ editing.
 

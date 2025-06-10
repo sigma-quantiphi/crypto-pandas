@@ -47,6 +47,41 @@ class AsyncCCXTPandasExchange:
         data = await self.exchange.fetch_balance(params=params)
         return ccxt_processor.balance_to_dataframe(data)
 
+    async def fetch_trading_fee(self, symbol: str, params: dict = {}) -> dict:
+        """
+        Fetches the trading fee for a specific symbol and returns it as a dictionary.
+
+        This method retrieves information about the trading fee associated with a specific
+        symbol (trading pair) from the exchange. The result is preprocessed to return a clean,
+        standardized dictionary of fee-related data for easier usage.
+
+        Args:
+            symbol (str): The trading pair symbol (e.g., 'BTC/USDT') for which to fetch trading fees.
+            params (dict, optional): Additional parameters for the API request.
+                Defaults to an empty dictionary.
+
+        Returns:
+            dict: A dictionary containing trading fee details, including fields such as maker and
+            taker fees and other relevant attributes.
+        """
+        data = await self.exchange.fetch_trading_fee(symbol=symbol, params=params)
+        return ccxt_processor.preprocess_dict(data)
+
+    async def fetch_trading_fees(self, params: dict = {}) -> pd.DataFrame:
+        """
+        Fetches trading fees for all supported symbols and converts the data into a pandas DataFrame.
+
+        Args:
+            params (dict, optional): Additional parameters for the API request. Defaults to an empty dictionary.
+
+        Returns:
+            pd.DataFrame: A pandas DataFrame containing trading fee data for all supported symbols, including fields
+            such as symbol, maker fee, taker fee, and tiered trading fee structures.
+        """
+
+        data = await self.exchange.fetch_trading_fees(params=params)
+        return ccxt_processor.markets_to_dataframe(data)
+
     async def fetch_positions_risk(
         self, symbols: list[str] | None = None, params: dict = {}
     ) -> pd.DataFrame:
