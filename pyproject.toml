@@ -1,6 +1,6 @@
 [project]
 name = "crypto-pandas"
-version = "0.7.6"
+version = "0.7.7"
 description = "Library combining the power of CCXT with Pandas."
 authors = [
     {name = "Sigma Quantiphi", email = "contact@sqphi.com"}

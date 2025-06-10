@@ -954,34 +954,48 @@ class CCXTPandasExchange:
                         raise ValueError(
                             f"Order notional {notional} larger than limit {self.max_order_notional}"
                         )
-                    price /= markets["precision_price"]
-                    if (self.order_price_rounding == "defensive" and side == "buy") or (
-                        self.order_price_rounding == "aggressive" and side == "sell"
+                    if pd.notnull(markets["precision_price"]):
+                        price /= markets["precision_price"]
+                        if (
+                            self.order_price_rounding == "defensive" and side == "buy"
+                        ) or (
+                            self.order_price_rounding == "aggressive" and side == "sell"
+                        ):
+                            price = np.floor(price)
+                        elif (
+                            self.order_price_rounding == "defensive" and side == "sell"
+                        ) or (
+                            self.order_price_rounding == "aggressive" and side == "buy"
+                        ):
+                            price = np.ceil(price)
+                        else:
+                            price = round(price)
+                        price *= markets["precision_price"]
+                    if pd.notnull(markets["limits_price.min"]) and pd.notnull(
+                        markets["limits_price.max"]
                     ):
-                        price = np.floor(price)
-                    elif (
-                        self.order_price_rounding == "defensive" and side == "sell"
-                    ) or (self.order_price_rounding == "aggressive" and side == "buy"):
-                        price = np.ceil(price)
-                    else:
-                        price = round(price)
-                    price = np.clip(
-                        price * markets["precision_price"],
-                        markets["limits_price.min"],
-                        markets["limits_price.max"],
-                    )
-            amount /= markets["precision_amount"]
-            if self.order_amount_rounding == "floor":
-                amount = np.floor(amount)
-            elif self.order_amount_rounding == "ceil":
-                amount = np.ceil(amount)
-            else:
-                amount = round(amount)
-            amount = np.clip(
-                amount * markets["precision_amount"],
-                markets["limits_amount.min"],
-                markets["limits_amount.max"],
-            )
+                        price = np.clip(
+                            price,
+                            markets["limits_price.min"],
+                            markets["limits_price.max"],
+                        )
+            if pd.notnull(markets["precision_amount"]):
+                amount /= markets["precision_amount"]
+                if self.order_amount_rounding == "floor":
+                    amount = np.floor(amount)
+                elif self.order_amount_rounding == "ceil":
+                    amount = np.ceil(amount)
+                else:
+                    amount = round(amount)
+                amount *= markets["precision_amount"]
+            if pd.notnull(markets["limits_amount.min"]) and pd.notnull(
+                markets["limits_amount.max"]
+            ):
+                amount = np.clip(
+                    amount,
+                    markets["limits_amount.min"],
+                    markets["limits_amount.max"],
+                )
             return func(
                 self,
                 symbol=symbol,
@@ -1039,34 +1053,40 @@ class CCXTPandasExchange:
         orders = orders.merge(markets)
         # Round values appropriately
         if "price" in orders.columns:
-            orders["price"] /= orders["precision_price"]
-            orders["price_down"] = np.floor(orders["price"])
-            orders["price_up"] = np.floor(orders["price"])
-            if self.order_price_rounding == "defensive":
-                orders["price"] = orders["price_down"].where(
-                    orders["side"] == "buy", other=orders["price_up"]
+            if orders["precision_price"].notnull().all():
+                orders["price"] /= orders["precision_price"]
+                orders["price_down"] = np.floor(orders["price"])
+                orders["price_up"] = np.floor(orders["price"])
+                if self.order_price_rounding == "defensive":
+                    orders["price"] = orders["price_down"].where(
+                        orders["side"] == "buy", other=orders["price_up"]
+                    )
+                elif self.order_price_rounding == "aggressive":
+                    orders["price"] = orders["price_up"].where(
+                        orders["side"] == "buy", other=orders["price_down"]
+                    )
+                else:
+                    orders["price"] = orders["price"].round()
+                orders = orders.drop(columns=["price_down", "price_up"])
+                orders["price"] *= orders["precision_price"]
+            if orders[["limits_price.min", "limits_price.max"]].notnull().all().all():
+                orders["price"] = orders["price"].clip(
+                    lower=orders["limits_price.min"],
+                    upper=orders["limits_price.max"],
                 )
-            elif self.order_price_rounding == "aggressive":
-                orders["price"] = orders["price_up"].where(
-                    orders["side"] == "buy", other=orders["price_down"]
-                )
+        if orders["precision_amount"].notnull().all():
+            orders["amount"] /= orders["precision_amount"]
+            if self.order_amount_rounding == "floor":
+                orders["amount"] = np.floor(orders["amount"])
+            elif self.order_amount_rounding == "ceil":
+                orders["amount"] = np.ceil(orders["amount"])
             else:
-                orders["price"] = orders["price"].round()
-            orders = orders.drop(columns=["price_down", "price_up"])
-            orders["price"] = (orders["price"] * orders["precision_price"]).clip(
-                lower=orders["limits_price.min"], upper=orders["limits_price.max"]
+                orders["amount"] = orders["amount"].round()
+            orders["amount"] *= orders["precision_amount"]
+        if orders[["limits_amount.min", "limits_amount.max"]].notnull().all().all():
+            orders["amount"] = orders["amount"].clip(
+                lower=orders["limits_amount.min"], upper=orders["limits_amount.max"]
             )
-        orders["amount"] /= orders["precision_amount"]
-        if self.order_amount_rounding == "floor":
-            orders["amount"] = np.floor(orders["amount"])
-        elif self.order_amount_rounding == "ceil":
-            orders["amount"] = np.ceil(orders["amount"])
-        else:
-            orders["amount"] = orders["amount"].round()
-        orders["amount"] = (orders["amount"] * orders["precision_amount"]).clip(
-            lower=orders["limits_amount.min"], upper=orders["limits_amount.max"]
-        )
-
         # Serialize param columns
         param_cols = orders.columns[orders.columns.str.startswith("params.")]
         orders["params"] = orders.apply(combine_params, axis=1, param_cols=param_cols)

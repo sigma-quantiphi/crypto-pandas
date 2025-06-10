@@ -1,3 +1,6 @@
+## [0.7.7]
+* Fix to rounding should `precision` or `limits` not be present in order creation/ editing.
+
 ## [0.7.5]
 * Keep None since.
 
