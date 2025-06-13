@@ -1,3 +1,6 @@
+## [0.7.12]
+* Added fix should params column be provided.
+
 ## [0.7.11]
 * Fix to `fetch_funding_rates` dataframe output.
 

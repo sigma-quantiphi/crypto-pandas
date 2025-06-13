@@ -1125,8 +1125,9 @@ class CCXTPandasExchange:
                 lower=orders["limits_amount.min"], upper=orders["limits_amount.max"]
             )
         # Serialize param columns
-        param_cols = orders.columns[orders.columns.str.startswith("params.")]
-        orders["params"] = orders.apply(combine_params, axis=1, param_cols=param_cols)
+        if "params" not in orders.columns:
+            param_cols = orders.columns[orders.columns.str.startswith("params.")]
+            orders["params"] = orders.apply(combine_params, axis=1, param_cols=param_cols)
         return ccxt_processor.orders_to_dict(orders)
 
     @order_preprocessing
