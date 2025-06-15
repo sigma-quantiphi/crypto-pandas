@@ -142,18 +142,18 @@ class CCXTPandasExchange:
     def fetch_trading_fee(self, symbol: str, params: dict = {}) -> dict:
         """
         Fetches the trading fee for a specific symbol and returns it as a dictionary.
-    
-        This method retrieves information about the trading fee associated with a specific 
-        symbol (trading pair) from the exchange. The result is preprocessed to return a clean, 
+
+        This method retrieves information about the trading fee associated with a specific
+        symbol (trading pair) from the exchange. The result is preprocessed to return a clean,
         standardized dictionary of fee-related data for easier usage.
-    
+
         Args:
             symbol (str): The trading pair symbol (e.g., 'BTC/USDT') for which to fetch trading fees.
             params (dict, optional): Additional parameters for the API request.
                 Defaults to an empty dictionary.
-    
+
         Returns:
-            dict: A dictionary containing trading fee details, including fields such as maker and 
+            dict: A dictionary containing trading fee details, including fields such as maker and
             taker fees and other relevant attributes.
         """
         data = self.exchange.fetch_trading_fee(symbol=symbol, params=params)
@@ -162,10 +162,10 @@ class CCXTPandasExchange:
     def fetch_trading_fees(self, params: dict = {}) -> pd.DataFrame:
         """
         Fetches trading fees for all supported symbols and converts the data into a pandas DataFrame.
-    
+
         Args:
             params (dict, optional): Additional parameters for the API request. Defaults to an empty dictionary.
-    
+
         Returns:
             pd.DataFrame: A pandas DataFrame containing trading fee data for all supported symbols, including fields
             such as symbol, maker fee, taker fee, and tiered trading fee structures.
@@ -1127,7 +1127,9 @@ class CCXTPandasExchange:
         # Serialize param columns
         if "params" not in orders.columns:
             param_cols = orders.columns[orders.columns.str.startswith("params.")]
-            orders["params"] = orders.apply(combine_params, axis=1, param_cols=param_cols)
+            orders["params"] = orders.apply(
+                combine_params, axis=1, param_cols=param_cols
+            )
         return ccxt_processor.orders_to_dict(orders)
 
     @order_preprocessing
@@ -1329,6 +1331,7 @@ class CCXTPandasExchange:
         """
         data = self.exchange.cancel_orders_for_symbols(
             orders=orders[["id", "symbol"]].to_dict("records"),
+            params=params
         )
         return ccxt_processor.response_to_dataframe(data)
 
