@@ -76,6 +76,7 @@ orders_dataframe_methods = {
     "watch_orders",
     "watch_orders_for_symbols",
 }
+dataframe_methods = standard_dataframe_methods | markets_dataframe_methods | balance_dataframe_methods | ohlcv_dataframe_methods | orderbook_dataframe_methods | orders_dataframe_methods
 dict_methods = {
     "cancel_order",
     "create_order",

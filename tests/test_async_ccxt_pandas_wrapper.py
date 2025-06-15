@@ -23,7 +23,9 @@ async def main():
     order["type"] = "limit"
     await exchange.close()
     response = await exchange.create_order(**order.to_dict("records")[0])
-    cancel_response = await exchange.cancel_order(id=response["id"], symbol=response["symbol"])
+    cancel_response = await exchange.cancel_order(
+        id=response["id"], symbol=response["symbol"]
+    )
     await exchange.close()
     print(data)
     print(order_book)

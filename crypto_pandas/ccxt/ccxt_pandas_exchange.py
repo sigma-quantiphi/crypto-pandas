@@ -52,6 +52,53 @@ class CCXTPandasExchange:
         order_price_rounding (Literal["aggressive", "defensive", "round"]): Strategy for
             rounding order prices. Default is "round".
 
+        Methods:
+        load_markets: Load market data and cache it.
+        fetch_balance: Fetch account balance as a DataFrame.
+        fetch_trading_fee: Fetch trading fee as a DataFrame.
+        fetch_trading_fees: Fetch trading fees as a DataFrame.
+        fetch_positions_risk: Fetch risk information for open positions.
+        fetch_position: Fetch details of a specific position.
+        fetch_positions: Fetch all positions.
+        fetch_transfers: Fetch transfer history.
+        fetch_ledger: Fetch the account ledger.
+        fetch_withdrawals: Fetch withdrawal history.
+        fetch_currencies: Fetch supported currencies.
+        fetch_ticker: Fetch ticker information for a specific symbol.
+        fetch_tickers: Fetch all tickers as a DataFrame.
+        fetch_order_book: Fetch order book for a given symbol.
+        fetch_ohlcv: Fetch OHLCV (candlestick) data.
+        fetch_funding_history: Fetch historical funding data.
+        fetch_funding_rate_history: Fetch historical funding rates.
+        fetch_open_interest: Fetch open interest for a given symbol.
+        fetch_open_interest_history: Fetch historical open interest.
+        fetch_status: Fetch the exchange status.
+        fetch_trades: Fetch recent trades for a given symbol.
+        fetch_my_trades: Fetch user's trade history.
+        fetch_leverages: Fetch leverage settings.
+        fetch_liquidations: Fetch liquidation events.
+        fetch_greeks: Fetch greek values (options metrics).
+        fetch_long_short_ratio_history: Fetch historical long-short ratios.
+        fetch_margin_adjustment_history: Fetch historical margin adjustment data.
+        fetch_my_liquidations: Fetch user's liquidation history.
+        fetch_option: Fetch option details.
+        fetch_funding_rates: Fetch funding rates.
+        fetch_convert_trade_history: Fetch historical convert trades.
+        fetch_bids_asks: Fetch the latest bid/ask prices for multiple symbols.
+        fetch_orders: Fetch order history.
+        fetch_open_orders: Fetch open orders.
+        fetch_closed_orders: Fetch closed orders.
+        fetch_canceled_and_closed_orders: Fetch canceled and closed orders.
+        fetch_order: Fetch details of a specific order.
+        create_order: Create a new order after preprocessing.
+        cancel_order: Cancel a given order by ID.
+        edit_order: Edit an existing order with new parameters.
+        create_orders: Batch-create multiple orders.
+        cancel_orders: Cancel a batch of orders using their IDs.
+        cancel_all_orders: Cancel all orders for a specific symbol or account-wide.
+        cancel_orders_for_symbols: Cancel specific orders across symbols.
+        edit_orders: Batch-edit multiple orders.
+
     """
 
     exchange: ccxt.Exchange = field(default_factory=ccxt.binance)
@@ -83,6 +130,8 @@ class CCXTPandasExchange:
                     price_strategy=self.order_price_rounding,
                     amount_strategy=self.order_amount_rounding,
                 )
+                if "notional" in kwargs:
+                    kwargs.pop("notional")
             elif method_name in bulk_order_methods:
                 kwargs["orders"] = preprocess_order_dataframe(
                     orders=kwargs["orders"],
@@ -118,7 +167,7 @@ class CCXTPandasExchange:
 
         return wrapped
 
-    async def load_cached_markets(self, params: dict = {}) -> pd.DataFrame:
+    def load_cached_markets(self, params: dict = {}) -> pd.DataFrame:
         """
         Loads market data from the exchange and caches it.
 

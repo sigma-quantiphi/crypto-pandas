@@ -1,3 +1,7 @@
+## [0.8.0a]
+* Both sync and async methods with getattr for simpler architecture and future method additions.
+* Async create/edit/cancel orders now possible.
+
 ## [0.7.12]
 * Added fix should params column be provided.
 
