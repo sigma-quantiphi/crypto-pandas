@@ -11,6 +11,7 @@ load_dotenv()
 settings = {
     "apiKey": os.getenv("API_KEY"),
     "secret": os.getenv("API_SECRET"),
+    # "sandbox": True,
     "options": {
         "defaultType": "future",
     },
@@ -90,7 +91,7 @@ def test_fetch_order_book(exchange):
 
 
 def test_fetch_ohlcv(exchange):
-    data = exchange.fetch_ohlcv("BTC/USDT")
+    data = exchange.fetch_ohlcv(symbol=symbol)
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
@@ -99,8 +100,7 @@ def test_fetch_ohlcv(exchange):
 def test_fetch_status(exchange):
     data = exchange.fetch_status()
     print(data)
-    print(data.dtypes)
-    assert isinstance(data, pd.DataFrame)
+    assert isinstance(data, dict)
 
 
 def test_fetch_trades(exchange):
@@ -272,8 +272,10 @@ def test_create_order(exchange):
         price=600,
     )
     print(data)
+    assert isinstance(data, dict)
     data = exchange.fetch_order(id=data["id"], symbol=symbol)
     print(data)
+    assert isinstance(data, dict)
     data = exchange.cancel_order(id=data["id"], symbol=symbol)
     print(data)
     assert isinstance(data, dict)
@@ -296,11 +298,15 @@ def test_create_orders(exchange):
     orders["symbol"] = symbol
     data = exchange.create_orders(orders=orders)
     print(data)
+    assert isinstance(data, pd.DataFrame)
     data = exchange.fetch_open_orders(symbol=symbol)
     print(data)
-    data["amount"] = 0.02
-    data = exchange.edit_orders(orders=data)
-    print(data)
-    data = exchange.cancel_all_orders(symbol=symbol)
-    print(data)
     assert isinstance(data, pd.DataFrame)
+    if not data.empty:
+        data["amount"] = 0.02
+        data = exchange.edit_orders(orders=data)
+        print(data)
+        assert isinstance(data, pd.DataFrame)
+        data = exchange.cancel_all_orders(symbol=symbol)
+        print(data)
+        assert isinstance(data, pd.DataFrame)

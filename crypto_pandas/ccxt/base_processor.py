@@ -55,20 +55,31 @@ class BaseProcessor:
         "createTime",
         "created",
         "expiry",
+        "fundingTimestamp",
+        "nextFundingTimestamp",
+        "previousFundingTimestamp",
         "time",
         "timestamp",
         "updateTime",
-        "fundingTimestamp",
     )
     str_to_datetime_fields: tuple = (
         "datetime",
         "expiryDatetime",
         "fundingDatetime",
+        "previousFundingDatetime",
     )
     numeric_fields: tuple = (
         "availableBalance",
+        "ask",
+        "askVolume",
+        "average",
+        "baseVolume",
+        "bid",
+        "bidVolume",
         "buySellRatio",
         "buyVol",
+        "change",
+        "close",
         "collateral",
         "collateralMarginLevel",
         "contractSize",
@@ -76,10 +87,14 @@ class BaseProcessor:
         "crossUnPnl",
         "crossWalletBalance",
         "entryPrice",
+        "fee_cost",
+        "fee_currency",
         "free",
         "freeze",
+        "indexPrice",
         "initialMargin",
         "initialMarginPercentage",
+        "last",
         "leverage",
         "liquidationPrice",
         "locked",
@@ -94,11 +109,16 @@ class BaseProcessor:
         "markPrice",
         "maxNotional",
         "maxWithdrawAmount",
+        "nextFundingRate",
         "notional",
+        "open",
         "openOrderInitialMargin",
         "percentage",
         "positionAmount",
         "positionInitialMargin",
+        "previousClose",
+        "previousFundingRate",
+        "quoteVolume",
         "sellVol",
         "shortAccount",
         "strike",
@@ -108,6 +128,7 @@ class BaseProcessor:
         "totalNetAssetOfBtc",
         "unrealizedPnl",
         "unrealizedProfit",
+        "vwap",
         "walletBalance",
         "withdrawing",
     )
@@ -152,6 +173,9 @@ class BaseProcessor:
             pd.DataFrame: A processed DataFrame with formatted columns.
         """
         columns = data.columns
+        data = expand_dict_columns(
+            data.drop(columns=["info"], errors="ignore"), separator="_"
+        )
         if self.int_to_datetime_fields:
             datetime_columns_to_convert = [
                 x for x in columns if x in self.int_to_datetime_fields
@@ -178,22 +202,20 @@ class BaseProcessor:
         if self.bool_fields:
             bool_columns_to_convert = [x for x in columns if x in self.bool_fields]
             data[bool_columns_to_convert] = data[bool_columns_to_convert].astype(bool)
-        return expand_dict_columns(
-            data.drop(columns=["info", "fees"], errors="ignore"), separator="_"
-        )
+        return data
 
     def response_to_dataframe(
         self, data: list | dict, column_names: tuple = None
     ) -> pd.DataFrame:
         """
-        Convert a list of dictionaries into a pandas DataFrame and preprocess it.
+                Convert a list of dictionaries into a pandas DataFrame and preprocess it.
 
-        Args:
-            data (list): Raw data returned from the API.
-            column_names (tuple, optional): Column names for the DataFrame.
-
-        Returns:
-            pd.DataFrame: A preprocessed DataFrame.
+                Args:
+                    data (list): Raw data returned from the API.
+                    column_names (tuple, optional): Column names for the DataFrame.
+        symbol (str): The trading pair (e.g., "BTC/USDT") associated with the OHLCV data.
+                Returns:
+                    pd.DataFrame: A preprocessed DataFrame.
         """
         data = pd.DataFrame(data=data)
         if column_names:
@@ -256,17 +278,19 @@ class BaseProcessor:
         )
         return self.preprocess_dataframe(data)
 
-    def ohlcv_to_dataframe(self, data: list) -> pd.DataFrame:
+    def ohlcv_to_dataframe(self, data: list, symbol: str) -> pd.DataFrame:
         """
         Convert OHLCV data into a pandas DataFrame.
 
         Args:
             data (list): List containing OHLCV data.
-
+            symbol (str): Symbol associated with the OHLCV data, such as "BTC/USDT" or "ETH/BTC"..
         Returns:
             pd.DataFrame: A preprocessed OHLCV DataFrame.
         """
-        return self.response_to_dataframe(data, column_names=self.ohlcv_fields)
+        data = self.response_to_dataframe(data, column_names=self.ohlcv_fields)
+        data["symbol"] = symbol
+        return data
 
     def orders_to_dataframe(self, data: list) -> pd.DataFrame:
         """
