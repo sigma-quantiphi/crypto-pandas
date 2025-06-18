@@ -28,6 +28,7 @@ standard_dataframe_methods = {
     "fetch_borrow_interest",
     "fetch_borrow_rate_histories",
     "fetch_borrow_rate_history",
+    "fetch_funding_history",
     "fetch_funding_rate_history",
     "fetch_open_interest_history",
     "fetch_deposit_withdraw_fees",

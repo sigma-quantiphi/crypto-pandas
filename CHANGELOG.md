@@ -1,3 +1,6 @@
+## [0.8.0b]
+* Add `fundingHistory` data parsing
+
 ## [0.8.0a]
 * Both sync and async methods with getattr for simpler architecture and future method additions.
 * Async create/edit/cancel orders now possible.
