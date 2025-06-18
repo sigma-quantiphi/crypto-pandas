@@ -1,3 +1,6 @@
+## [0.8.0c]
+* Remove ohlcv symbol column. Async reroutes non async compatible methods"
+
 ## [0.8.0b]
 * Add `fundingHistory` data parsing
 

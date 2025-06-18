@@ -278,18 +278,16 @@ class BaseProcessor:
         )
         return self.preprocess_dataframe(data)
 
-    def ohlcv_to_dataframe(self, data: list, symbol: str) -> pd.DataFrame:
+    def ohlcv_to_dataframe(self, data: list) -> pd.DataFrame:
         """
         Convert OHLCV data into a pandas DataFrame.
 
         Args:
             data (list): List containing OHLCV data.
-            symbol (str): Symbol associated with the OHLCV data, such as "BTC/USDT" or "ETH/BTC"..
         Returns:
             pd.DataFrame: A preprocessed OHLCV DataFrame.
         """
         data = self.response_to_dataframe(data, column_names=self.ohlcv_fields)
-        data["symbol"] = symbol
         return data
 
     def orders_to_dataframe(self, data: list) -> pd.DataFrame:

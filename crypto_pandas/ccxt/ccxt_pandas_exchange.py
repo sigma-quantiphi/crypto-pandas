@@ -154,9 +154,7 @@ class CCXTPandasExchange:
             elif method_name in balance_dataframe_methods:
                 result = ccxt_processor.balance_to_dataframe(result)
             elif method_name in ohlcv_dataframe_methods:
-                result = ccxt_processor.ohlcv_to_dataframe(
-                    result, symbol=kwargs["symbol"]
-                )
+                result = ccxt_processor.ohlcv_to_dataframe(result)
             elif method_name in orderbook_dataframe_methods:
                 result = ccxt_processor.order_book_to_dataframe(result)
             elif method_name in orders_dataframe_methods:

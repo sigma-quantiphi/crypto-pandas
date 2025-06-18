@@ -1,11 +1,7 @@
 import asyncio
-import sys
 
 import ccxt.pro as ccxt
 from crypto_pandas.ccxt.async_ccxt_pandas_exchange import AsyncCCXTPandasExchange
-
-if sys.platform.startswith("win"):
-    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 
 async def main():

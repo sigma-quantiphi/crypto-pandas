@@ -1,3 +1,5 @@
+import asyncio
+import sys
 from functools import wraps
 from typing import Literal, Callable, Union
 
@@ -27,6 +29,8 @@ from crypto_pandas.utils.pandas_utils import (
 )
 
 ccxt_processor = BaseProcessor()
+if sys.platform.startswith("win"):
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 
 @dataclass
@@ -43,8 +47,7 @@ class AsyncCCXTPandasExchange:
         if not callable(original_method):
             return original_method
 
-        @wraps(original_method)
-        async def wrapped(*args, **kwargs) -> Union[dict, pd.DataFrame]:
+        async def preprocess_kwargs(kwargs: dict) -> dict:
             if "since" in kwargs:
                 kwargs["since"] = timestamp_to_int(kwargs["since"])
             if method_name in single_order_methods:
@@ -74,8 +77,9 @@ class AsyncCCXTPandasExchange:
                 kwargs["orders"] = ccxt_processor.orders_to_dict(kwargs["orders"])
             elif method_name in symbol_order_methods:
                 kwargs["orders"] = kwargs["orders"][["id", "symbol"]].to_dict("records")
+            return kwargs
 
-            result = await original_method(*args, **kwargs)
+        def preprocess_data(result: dict | list) -> dict | list | pd.DataFrame:
             if method_name in standard_dataframe_methods:
                 result = ccxt_processor.response_to_dataframe(result)
             elif method_name in markets_dataframe_methods:
@@ -83,9 +87,7 @@ class AsyncCCXTPandasExchange:
             elif method_name in balance_dataframe_methods:
                 result = ccxt_processor.balance_to_dataframe(result)
             elif method_name in ohlcv_dataframe_methods:
-                result = ccxt_processor.ohlcv_to_dataframe(
-                    result, symbol=kwargs["symbol"]
-                )
+                result = ccxt_processor.ohlcv_to_dataframe(result)
             elif method_name in orderbook_dataframe_methods:
                 result = ccxt_processor.order_book_to_dataframe(result)
             elif method_name in orders_dataframe_methods:
@@ -93,6 +95,16 @@ class AsyncCCXTPandasExchange:
             elif method_name in dict_methods:
                 result = ccxt_processor.preprocess_dict(result)
             return result
+
+        @wraps(original_method)
+        async def wrapped(*args, **kwargs) -> Union[dict, pd.DataFrame, asyncio.Future]:
+            kwargs = await preprocess_kwargs(kwargs=kwargs)
+            if asyncio.iscoroutinefunction(original_method):
+                result = await original_method(*args, **kwargs)
+                return preprocess_data(result)
+            else:
+                result = original_method(*args, **kwargs)
+                return preprocess_data(result)
 
         return wrapped
 
