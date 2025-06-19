@@ -1,0 +1,33 @@
+import asyncio
+import ccxt.pro as ccxt_pro
+from crypto_pandas import AsyncCCXTPandasExchange
+
+exchange = ccxt_pro.binance()
+pandas_exchange = AsyncCCXTPandasExchange(exchange=exchange)
+symbols = ["BTC/USDT:USDT", "ETH/USDT:USDT"]
+symbolsAndTimeframes = [[x, "1m"] for x in symbols]
+
+
+async def main():
+    try:
+        while True:
+            tasks = [
+                pandas_exchange.watchOHLCVForSymbols(
+                    symbolsAndTimeframes=symbolsAndTimeframes
+                ),
+                pandas_exchange.watchBidsAsks(symbols=symbols),
+                pandas_exchange.watchTradesForSymbols(symbols=symbols),
+            ]
+            ohlcv, bids_asks, trades = await asyncio.gather(*tasks)
+            await exchange.close()
+            print(ohlcv)
+            print(bids_asks)
+            print(trades)
+    except KeyboardInterrupt:
+        print("Websocket connection closed")
+    finally:
+        await exchange.close()
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
