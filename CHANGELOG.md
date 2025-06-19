@@ -1,5 +1,11 @@
+## [0.9.0]
+* New architecture with simple method inheritance.
+* Fixed `watchOHLCVForSymbols` data parsing.
+* Fixed `ohlcv` snake/camel case mapping.
+* Reintroduced semaphore.
+
 ## [0.8.0c]
-* Remove ohlcv symbol column. Async reroutes non async compatible methods"
+* Remove OHLCV symbol column. Async reroutes non async compatible methods.
 
 ## [0.8.0b]
 * Add `fundingHistory` data parsing

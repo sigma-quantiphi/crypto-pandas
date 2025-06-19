@@ -278,17 +278,41 @@ class BaseProcessor:
         )
         return self.preprocess_dataframe(data)
 
-    def ohlcv_to_dataframe(self, data: list) -> pd.DataFrame:
+    def ohlcv_to_dataframe(self, data: list, symbol: str | None = None) -> pd.DataFrame:
         """
         Convert OHLCV data into a pandas DataFrame.
 
         Args:
             data (list): List containing OHLCV data.
+            symbol (str | None): The trading pair (e.g., "BTC/USDT") associated with the OHLCV data, if applicable.
+
         Returns:
             pd.DataFrame: A preprocessed OHLCV DataFrame.
         """
         data = self.response_to_dataframe(data, column_names=self.ohlcv_fields)
+        if symbol:
+            data["symbol"] = symbol
         return data
+
+    def ohlcv_symbols_to_dataframe(self, data: dict) -> pd.DataFrame:
+        """
+        Convert OHLCV data for multiple trading pairs into a pandas DataFrame.
+
+        Args:
+            data (dict): Dictionary containing OHLCV data, where keys are symbols
+                         and sub-keys are timeframes.
+
+        Returns:
+            pd.DataFrame: A preprocessed DataFrame containing OHLCV data with symbol
+                          and timeframe columns for each trading pair.
+        """
+        full_data = []
+        for symbol, timeframes in data.items():
+            for timeframe, ohlcv_data in timeframes.items():
+                df = self.ohlcv_to_dataframe(data=ohlcv_data, symbol=symbol)
+                df["timeframe"] = timeframe
+                full_data.append(df.copy())
+        return pd.concat(full_data, ignore_index=True)
 
     def orders_to_dataframe(self, data: list) -> pd.DataFrame:
         """

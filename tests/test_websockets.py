@@ -10,13 +10,14 @@ async def main():
     data = await exchange.load_cached_markets()
     print(data)
     while n < 5:
-        order_book = await exchange.watch_ohlcv(symbol="BTC/USDT:USDT")
-        print(order_book)
-        bids_asks = await exchange.watch_bids_asks(
-            symbols=["BTC/USDT:USDT", "ETH/USDT:USDT"]
+        tasks = (
+            exchange.watch_ohlcv(symbol="BTC/USDT:USDT"),
+            exchange.watch_bids_asks(symbols=["BTC/USDT:USDT", "ETH/USDT:USDT"]),
+            exchange.watch_trades(symbol="BTC/USDT:USDT"),
         )
+        order_book, bids_asks, trades = await asyncio.gather(*tasks)
+        print(order_book)
         print(bids_asks.dropna(how="all", axis=1))
-        trades = await exchange.watch_trades(symbol="BTC/USDT")
         print(trades)
         n += 1
     await exchange.close()

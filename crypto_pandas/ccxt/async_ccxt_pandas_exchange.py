@@ -2,6 +2,7 @@ import asyncio
 import sys
 from functools import wraps
 from typing import Literal, Callable, Union
+from asyncio import Semaphore
 
 import ccxt.pro as ccxt
 import pandas as pd
@@ -21,6 +22,7 @@ from crypto_pandas.ccxt.method_mappings import (
     bulk_order_methods,
     single_order_methods,
     symbol_order_methods,
+    ohlcv_symbols_dataframe_methods,
 )
 from crypto_pandas.utils.pandas_utils import (
     timestamp_to_int,
@@ -41,6 +43,11 @@ class AsyncCCXTPandasExchange:
     markets_cache_time: int = 3600
     order_amount_rounding: Literal["floor", "ceil", "round"] = "round"
     order_price_rounding: Literal["aggressive", "defensive", "round"] = "round"
+    semaphore_value: int = 1000
+    _semaphore: Semaphore = field(default_factory=Semaphore)
+
+    def __post_init__(self):
+        self._semaphore = Semaphore(self.semaphore_value)
 
     def __getattr__(self, method_name: str) -> Callable:
         original_method = getattr(self.exchange, method_name)
@@ -79,32 +86,37 @@ class AsyncCCXTPandasExchange:
                 kwargs["orders"] = kwargs["orders"][["id", "symbol"]].to_dict("records")
             return kwargs
 
-        def preprocess_data(result: dict | list) -> dict | list | pd.DataFrame:
+        def preprocess_data(
+            result: dict | list, symbol: str | None = None
+        ) -> dict | list | pd.DataFrame:
             if method_name in standard_dataframe_methods:
-                result = ccxt_processor.response_to_dataframe(result)
+                result = ccxt_processor.response_to_dataframe(data=result)
             elif method_name in markets_dataframe_methods:
-                result = ccxt_processor.markets_to_dataframe(result)
+                result = ccxt_processor.markets_to_dataframe(data=result)
             elif method_name in balance_dataframe_methods:
-                result = ccxt_processor.balance_to_dataframe(result)
+                result = ccxt_processor.balance_to_dataframe(data=result)
             elif method_name in ohlcv_dataframe_methods:
-                result = ccxt_processor.ohlcv_to_dataframe(result)
+                result = ccxt_processor.ohlcv_to_dataframe(data=result, symbol=symbol)
             elif method_name in orderbook_dataframe_methods:
-                result = ccxt_processor.order_book_to_dataframe(result)
+                result = ccxt_processor.order_book_to_dataframe(data=result)
             elif method_name in orders_dataframe_methods:
-                result = ccxt_processor.orders_to_dataframe(result)
+                result = ccxt_processor.orders_to_dataframe(data=result)
+            elif method_name in ohlcv_symbols_dataframe_methods:
+                result = ccxt_processor.ohlcv_symbols_to_dataframe(data=result)
             elif method_name in dict_methods:
-                result = ccxt_processor.preprocess_dict(result)
+                result = ccxt_processor.preprocess_dict(data=result)
             return result
 
         @wraps(original_method)
         async def wrapped(*args, **kwargs) -> Union[dict, pd.DataFrame, asyncio.Future]:
             kwargs = await preprocess_kwargs(kwargs=kwargs)
-            if asyncio.iscoroutinefunction(original_method):
-                result = await original_method(*args, **kwargs)
-                return preprocess_data(result)
-            else:
-                result = original_method(*args, **kwargs)
-                return preprocess_data(result)
+            async with self._semaphore:
+                if asyncio.iscoroutinefunction(original_method):
+                    result = await original_method(*args, **kwargs)
+                    return preprocess_data(result, symbol=kwargs.get("symbol"))
+                else:
+                    result = original_method(*args, **kwargs)
+                    return preprocess_data(result, symbol=kwargs.get("symbol"))
 
         return wrapped
 
@@ -112,6 +124,7 @@ class AsyncCCXTPandasExchange:
 
         @alru_cache(ttl=self.markets_cache_time)
         async def _cached_load_markets() -> pd.DataFrame:
-            return await self.load_markets(reload=True, params=params)
+            async with self._semaphore:
+                return await self.load_markets(reload=True, params=params)
 
         return await _cached_load_markets()

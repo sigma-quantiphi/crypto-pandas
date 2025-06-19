@@ -63,7 +63,8 @@ markets_dataframe_methods = {
 balance_dataframe_methods = {
     "fetch_balance",
 }
-ohlcv_dataframe_methods = {"fetch_ohlcv", "watch_ohlcv", "watch_ohlcv_for_symbols"}
+ohlcv_dataframe_methods = {"fetch_ohlcv", "watch_ohlcv", "fetchOHLCV", "watchOHLCV"}
+ohlcv_symbols_dataframe_methods = {"watch_ohlcv_for_symbols", "watchOHLCVForSymbols"}
 orderbook_dataframe_methods = {
     "fetch_order_book",
     "watch_order_book",
@@ -77,14 +78,6 @@ orders_dataframe_methods = {
     "watch_orders",
     "watch_orders_for_symbols",
 }
-dataframe_methods = (
-    standard_dataframe_methods
-    | markets_dataframe_methods
-    | balance_dataframe_methods
-    | ohlcv_dataframe_methods
-    | orderbook_dataframe_methods
-    | orders_dataframe_methods
-)
 dict_methods = {
     "cancel_order",
     "create_order",
@@ -108,10 +101,17 @@ symbol_order_methods = {"cancel_orders_for_symbols"}
 standard_dataframe_methods = add_camel_case_methods(standard_dataframe_methods)
 markets_dataframe_methods = add_camel_case_methods(markets_dataframe_methods)
 balance_dataframe_methods = add_camel_case_methods(balance_dataframe_methods)
-ohlcv_dataframe_methods = add_camel_case_methods(ohlcv_dataframe_methods)
 orderbook_dataframe_methods = add_camel_case_methods(orderbook_dataframe_methods)
 orders_dataframe_methods = add_camel_case_methods(orders_dataframe_methods)
 dict_methods = add_camel_case_methods(dict_methods)
 single_order_methods = add_camel_case_methods(single_order_methods)
 bulk_order_methods = add_camel_case_methods(bulk_order_methods)
 symbol_order_methods = add_camel_case_methods(symbol_order_methods)
+dataframe_methods = (
+    standard_dataframe_methods
+    | markets_dataframe_methods
+    | balance_dataframe_methods
+    | ohlcv_dataframe_methods
+    | orderbook_dataframe_methods
+    | orders_dataframe_methods
+)

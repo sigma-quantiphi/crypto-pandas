@@ -19,6 +19,7 @@ from crypto_pandas.ccxt.method_mappings import (
     bulk_order_methods,
     single_order_methods,
     symbol_order_methods,
+    ohlcv_symbols_dataframe_methods,
 )
 from crypto_pandas.utils.pandas_utils import (
     timestamp_to_int,
@@ -148,19 +149,23 @@ class CCXTPandasExchange:
                 kwargs["orders"] = kwargs["orders"][["id", "symbol"]].to_dict("records")
             result = original_method(*args, **kwargs)
             if method_name in standard_dataframe_methods:
-                result = ccxt_processor.response_to_dataframe(result)
+                result = ccxt_processor.response_to_dataframe(data=result)
             elif method_name in markets_dataframe_methods:
-                result = ccxt_processor.markets_to_dataframe(result)
+                result = ccxt_processor.markets_to_dataframe(data=result)
             elif method_name in balance_dataframe_methods:
-                result = ccxt_processor.balance_to_dataframe(result)
+                result = ccxt_processor.balance_to_dataframe(data=result)
             elif method_name in ohlcv_dataframe_methods:
-                result = ccxt_processor.ohlcv_to_dataframe(result)
+                result = ccxt_processor.ohlcv_to_dataframe(
+                    data=result, symbol=kwargs.get("symbol")
+                )
             elif method_name in orderbook_dataframe_methods:
-                result = ccxt_processor.order_book_to_dataframe(result)
+                result = ccxt_processor.order_book_to_dataframe(data=result)
             elif method_name in orders_dataframe_methods:
-                result = ccxt_processor.orders_to_dataframe(result)
+                result = ccxt_processor.orders_to_dataframe(data=result)
+            elif method_name in ohlcv_symbols_dataframe_methods:
+                result = ccxt_processor.ohlcv_symbols_to_dataframe(data=result)
             elif method_name in dict_methods:
-                result = ccxt_processor.preprocess_dict(result)
+                result = ccxt_processor.preprocess_dict(data=result)
             return result
 
         return wrapped
