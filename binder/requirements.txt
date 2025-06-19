@@ -1,3 +1,3 @@
-crypto-pandas>=0.7.5
+crypto-pandas>=0.9.0
 matplotlib
 plotly
