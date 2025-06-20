@@ -236,12 +236,16 @@ def concat_results(
     results: list[pd.DataFrame] | list[dict], errors: Literal["raise", "warn", "ignore"]
 ) -> pd.DataFrame:
     """Concatenate results from asyncio gather"""
-    clean_results = []
-    errors_results = []
+    clean_results, errors_results, all_dataframe, all_dict = [], [], True, True
     for x in results:
-        if isinstance(x, dict | pd.DataFrame):
+        if isinstance(x, dict):
             clean_results.append(x)
+            all_dataframe = False
+        elif isinstance(x, pd.DataFrame):
+            clean_results.append(x)
+            all_dict = False
         else:
+            all_dataframe, all_dict = False, False,
             errors_results.append(x)
     if errors_results:
         if errors == "raise":
@@ -249,9 +253,9 @@ def concat_results(
         elif errors == "warn":
             warnings.warn(f"Errors encountered: {errors_results}")
     if clean_results:
-        if all([isinstance(x, pd.DataFrame)] for x in clean_results):
+        if all_dataframe:
             return pd.concat(results, ignore_index=True)
-        elif all([isinstance(x, dict)] for x in clean_results):
+        elif all_dict:
             return pd.DataFrame(data=results).drop(columns=["info"], errors="ignore")
         else:
             raise ValueError(
