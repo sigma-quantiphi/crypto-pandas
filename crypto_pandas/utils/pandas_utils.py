@@ -1,3 +1,7 @@
+import asyncio
+import warnings
+from typing import Literal
+
 import numpy as np
 import pandas as pd
 import pandera as pa
@@ -226,3 +230,39 @@ def preprocess_order_dataframe(
         param_cols = orders.columns[orders.columns.str.startswith("params.")]
         orders["params"] = orders.apply(combine_params, axis=1, param_cols=param_cols)
     return orders
+
+
+def concat_results(
+    results: list[pd.DataFrame] | list[dict], errors: Literal["raise", "warn", "ignore"]
+) -> pd.DataFrame:
+    """Concatenate results from asyncio gather"""
+    clean_results = []
+    errors_results = []
+    for x in results:
+        if isinstance(x, dict | pd.DataFrame):
+            clean_results.append(x)
+        else:
+            errors_results.append(x)
+    if errors_results:
+        if errors == "raise":
+            raise ValueError(f"Errors encountered: {errors_results}")
+        elif errors == "warn":
+            warnings.warn(f"Errors encountered: {errors_results}")
+    if clean_results:
+        if all([isinstance(x, pd.DataFrame)] for x in clean_results):
+            return pd.concat(results, ignore_index=True)
+        elif all([isinstance(x, dict)] for x in clean_results):
+            return pd.DataFrame(data=results).drop(columns=["info"], errors="ignore")
+        else:
+            raise ValueError(
+                "Results must be either a list of DataFrames or a list of dictionaries."
+            )
+    else:
+        return pd.DataFrame()
+
+
+def async_concat_results(
+    tasks: list, errors: Literal["raise", "warn", "ignore"]
+) -> pd.DataFrame:
+    results = asyncio.gather(*tasks, return_exceptions=True)
+    return concat_results(results=results, errors=errors)

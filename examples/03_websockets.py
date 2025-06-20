@@ -20,8 +20,11 @@ async def main():
             ]
             ohlcv, bids_asks, trades = await asyncio.gather(*tasks)
             await exchange.close()
+            print("Received OHLCV")
             print(ohlcv)
+            print("Received Bids Asks")
             print(bids_asks)
+            print("Received Trades")
             print(trades)
     except KeyboardInterrupt:
         print("Websocket connection closed")
