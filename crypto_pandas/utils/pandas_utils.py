@@ -1,10 +1,11 @@
 import asyncio
 import warnings
-from typing import Literal
+from typing import Literal, Awaitable, Any
 
 import numpy as np
 import pandas as pd
 import pandera as pa
+from pandas import DataFrame
 
 order_data_columns = [
     "symbol",
@@ -270,6 +271,31 @@ def concat_results(
 
 async def async_concat_results(
     tasks: list, errors: Literal["raise", "warn", "ignore"] = "raise"
-) -> pd.DataFrame:
-    results = await asyncio.gather(*tasks, return_exceptions=True)
-    return concat_results(results=results, errors=errors)
+) -> DataFrame | list[DataFrame] | Any:
+    # Single coroutine
+    if isinstance(tasks, Awaitable):
+        return await tasks
+    # Flat list of awaitables
+    elif all(isinstance(t, Awaitable) for t in tasks):
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+        return concat_results(results=results, errors=errors)
+    elif all(
+        isinstance(group, list) and all(isinstance(t, Awaitable) for t in group)
+        for group in tasks
+    ):
+        flat_tasks = [t for group in tasks for t in group]
+        flat_results = await asyncio.gather(*flat_tasks)
+        # Reconstruct shape
+        results = []
+        i = 0
+        for group in tasks:
+            group_size = len(group)
+            group_results = flat_results[i : i + group_size]
+            group_results = concat_results(results=group_results, errors=errors)
+            results.append(group_results)
+            i += group_size
+        return results
+    else:
+        raise TypeError(
+            "Expected coroutine, list of coroutines, or list of lists of coroutines."
+        )
