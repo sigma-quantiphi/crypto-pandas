@@ -1,3 +1,7 @@
+## [0.9.5]
+* Introduced `account` and `exchange` parameters in BaseProcessor for Crypto-Pandas-Pro.
+* Made `BaseProcessor` attribute of CCXTPandasExchange.
+
 ## [0.9.1]
 * Created asyncio `concat_gather_results` function.
 

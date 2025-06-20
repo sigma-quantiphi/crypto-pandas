@@ -40,6 +40,8 @@ class BaseProcessor:
     - Preprocess order books, trades, and OHLCV data.
 
     Attributes:
+        exchange_name (str): Name of the exchange being processed (e.g., "binance").
+        account_name (str): Name of the account associated with the API data.
         order_schema (OrderSchema): Schema used to validate and process orders.
         datetime_to_int_fields (tuple): Fields that should be converted from datetime to integer timestamps.
         int_to_datetime_fields (tuple): Fields to convert from integer timestamps to pandas datetime.
@@ -47,8 +49,11 @@ class BaseProcessor:
         numeric_fields (tuple): Fields that should be cast to numeric types.
         bool_fields (tuple): Fields that should be cast to boolean types.
         ohlcv_fields (tuple): Standard OHLCV (Open, High, Low, Close, Volume) column names.
+        conduct_order_checks (bool): Flag to enable or disable checks when converting orders to dictionary format.
     """
 
+    exchange_name: str = None
+    account_name: str = None
     order_schema: OrderSchema = field(default=OrderSchema)
     datetime_to_int_fields: tuple = None
     int_to_datetime_fields: tuple = (
@@ -160,6 +165,10 @@ class BaseProcessor:
                 data[key] = pd.Timestamp(value, tz="UTC")
             elif self.numeric_fields and (key in self.numeric_fields):
                 data[key] = pd.to_numeric(value, errors="coerce")
+        if self.exchange_name:
+            data["exchange"] = self.exchange_name
+        if self.account_name:
+            data["exchange"] = self.account_name
         return data
 
     def preprocess_dataframe(self, data: pd.DataFrame) -> pd.DataFrame:
@@ -202,6 +211,10 @@ class BaseProcessor:
         if self.bool_fields:
             bool_columns_to_convert = [x for x in columns if x in self.bool_fields]
             data[bool_columns_to_convert] = data[bool_columns_to_convert].astype(bool)
+        if self.exchange_name:
+            data["exchange"] = self.exchange_name
+        if self.account_name:
+            data["exchange"] = self.account_name
         return data
 
     def response_to_dataframe(
@@ -223,7 +236,7 @@ class BaseProcessor:
         return self.preprocess_dataframe(data)
 
     def markets_to_dataframe(self, data: dict) -> pd.DataFrame:
-        data = pd.DataFrame(list(data.values()))
+        data = pd.DataFrame(data).transpose()
         return self.preprocess_dataframe(data)
 
     def balance_to_dataframe(self, data: dict) -> pd.DataFrame:

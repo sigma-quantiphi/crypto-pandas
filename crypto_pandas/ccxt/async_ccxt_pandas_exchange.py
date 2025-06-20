@@ -30,23 +30,53 @@ from crypto_pandas.utils.pandas_utils import (
     preprocess_order_dataframe,
 )
 
-ccxt_processor = BaseProcessor()
 if sys.platform.startswith("win"):
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 
 @dataclass
 class AsyncCCXTPandasExchange:
+    """
+    An asynchronous wrapper class for ccxt Exchange that integrates pandas for enhanced data handling
+    and provides preprocessing utilities for working with cryptocurrency trading data.
+
+    Attributes:
+        exchange (ccxt.Exchange): The ccxt exchange instance, defaulting to Binance.
+        exchange_name (str | None): The name of the exchange, used for processor initialization.
+        account_name (str | None): The account name, used for processor initialization.
+        max_order_notional (float): The maximum allowable notional value for a single order.
+        max_number_of_orders (int): The maximum number of orders allowed in bulk order processing.
+        markets_cache_time (int): The cache time in seconds for market data.
+        order_amount_rounding (Literal["floor", "ceil", "round"]): Strategy for rounding order amounts.
+        order_price_rounding (Literal["aggressive", "defensive", "round"]): Strategy for rounding order prices.
+        semaphore_value (int): The value for the asyncio Semaphore controlling concurrent requests.
+        _ccxt_processor (BaseProcessor): The processor handling preprocessing tasks for ccxt methods.
+        _semaphore (Semaphore): An asyncio Semaphore instance to limit concurrency.
+
+    Methods:
+        __getattr__(method_name: str) -> Callable:
+            Dynamically intercepts ccxt methods to preprocess inputs/outputs and adds semaphore control.
+
+        load_cached_markets(params: dict = {}) -> pd.DataFrame:
+            Loads and caches markets data asynchronously, with optional parameters for customization.
+    """
+
     exchange: ccxt.Exchange = field(default_factory=ccxt.binance)
+    exchange_name: str | None = None
+    account_name: str | None = None
     max_order_notional: float = 10_000
     max_number_of_orders: int = 5
     markets_cache_time: int = 3600
     order_amount_rounding: Literal["floor", "ceil", "round"] = "round"
     order_price_rounding: Literal["aggressive", "defensive", "round"] = "round"
     semaphore_value: int = 1000
+    _ccxt_processor: BaseProcessor = field(default_factory=BaseProcessor)
     _semaphore: Semaphore = field(default_factory=Semaphore)
 
     def __post_init__(self):
+        self._ccxt_processor = BaseProcessor(
+            exchange_name=self.exchange_name, account_name=self.account_name
+        )
         self._semaphore = Semaphore(self.semaphore_value)
 
     def __getattr__(self, method_name: str) -> Callable:
@@ -81,7 +111,7 @@ class AsyncCCXTPandasExchange:
                     price_strategy=self.order_price_rounding,
                     amount_strategy=self.order_amount_rounding,
                 )
-                kwargs["orders"] = ccxt_processor.orders_to_dict(kwargs["orders"])
+                kwargs["orders"] = self._ccxt_processor.orders_to_dict(kwargs["orders"])
             elif method_name in symbol_order_methods:
                 kwargs["orders"] = kwargs["orders"][["id", "symbol"]].to_dict("records")
             return kwargs
@@ -90,21 +120,23 @@ class AsyncCCXTPandasExchange:
             result: dict | list, symbol: str | None = None
         ) -> dict | list | pd.DataFrame:
             if method_name in standard_dataframe_methods:
-                result = ccxt_processor.response_to_dataframe(data=result)
+                result = self._ccxt_processor.response_to_dataframe(data=result)
             elif method_name in markets_dataframe_methods:
-                result = ccxt_processor.markets_to_dataframe(data=result)
+                result = self._ccxt_processor.markets_to_dataframe(data=result)
             elif method_name in balance_dataframe_methods:
-                result = ccxt_processor.balance_to_dataframe(data=result)
+                result = self._ccxt_processor.balance_to_dataframe(data=result)
             elif method_name in ohlcv_dataframe_methods:
-                result = ccxt_processor.ohlcv_to_dataframe(data=result, symbol=symbol)
+                result = self._ccxt_processor.ohlcv_to_dataframe(
+                    data=result, symbol=symbol
+                )
             elif method_name in orderbook_dataframe_methods:
-                result = ccxt_processor.order_book_to_dataframe(data=result)
+                result = self._ccxt_processor.order_book_to_dataframe(data=result)
             elif method_name in orders_dataframe_methods:
-                result = ccxt_processor.orders_to_dataframe(data=result)
+                result = self._ccxt_processor.orders_to_dataframe(data=result)
             elif method_name in ohlcv_symbols_dataframe_methods:
-                result = ccxt_processor.ohlcv_symbols_to_dataframe(data=result)
+                result = self._ccxt_processor.ohlcv_symbols_to_dataframe(data=result)
             elif method_name in dict_methods:
-                result = ccxt_processor.preprocess_dict(data=result)
+                result = self._ccxt_processor.preprocess_dict(data=result)
             return result
 
         @wraps(original_method)

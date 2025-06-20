@@ -245,7 +245,10 @@ def concat_results(
             clean_results.append(x)
             all_dict = False
         else:
-            all_dataframe, all_dict = False, False,
+            all_dataframe, all_dict = (
+                False,
+                False,
+            )
             errors_results.append(x)
     if errors_results:
         if errors == "raise":

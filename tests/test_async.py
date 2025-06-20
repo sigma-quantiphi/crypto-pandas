@@ -6,9 +6,9 @@ from tests.test_sync import settings
 
 
 async def main():
-    exchange = AsyncCCXTPandasExchange(
-        exchange=ccxt.binance(settings), max_number_of_orders=5
-    )
+    exchange = ccxt.binance(settings)
+    exchange.set_sandbox_mode(True)
+    exchange = AsyncCCXTPandasExchange(exchange=exchange, max_number_of_orders=5)
     tasks = await asyncio.gather(
         exchange.load_cached_markets(),
         exchange.fetch_order_book(symbol="BNB/USDT:USDT"),

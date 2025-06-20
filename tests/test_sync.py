@@ -21,7 +21,9 @@ symbol = "BNB/USDC:USDC"
 
 @pytest.fixture(scope="module")
 def exchange():
-    return CCXTPandasExchange(exchange=ccxt.binance(settings))
+    exchange = ccxt.binance(settings)
+    exchange.set_sandbox_mode(True)
+    return CCXTPandasExchange(exchange=exchange)
 
 
 @pytest.fixture(scope="module")

@@ -9,7 +9,7 @@ async def main():
     n = 0
     data = await exchange.load_cached_markets()
     print(data)
-    while n < 5:
+    while n < 50:
         tasks = (
             exchange.watch_ohlcv(symbol="BTC/USDT:USDT"),
             exchange.watch_bids_asks(symbols=["BTC/USDT:USDT", "ETH/USDT:USDT"]),
