@@ -1,5 +1,5 @@
 ## [0.9.1]
-* Created asyncio `concat_gather_results` function
+* Created asyncio `concat_gather_results` function.
 
 ## [0.9.0]
 * New architecture with simple method inheritance.

@@ -261,8 +261,8 @@ def concat_results(
         return pd.DataFrame()
 
 
-def async_concat_results(
+async def async_concat_results(
     tasks: list, errors: Literal["raise", "warn", "ignore"]
 ) -> pd.DataFrame:
-    results = asyncio.gather(*tasks, return_exceptions=True)
+    results = await asyncio.gather(*tasks, return_exceptions=True)
     return concat_results(results=results, errors=errors)
