@@ -1,3 +1,6 @@
+## [0.9.7]
+* Fix to `account` column name.
+
 ## [0.9.6]
 * `async_concat_results` can now accept awaitable, list[awaitable] or list[list[awaitable]]
 

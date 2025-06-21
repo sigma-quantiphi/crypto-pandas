@@ -9,7 +9,7 @@ async def main():
     exchange = ccxt.binance(settings)
     exchange.set_sandbox_mode(True)
     exchange = AsyncCCXTPandasExchange(exchange=exchange, max_number_of_orders=5)
-    tasks = await asyncio.gather(
+    markets, order_book, bids_asks, trades = await asyncio.gather(
         exchange.load_cached_markets(),
         exchange.fetch_order_book(symbol="BNB/USDT:USDT"),
         exchange.fetch_bids_asks(
@@ -18,8 +18,7 @@ async def main():
         exchange.fetch_trades(symbol="BNB/USDT"),
         return_exceptions=True,
     )
-    data, order_book, bids_asks, trades = tasks
-    print(data)
+    print(markets)
     print(order_book)
     print(bids_asks.dropna(how="all", axis=1))
     print(trades)
