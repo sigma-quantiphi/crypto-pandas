@@ -168,7 +168,7 @@ class BaseProcessor:
         if self.exchange_name:
             data["exchange"] = self.exchange_name
         if self.account_name:
-            data["exchange"] = self.account_name
+            data["account"] = self.account_name
         return data
 
     def preprocess_dataframe(self, data: pd.DataFrame) -> pd.DataFrame:
