@@ -161,15 +161,15 @@ def preprocess_order(
             price = np.clip(
                 price, market["limits_price.min"], market["limits_price.max"]
             )
-    amount = round_amount(
-        amount=amount, precision=market["precision_amount"], strategy=amount_strategy
-    )
-    if pd.notnull(market["limits_amount.min"]) and pd.notnull(
-        market["limits_amount.max"]
-    ):
-        amount = np.clip(
-            amount, market["limits_amount.min"], market["limits_amount.max"]
+        amount = round_amount(
+            amount=amount, precision=market["precision_amount"], strategy=amount_strategy
         )
+        if pd.notnull(market["limits_amount.min"]) and pd.notnull(
+            market["limits_amount.max"]
+        ):
+            amount = np.clip(
+                amount, market["limits_amount.min"], market["limits_amount.max"]
+            )
     return amount, price
 
 
@@ -215,7 +215,7 @@ def preprocess_order_dataframe(
         orders["price"] = orders["price"].clip(
             orders["limits_price.min"], orders["limits_price.max"]
         )
-    if orders["precision_amount"].notnull().all():
+    if "amount" in orders.columns and orders["precision_amount"].notnull().all():
         orders["amount"] = orders.apply(
             lambda row: round_amount(
                 amount=row["amount"],
