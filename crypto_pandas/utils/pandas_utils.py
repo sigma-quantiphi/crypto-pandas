@@ -162,7 +162,9 @@ def preprocess_order(
                 price, market["limits_price.min"], market["limits_price.max"]
             )
         amount = round_amount(
-            amount=amount, precision=market["precision_amount"], strategy=amount_strategy
+            amount=amount,
+            precision=market["precision_amount"],
+            strategy=amount_strategy,
         )
         if pd.notnull(market["limits_amount.min"]) and pd.notnull(
             market["limits_amount.max"]

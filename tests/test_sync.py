@@ -183,6 +183,13 @@ def test_fetch_funding_rate_history(exchange):
     assert isinstance(data, pd.DataFrame)
 
 
+def test_fetch_funding_rate_history(exchange):
+    data = exchange.fetch_funding_rate_history(symbol)
+    print(data)
+    print(data.dtypes)
+    assert isinstance(data, pd.DataFrame)
+
+
 def test_fetch_open_interest(exchange):
     data = exchange.fetch_open_interest(symbol)
     print(data)
