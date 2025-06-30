@@ -17,8 +17,9 @@ async def main():
                 ),
                 pandas_exchange.watchBidsAsks(symbols=symbols),
                 pandas_exchange.watchTradesForSymbols(symbols=symbols),
+                pandas_exchange.watchOrderBookForSymbols(symbols=symbols),
             ]
-            ohlcv, bids_asks, trades = await asyncio.gather(*tasks)
+            ohlcv, bids_asks, trades, ob = await asyncio.gather(*tasks)
             await exchange.close()
             print("Received OHLCV")
             print(ohlcv)
@@ -26,6 +27,8 @@ async def main():
             print(bids_asks)
             print("Received Trades")
             print(trades)
+            print("Received OB")
+            print(ob)
     except KeyboardInterrupt:
         print("Websocket connection closed")
     finally:

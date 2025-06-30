@@ -1,3 +1,6 @@
+## [0.9.11]
+* Added DataFrame parsing for `fetch_order_books`.
+
 ## [0.9.7]
 * Fix to `account` column name.
 

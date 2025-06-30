@@ -291,6 +291,26 @@ class BaseProcessor:
         )
         return self.preprocess_dataframe(data)
 
+    def order_books_to_dataframe(self, data: dict) -> pd.DataFrame:
+        """
+        Convert order book data for multiple symbols into a unified pandas DataFrame.
+
+        Args:
+            data (dict): A dictionary containing order book data for multiple symbols.
+                         Each key is a symbol, and the value is the corresponding
+                         order book data.
+
+        Returns:
+            pd.DataFrame: A preprocessed DataFrame containing combined order book information
+                          for all symbols, including price, quantity, and metadata.
+        """
+        df = []
+        for symbol, symbol_data in data.items():
+            symbol_data = self.order_book_to_dataframe(symbol_data)
+            symbol_data["symbol"] = symbol
+            df.append(symbol_data.copy())
+        return pd.concat(df, ignore_index=True)
+
     def ohlcv_to_dataframe(self, data: list, symbol: str | None = None) -> pd.DataFrame:
         """
         Convert OHLCV data into a pandas DataFrame.

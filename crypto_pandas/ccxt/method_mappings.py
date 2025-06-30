@@ -71,6 +71,7 @@ orderbook_dataframe_methods = {
     "watch_order_book",
     "watch_order_book_for_symbols",
 }
+orderbooks_dataframe_methods = {"fetch_order_books"}
 orders_dataframe_methods = {
     "fetch_canceled_and_closed_orders",
     "fetch_closed_orders",
@@ -103,6 +104,7 @@ standard_dataframe_methods = add_camel_case_methods(standard_dataframe_methods)
 markets_dataframe_methods = add_camel_case_methods(markets_dataframe_methods)
 balance_dataframe_methods = add_camel_case_methods(balance_dataframe_methods)
 orderbook_dataframe_methods = add_camel_case_methods(orderbook_dataframe_methods)
+orderbooks_dataframe_methods = add_camel_case_methods(orderbooks_dataframe_methods)
 orders_dataframe_methods = add_camel_case_methods(orders_dataframe_methods)
 dict_methods = add_camel_case_methods(dict_methods)
 single_order_methods = add_camel_case_methods(single_order_methods)
