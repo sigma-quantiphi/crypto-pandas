@@ -19,7 +19,7 @@ from crypto_pandas.ccxt.method_mappings import (
     bulk_order_methods,
     single_order_methods,
     symbol_order_methods,
-    ohlcv_symbols_dataframe_methods,
+    ohlcv_symbols_dataframe_methods, orderbooks_dataframe_methods,
 )
 from crypto_pandas.utils.pandas_utils import (
     timestamp_to_int,
@@ -119,6 +119,8 @@ class CCXTPandasExchange:
                 )
             elif method_name in orderbook_dataframe_methods:
                 result = self._ccxt_processor.order_book_to_dataframe(data=result)
+            elif method_name in orderbooks_dataframe_methods:
+                result = self._ccxt_processor.order_books_to_dataframe(data=result)
             elif method_name in orders_dataframe_methods:
                 result = self._ccxt_processor.orders_to_dataframe(data=result)
             elif method_name in ohlcv_symbols_dataframe_methods:
