@@ -289,7 +289,9 @@ class BaseProcessor:
         data = pd.concat(dfs, ignore_index=True).rename(
             columns={0: "price", 1: "qty", "T": "timestamp", "u": "updateId"}
         )
-        return self.preprocess_dataframe(data)
+        if not data.empty:
+            data = self.preprocess_dataframe(data)
+        return data
 
     def order_books_to_dataframe(self, data: dict) -> pd.DataFrame:
         """
