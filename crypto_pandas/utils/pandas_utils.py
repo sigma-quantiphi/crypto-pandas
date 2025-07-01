@@ -214,9 +214,10 @@ def preprocess_order_dataframe(
             ),
             axis=1,
         )
-        orders["price"] = orders["price"].clip(
-            orders["limits_price.min"], orders["limits_price.max"]
-        )
+        if orders[["limits_price.min", "limits_price.max"]].notnull().all(axis=None):
+            orders["price"] = orders["price"].clip(
+                orders["limits_price.min"], orders["limits_price.max"]
+            )
     if "amount" in orders.columns and orders["precision_amount"].notnull().all():
         orders["amount"] = orders.apply(
             lambda row: round_amount(
@@ -226,9 +227,10 @@ def preprocess_order_dataframe(
             ),
             axis=1,
         )
-        orders["amount"] = orders["amount"].clip(
-            orders["limits_amount.min"], orders["limits_amount.max"]
-        )
+        if orders[["limits_amount.min", "limits_amount.max"]].notnull().all(axis=None):
+            orders["amount"] = orders["amount"].clip(
+                orders["limits_amount.min"], orders["limits_amount.max"]
+            )
     if "params" not in orders.columns:
         param_cols = orders.columns[orders.columns.str.startswith("params.")]
         orders["params"] = orders.apply(combine_params, axis=1, param_cols=param_cols)
@@ -236,22 +238,16 @@ def preprocess_order_dataframe(
 
 
 def concat_results(
-    results: list[pd.DataFrame] | list[dict], errors: Literal["raise", "warn", "ignore"]
+    results: list[pd.DataFrame] | list[dict], errors: Literal["raise", "warn", "ignore"] = "raise"
 ) -> pd.DataFrame:
     """Concatenate results from asyncio gather"""
-    clean_results, errors_results, all_dataframe, all_dict = [], [], True, True
+    clean_results, errors_results = [], []
     for x in results:
         if isinstance(x, dict):
             clean_results.append(x)
-            all_dataframe = False
         elif isinstance(x, pd.DataFrame):
             clean_results.append(x)
-            all_dict = False
         else:
-            all_dataframe, all_dict = (
-                False,
-                False,
-            )
             errors_results.append(x)
     if errors_results:
         if errors == "raise":
@@ -259,10 +255,10 @@ def concat_results(
         elif errors == "warn":
             warnings.warn(f"Errors encountered: {errors_results}")
     if clean_results:
-        if all_dataframe:
-            return pd.concat(results, ignore_index=True)
-        elif all_dict:
-            return pd.DataFrame(data=results).drop(columns=["info"], errors="ignore")
+        if all([isinstance(x, pd.DataFrame) for x in clean_results]):
+            return pd.concat(clean_results, ignore_index=True)
+        elif all([isinstance(x, dict) for x in clean_results]):
+            return pd.DataFrame(data=clean_results).drop(columns=["info"], errors="ignore")
         else:
             raise ValueError(
                 "Results must be either a list of DataFrames or a list of dictionaries."

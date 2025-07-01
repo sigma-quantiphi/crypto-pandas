@@ -1,3 +1,6 @@
+## [0.9.14]
+* Clipping `price` and `amount` only if min/max values are not null from `load_markets`.
+
 ## [0.9.11]
 * Added DataFrame parsing for `fetch_order_books`.
 
