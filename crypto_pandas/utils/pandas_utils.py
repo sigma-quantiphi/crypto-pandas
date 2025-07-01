@@ -133,8 +133,9 @@ def preprocess_order(
     max_notional: float,
     price_strategy: str,
     amount_strategy: str,
+    price_out_of_range: Literal["warn", "clip"] = "warn",
+    amount_out_of_range: Literal["warn", "clip"] = "warn",
 ) -> tuple:
-
     market = markets.query(f"symbol == '{symbol}'").to_dict("records")[0]
     if type == "limit":
         if pd.isnull(price):
@@ -149,26 +150,40 @@ def preprocess_order(
             raise ValueError(
                 f"Order notional {notional} larger than limit {max_notional}"
             )
-        price = round_price(
-            price=price,
-            precision=market["precision_price"],
-            side=side,
-            strategy=price_strategy,
-        )
+        if pd.notnull(market["precision_price"]):
+            price = round_price(
+                price=price,
+                precision=market["precision_price"],
+                side=side,
+                strategy=price_strategy,
+            )
         if pd.notnull(market["limits_price.min"]) and pd.notnull(
             market["limits_price.max"]
         ):
-            price = np.clip(
-                price, market["limits_price.min"], market["limits_price.max"]
-            )
+            if price_out_of_range == "warn":
+                if (
+                    not market["limits_price.min"]
+                    <= price
+                    <= market["limits_price.max"]
+                ):
+                    price = None
+            else:
+                price = np.clip(
+                    price, market["limits_price.min"], market["limits_price.max"]
+                )
+    if pd.notnull(market["precision_amount"]):
         amount = round_amount(
             amount=amount,
             precision=market["precision_amount"],
             strategy=amount_strategy,
         )
-        if pd.notnull(market["limits_amount.min"]) and pd.notnull(
-            market["limits_amount.max"]
-        ):
+    if pd.notnull(market["limits_amount.min"]) and pd.notnull(
+        market["limits_amount.max"]
+    ):
+        if amount_out_of_range == "warn":
+            if not market["limits_amount.min"] <= amount <= market["limits_amount.max"]:
+                amount = None
+        else:
             amount = np.clip(
                 amount, market["limits_amount.min"], market["limits_amount.max"]
             )
@@ -192,6 +207,8 @@ def preprocess_order_dataframe(
     max_notional: float,
     price_strategy: str,
     amount_strategy: str,
+    price_out_of_range: Literal["warn", "clip"] = "warn",
+    amount_out_of_range: Literal["warn", "clip"] = "warn",
 ) -> pd.DataFrame:
     check_orders_dataframe_size(orders=orders, max_number_of_orders=max_orders)
     orders = date_time_columns_to_int_str(orders)
@@ -204,33 +221,49 @@ def preprocess_order_dataframe(
         if not orders_error.empty:
             raise ValueError(f"Orders exceeding max notional: {orders_error}")
     orders = orders.merge(markets[order_data_columns])
-    if "price" in orders.columns and orders["precision_price"].notnull().all():
-        orders["price"] = orders.apply(
-            lambda row: round_price(
-                price=row["price"],
-                precision=row["precision_price"],
-                side=row["side"],
-                strategy=price_strategy,
-            ),
-            axis=1,
-        )
+    if "price" in orders.columns:
+        if orders["precision_price"].notnull().all():
+            orders["price"] = orders.apply(
+                lambda row: round_price(
+                    price=row["price"],
+                    precision=row["precision_price"],
+                    side=row["side"],
+                    strategy=price_strategy,
+                ),
+                axis=1,
+            )
         if orders[["limits_price.min", "limits_price.max"]].notnull().all(axis=None):
-            orders["price"] = orders["price"].clip(
-                orders["limits_price.min"], orders["limits_price.max"]
+            if price_out_of_range == "warn":
+                warnings.warn(
+                    f"Removing orders with price outside limits:\n{orders.query("limits_price.min <= price <= limits_price.max").to_markdown(index=False)}"
+                )
+                orders = orders.query("limits_price.min <= price <= limits_price.max")
+            else:
+                orders["price"] = orders["price"].clip(
+                    orders["limits_price.min"], orders["limits_price.max"]
+                )
+    if "amount" in orders.columns:
+        if orders["precision_amount"].notnull().all():
+            orders["amount"] = orders.apply(
+                lambda row: round_amount(
+                    amount=row["amount"],
+                    precision=row["precision_amount"],
+                    strategy=amount_strategy,
+                ),
+                axis=1,
             )
-    if "amount" in orders.columns and orders["precision_amount"].notnull().all():
-        orders["amount"] = orders.apply(
-            lambda row: round_amount(
-                amount=row["amount"],
-                precision=row["precision_amount"],
-                strategy=amount_strategy,
-            ),
-            axis=1,
-        )
         if orders[["limits_amount.min", "limits_amount.max"]].notnull().all(axis=None):
-            orders["amount"] = orders["amount"].clip(
-                orders["limits_amount.min"], orders["limits_amount.max"]
-            )
+            if amount_out_of_range == "warn":
+                warnings.warn(
+                    f"Removing orders with amount outside limits:\n{orders.query("~(limits_price.min <= amount <= limits_amount.max)").to_markdown(index=False)}"
+                )
+                orders = orders.query(
+                    "limits_amount.min <= amount <= limits_amount.max"
+                )
+            else:
+                orders["amount"] = orders["amount"].clip(
+                    orders["limits_amount.min"], orders["limits_amount.max"]
+                )
     if "params" not in orders.columns:
         param_cols = orders.columns[orders.columns.str.startswith("params.")]
         orders["params"] = orders.apply(combine_params, axis=1, param_cols=param_cols)
@@ -238,7 +271,8 @@ def preprocess_order_dataframe(
 
 
 def concat_results(
-    results: list[pd.DataFrame] | list[dict], errors: Literal["raise", "warn", "ignore"] = "raise"
+    results: list[pd.DataFrame] | list[dict],
+    errors: Literal["raise", "warn", "ignore"] = "raise",
 ) -> pd.DataFrame:
     """Concatenate results from asyncio gather"""
     clean_results, errors_results = [], []
@@ -258,7 +292,9 @@ def concat_results(
         if all([isinstance(x, pd.DataFrame) for x in clean_results]):
             return pd.concat(clean_results, ignore_index=True)
         elif all([isinstance(x, dict) for x in clean_results]):
-            return pd.DataFrame(data=clean_results).drop(columns=["info"], errors="ignore")
+            return pd.DataFrame(data=clean_results).drop(
+                columns=["info"], errors="ignore"
+            )
         else:
             raise ValueError(
                 "Results must be either a list of DataFrames or a list of dictionaries."

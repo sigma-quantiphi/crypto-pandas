@@ -50,6 +50,12 @@ class AsyncCCXTPandasExchange:
         markets_cache_time (int): The cache time in seconds for market data.
         order_amount_rounding (Literal["floor", "ceil", "round"]): Strategy for rounding order amounts.
         order_price_rounding (Literal["aggressive", "defensive", "round"]): Strategy for rounding order prices.
+        amount_out_of_range (str): Defines behavior when volume exceeds acceptable ranges. Options include:
+            - "warn": Logs a warning while removing the order.
+            - "clip": Clips or limits the volume to valid ranges.
+        price_out_of_range (str): Defines behavior when price exceeds allowable ranges. Options include:
+            - "warn": Logs a warning while removing the order.
+            - "clip": Adjusts the price to fit within predefined limits.
         semaphore_value (int): The value for the asyncio Semaphore controlling concurrent requests.
         _ccxt_processor (BaseProcessor): The processor handling preprocessing tasks for ccxt methods.
         _semaphore (Semaphore): An asyncio Semaphore instance to limit concurrency.
@@ -70,13 +76,18 @@ class AsyncCCXTPandasExchange:
     markets_cache_time: int = 3600
     order_amount_rounding: Literal["floor", "ceil", "round"] = "round"
     order_price_rounding: Literal["aggressive", "defensive", "round"] = "round"
+    amount_out_of_range: Literal["warn", "clip"] = "warn"
+    price_out_of_range: Literal["warn", "clip"] = "warn"
     semaphore_value: int = 1000
     _ccxt_processor: BaseProcessor = field(default_factory=BaseProcessor)
     _semaphore: Semaphore = field(default_factory=Semaphore)
 
     def __post_init__(self):
         self._ccxt_processor = BaseProcessor(
-            exchange_name=self.exchange_name, account_name=self.account_name
+            exchange_name=self.exchange_name,
+            account_name=self.account_name,
+            amount_out_of_range=self.amount_out_of_range,
+            price_out_of_range=self.price_out_of_range,
         )
         self._semaphore = Semaphore(self.semaphore_value)
 

@@ -19,7 +19,8 @@ from crypto_pandas.ccxt.method_mappings import (
     bulk_order_methods,
     single_order_methods,
     symbol_order_methods,
-    ohlcv_symbols_dataframe_methods, orderbooks_dataframe_methods,
+    ohlcv_symbols_dataframe_methods,
+    orderbooks_dataframe_methods,
 )
 from crypto_pandas.utils.pandas_utils import (
     timestamp_to_int,
@@ -45,6 +46,12 @@ class CCXTPandasExchange:
         markets_cache_time (int): Cache duration (in seconds) for markets data.
         order_amount_rounding (Literal["floor", "ceil", "round"]): Strategy for rounding order amounts.
         order_price_rounding (Literal["aggressive", "defensive", "round"]): Strategy for rounding order prices.
+        amount_out_of_range (str): Defines behavior when volume exceeds acceptable ranges. Options include:
+            - "warn": Logs a warning while removing the order.
+            - "clip": Clips or limits the volume to valid ranges.
+        price_out_of_range (str): Defines behavior when price exceeds allowable ranges. Options include:
+            - "warn": Logs a warning while removing the order.
+            - "clip": Adjusts the price to fit within predefined limits.
         _ccxt_processor (BaseProcessor): A helper class to process CCXT responses and provide consistent output.
 
     Methods:
@@ -61,11 +68,16 @@ class CCXTPandasExchange:
     markets_cache_time: int = 3600
     order_amount_rounding: Literal["floor", "ceil", "round"] = "round"
     order_price_rounding: Literal["aggressive", "defensive", "round"] = "round"
+    amount_out_of_range: Literal["warn", "clip"] = "warn"
+    price_out_of_range: Literal["warn", "clip"] = "warn"
     _ccxt_processor: BaseProcessor = field(default_factory=BaseProcessor)
 
     def __post_init__(self):
         self._ccxt_processor = BaseProcessor(
-            exchange_name=self.exchange_name, account_name=self.account_name
+            exchange_name=self.exchange_name,
+            account_name=self.account_name,
+            amount_out_of_range=self.amount_out_of_range,
+            price_out_of_range=self.price_out_of_range,
         )
 
     def __getattr__(self, method_name: str) -> Callable:

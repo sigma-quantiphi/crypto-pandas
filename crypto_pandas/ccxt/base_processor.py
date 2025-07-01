@@ -14,7 +14,7 @@ Attributes:
 """
 
 from dataclasses import dataclass, field
-from typing import Union
+from typing import Union, Literal
 
 import pandas as pd
 
@@ -38,24 +38,34 @@ class BaseProcessor:
     - Normalize nested JSON responses.
     - Filter and format order data according to a schema.
     - Preprocess order books, trades, and OHLCV data.
+    - Handle cases where price or volume are out of range based on specific configurations.
 
     Attributes:
         exchange_name (str): Name of the exchange being processed (e.g., "binance").
         account_name (str): Name of the account associated with the API data.
         order_schema (OrderSchema): Schema used to validate and process orders.
+        amount_out_of_range (str): Defines behavior when volume exceeds acceptable ranges. Options include:
+            - "warn": Logs a warning while removing the order.
+            - "clip": Clips or limits the volume to valid ranges.
+        price_out_of_range (str): Defines behavior when price exceeds allowable ranges. Options include:
+            - "warn": Logs a warning while removing the order.
+            - "clip": Adjusts the price to fit within predefined limits.
+        conduct_order_checks (bool): Flag to enable or disable checks when converting orders to dictionary format.
         datetime_to_int_fields (tuple): Fields that should be converted from datetime to integer timestamps.
         int_to_datetime_fields (tuple): Fields to convert from integer timestamps to pandas datetime.
         str_to_datetime_fields (tuple): Fields with string timestamps to convert to pandas datetime.
         numeric_fields (tuple): Fields that should be cast to numeric types.
         bool_fields (tuple): Fields that should be cast to boolean types.
         ohlcv_fields (tuple): Standard OHLCV (Open, High, Low, Close, Volume) column names.
-        conduct_order_checks (bool): Flag to enable or disable checks when converting orders to dictionary format.
     """
 
     exchange_name: str = None
     account_name: str = None
     order_schema: OrderSchema = field(default=OrderSchema)
     datetime_to_int_fields: tuple = None
+    conduct_order_checks: bool = True
+    amount_out_of_range: Literal["warn", "clip"] = "warn"
+    price_out_of_range: Literal["warn", "clip"] = "warn"
     int_to_datetime_fields: tuple = (
         "createTime",
         "created",
@@ -146,7 +156,6 @@ class BaseProcessor:
         "close",
         "volume",
     )
-    conduct_order_checks: bool = True
 
     def preprocess_dict(self, data: dict) -> dict:
         """
