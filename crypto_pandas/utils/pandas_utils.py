@@ -239,7 +239,7 @@ def preprocess_order_dataframe(
                 )
                 orders = orders.query(
                     "`limits_price.min` <= price <= `limits_price.max`"
-                )
+                ).reset_index(drop=True)
             else:
                 orders["price"] = orders["price"].clip(
                     orders["limits_price.min"], orders["limits_price.max"]
@@ -261,7 +261,7 @@ def preprocess_order_dataframe(
                 )
                 orders = orders.query(
                     "`limits_amount.min` <= amount <= `limits_amount.max`"
-                )
+                ).reset_index(drop=True)
             else:
                 orders["amount"] = orders["amount"].clip(
                     orders["limits_amount.min"], orders["limits_amount.max"]
