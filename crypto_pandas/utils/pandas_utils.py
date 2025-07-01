@@ -235,9 +235,11 @@ def preprocess_order_dataframe(
         if orders[["limits_price.min", "limits_price.max"]].notnull().all(axis=None):
             if price_out_of_range == "warn":
                 warnings.warn(
-                    f"Removing orders with price outside limits:\n{orders.query("limits_price.min <= price <= limits_price.max").to_markdown(index=False)}"
+                    f"Removing orders with price outside limits:\n{orders.query("`limits_price.min` <= price <= `limits_price.max`").to_markdown(index=False)}"
                 )
-                orders = orders.query("limits_price.min <= price <= limits_price.max")
+                orders = orders.query(
+                    "`limits_price.min` <= price <= `limits_price.max`"
+                )
             else:
                 orders["price"] = orders["price"].clip(
                     orders["limits_price.min"], orders["limits_price.max"]
@@ -255,10 +257,10 @@ def preprocess_order_dataframe(
         if orders[["limits_amount.min", "limits_amount.max"]].notnull().all(axis=None):
             if amount_out_of_range == "warn":
                 warnings.warn(
-                    f"Removing orders with amount outside limits:\n{orders.query("~(limits_price.min <= amount <= limits_amount.max)").to_markdown(index=False)}"
+                    f"Removing orders with amount outside limits:\n{orders.query("~(`limits_price.min` <= amount <= `limits_amount.max`)").to_markdown(index=False)}"
                 )
                 orders = orders.query(
-                    "limits_amount.min <= amount <= limits_amount.max"
+                    "`limits_amount.min` <= amount <= `limits_amount.max`"
                 )
             else:
                 orders["amount"] = orders["amount"].clip(
