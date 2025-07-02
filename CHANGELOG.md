@@ -1,3 +1,6 @@
+## [0.9.18]
+* Added parsing for `fetchMarkets`, `fetchMarkPrices` and `fetchMarkPrice`.
+
 ## [0.9.15]
 * Added `price_out_of_range` and `volume_out_of_range` parameters to allow user
 to determine if they want a warning when price/volume out of limits range or if they want the values to be clipped.

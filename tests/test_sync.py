@@ -119,6 +119,27 @@ def test_fetch_my_trades(exchange):
     assert isinstance(data, pd.DataFrame)
 
 
+def test_mark_price(exchange):
+    data = exchange.fetch_mark_price(symbol)
+    print(data)
+    print(data.dtypes)
+    assert isinstance(data, dict)
+
+
+def test_mark_prices(exchange):
+    data = exchange.fetch_mark_prices()
+    print(data)
+    print(data.dtypes)
+    assert isinstance(data, pd.DataFrame)
+
+
+def test_markets(exchange):
+    data = exchange.fetch_markets()
+    print(data)
+    print(data.dtypes)
+    assert isinstance(data, pd.DataFrame)
+
+
 def test_fetch_orders(exchange):
     data = exchange.fetch_orders(symbol)
     print(data)
@@ -147,7 +168,6 @@ def test_fetch_greeks(bybit_exchange):
     data = bybit_exchange.fetch_greeks(options_symbol)
     print(data)
     assert isinstance(data, dict)
-
 
 # def test_fetch_position(exchange):
 #     data = exchange.fetch_position(symbol)
