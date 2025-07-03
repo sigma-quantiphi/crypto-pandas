@@ -8,19 +8,31 @@ from dotenv import load_dotenv
 from crypto_pandas.ccxt.ccxt_pandas_exchange import CCXTPandasExchange
 
 load_dotenv()
-settings = {
-    "apiKey": os.getenv("API_KEY"),
-    "secret": os.getenv("API_SECRET"),
-    # "sandbox": True,
-    "options": {
-        "defaultType": "future",
-    },
-}
 symbol = "BNB/USDC:USDC"
 
 
 @pytest.fixture(scope="module")
-def exchange():
+def binance_exchange():
+    settings = {
+        "apiKey": os.getenv("API_KEY"),
+        "secret": os.getenv("API_SECRET"),
+        "options": {
+            "defaultType": "future",
+        },
+    }
+    exchange = ccxt.binance(settings)
+    return CCXTPandasExchange(exchange=exchange)
+
+
+@pytest.fixture(scope="module")
+def sandbox_exchange():
+    settings = {
+        "apiKey": os.getenv("SANDBOX_API_KEY"),
+        "secret": os.getenv("SANDBOX_API_SECRET"),
+        "options": {
+            "defaultType": "future",
+        },
+    }
     exchange = ccxt.binance(settings)
     exchange.set_sandbox_mode(True)
     return CCXTPandasExchange(exchange=exchange)
@@ -31,131 +43,138 @@ def bybit_exchange():
     return CCXTPandasExchange(exchange=ccxt.bybit())
 
 
-def test_load_markets(exchange):
-    data = exchange.load_markets()
+def test_load_markets(sandbox_exchange):
+    data = sandbox_exchange.load_markets()
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
 
 
-def test_fetch_balance(exchange):
-    data = exchange.fetch_balance()
+def test_fetch_balance(sandbox_exchange):
+    data = sandbox_exchange.fetch_balance()
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
 
 
-def test_fetch_trading_fee(exchange):
-    data = exchange.fetch_trading_fee(symbol=symbol)
+def test_fetch_trading_fee(sandbox_exchange):
+    data = sandbox_exchange.fetch_trading_fee(symbol=symbol)
     print(data)
     assert isinstance(data, dict)
 
 
-def test_fetch_trading_fees(exchange):
-    data = exchange.fetch_trading_fees()
+def test_fetch_trading_fees(sandbox_exchange):
+    data = sandbox_exchange.fetch_trading_fees()
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
 
 
-def test_fetch_transfers(exchange):
-    data = exchange.fetch_transfers()
+def test_fetch_transfers(sandbox_exchange):
+    data = sandbox_exchange.fetch_transfers()
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
 
 
-def test_fetch_currencies(exchange):
-    data = exchange.fetch_currencies()
+def test_fetch_currencies(sandbox_exchange):
+    data = sandbox_exchange.fetch_currencies()
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
 
 
-def test_fetch_ticker(exchange):
-    data = exchange.fetch_ticker(symbol)
+def test_fetch_ticker(sandbox_exchange):
+    data = sandbox_exchange.fetch_ticker(symbol)
     print(data)
     assert isinstance(data, dict)
 
 
-def test_fetch_tickers(exchange):
-    data = exchange.fetch_tickers([symbol, "ETH/USDT:USDT"])
+def test_fetch_tickers(sandbox_exchange):
+    data = sandbox_exchange.fetch_tickers([symbol, "ETH/USDT:USDT"])
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
 
 
-def test_fetch_order_book(exchange):
-    data = exchange.fetch_order_book(symbol)
+def test_fetch_order_book(sandbox_exchange):
+    data = sandbox_exchange.fetch_order_book(symbol)
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
 
 
-def test_fetch_ohlcv(exchange):
-    data = exchange.fetch_ohlcv(symbol=symbol)
+def test_fetch_ohlcv(sandbox_exchange):
+    data = sandbox_exchange.fetch_ohlcv(symbol=symbol)
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
 
 
-def test_fetch_status(exchange):
-    data = exchange.fetch_status()
+def test_fetch_status(sandbox_exchange):
+    data = sandbox_exchange.fetch_status()
     print(data)
     assert isinstance(data, dict)
 
 
-def test_fetch_trades(exchange):
-    data = exchange.fetch_trades(symbol)
+def test_fetch_trades(sandbox_exchange):
+    data = sandbox_exchange.fetch_trades(symbol)
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
 
 
-def test_fetch_my_trades(exchange):
-    data = exchange.fetch_my_trades(symbol)
+def test_fetch_my_trades(sandbox_exchange):
+    data = sandbox_exchange.fetch_my_trades(symbol)
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
 
 
-def test_mark_price(exchange):
-    data = exchange.fetch_mark_price(symbol)
+def test_mark_price(sandbox_exchange):
+    data = sandbox_exchange.fetch_mark_price(symbol)
     print(data)
     print(data.dtypes)
     assert isinstance(data, dict)
 
 
-def test_mark_prices(exchange):
-    data = exchange.fetch_mark_prices()
+def test_mark_prices(sandbox_exchange):
+    data = sandbox_exchange.fetch_mark_prices()
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
 
 
-def test_markets(exchange):
-    data = exchange.fetch_markets()
+def test_markets(sandbox_exchange):
+    data = sandbox_exchange.fetch_markets()
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
 
 
-def test_fetch_orders(exchange):
-    data = exchange.fetch_orders(symbol)
+def test_isolated_borrow_rates(binance_exchange):
+    data = binance_exchange.fetch_isolated_borrow_rates()
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
 
 
-def test_fetch_open_orders(exchange):
-    data = exchange.fetch_open_orders(symbol)
+def test_fetch_orders(sandbox_exchange):
+    data = sandbox_exchange.fetch_orders(symbol)
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
 
 
-def test_fetch_closed_orders(exchange):
-    data = exchange.fetch_closed_orders(symbol)
+def test_fetch_open_orders(sandbox_exchange):
+    data = sandbox_exchange.fetch_open_orders(symbol)
+    print(data)
+    print(data.dtypes)
+    assert isinstance(data, pd.DataFrame)
+
+
+def test_fetch_closed_orders(sandbox_exchange):
+    data = sandbox_exchange.fetch_closed_orders(symbol)
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
@@ -182,8 +201,8 @@ def test_fetch_greeks(bybit_exchange):
 #     assert isinstance(data, pd.DataFrame)
 
 
-def test_fetch_ledger(exchange):
-    data = exchange.fetch_ledger()
+def test_fetch_ledger(sandbox_exchange):
+    data = sandbox_exchange.fetch_ledger()
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
@@ -196,28 +215,28 @@ def test_fetch_ledger(exchange):
 #     assert isinstance(data, pd.DataFrame)
 
 
-def test_fetch_funding_rate_history(exchange):
-    data = exchange.fetch_funding_rate_history(symbol)
+def test_fetch_funding_rate_history(sandbox_exchange):
+    data = sandbox_exchange.fetch_funding_rate_history(symbol)
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
 
 
-def test_fetch_funding_rate_history(exchange):
-    data = exchange.fetch_funding_rate_history(symbol)
+def test_fetch_last_prices(binance_exchange):
+    data = binance_exchange.fetch_last_prices(symbols=[symbol])
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
 
 
-def test_fetch_open_interest(exchange):
-    data = exchange.fetch_open_interest(symbol)
+def test_fetch_open_interest(sandbox_exchange):
+    data = sandbox_exchange.fetch_open_interest(symbol)
     print(data)
     assert isinstance(data, dict)
 
 
-def test_fetch_open_interest_history(exchange):
-    data = exchange.fetch_open_interest_history(symbol)
+def test_fetch_open_interest_history(sandbox_exchange):
+    data = sandbox_exchange.fetch_open_interest_history(symbol)
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
@@ -230,29 +249,29 @@ def test_fetch_open_interest_history(exchange):
 #     assert isinstance(data, pd.DataFrame)
 
 
-def test_fetch_leverages(exchange):
-    data = exchange.fetch_leverages([symbol])
+def test_fetch_leverages(sandbox_exchange):
+    data = sandbox_exchange.fetch_leverages([symbol])
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
 
 
-def test_fetch_long_short_ratio_history(exchange):
-    data = exchange.fetch_long_short_ratio_history(symbol)
+def test_fetch_long_short_ratio_history(sandbox_exchange):
+    data = sandbox_exchange.fetch_long_short_ratio_history(symbol)
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
 
 
-def test_fetch_margin_adjustment_history(exchange):
-    data = exchange.fetch_margin_adjustment_history(symbol=symbol)
+def test_fetch_margin_adjustment_history(sandbox_exchange):
+    data = sandbox_exchange.fetch_margin_adjustment_history(symbol=symbol)
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
 
 
-def test_fetch_my_liquidations(exchange):
-    data = exchange.fetch_my_liquidations(symbol)
+def test_fetch_my_liquidations(sandbox_exchange):
+    data = sandbox_exchange.fetch_my_liquidations(symbol)
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
@@ -264,36 +283,36 @@ def test_fetch_my_liquidations(exchange):
 #     assert isinstance(data, dict)
 
 
-def test_fetch_funding_rates(exchange):
-    data = exchange.fetch_funding_rates([symbol])
+def test_fetch_funding_rates(sandbox_exchange):
+    data = sandbox_exchange.fetch_funding_rates([symbol])
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
 
 
-def test_fetch_convert_trade_history(exchange):
-    data = exchange.fetch_convert_trade_history()
+def test_fetch_convert_trade_history(sandbox_exchange):
+    data = sandbox_exchange.fetch_convert_trade_history()
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
 
 
-def test_fetch_bids_asks(exchange):
-    data = exchange.fetch_bids_asks([symbol])
+def test_fetch_bids_asks(sandbox_exchange):
+    data = sandbox_exchange.fetch_bids_asks([symbol])
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
 
 
-def test_fetch_canceled_and_closed_orders(exchange):
-    data = exchange.fetch_canceled_and_closed_orders(symbol)
+def test_fetch_canceled_and_closed_orders(sandbox_exchange):
+    data = sandbox_exchange.fetch_canceled_and_closed_orders(symbol)
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
 
 
-def test_create_order(exchange):
-    data = exchange.create_order(
+def test_create_order(sandbox_exchange):
+    data = sandbox_exchange.create_order(
         symbol=symbol,
         type="limit",
         side="buy",
@@ -302,15 +321,15 @@ def test_create_order(exchange):
     )
     print(data)
     assert isinstance(data, dict)
-    data = exchange.fetch_order(id=data["id"], symbol=symbol)
+    data = sandbox_exchange.fetch_order(id=data["id"], symbol=symbol)
     print(data)
     assert isinstance(data, dict)
-    data = exchange.cancel_order(id=data["id"], symbol=symbol)
+    data = sandbox_exchange.cancel_order(id=data["id"], symbol=symbol)
     print(data)
     assert isinstance(data, dict)
 
 
-def test_create_orders(exchange):
+def test_create_orders(sandbox_exchange):
     orders = [
         dict(
             side="buy",
@@ -325,17 +344,17 @@ def test_create_orders(exchange):
     orders["notional"] = 7
     orders["type"] = "limit"
     orders["symbol"] = symbol
-    data = exchange.create_orders(orders=orders)
+    data = sandbox_exchange.create_orders(orders=orders)
     print(data)
     assert isinstance(data, pd.DataFrame)
-    data = exchange.fetch_open_orders(symbol=symbol)
+    data = sandbox_exchange.fetch_open_orders(symbol=symbol)
     print(data)
     assert isinstance(data, pd.DataFrame)
     if not data.empty:
         data["amount"] = 0.02
-        data = exchange.edit_orders(orders=data)
+        data = sandbox_exchange.edit_orders(orders=data)
         print(data)
         assert isinstance(data, pd.DataFrame)
-        data = exchange.cancel_all_orders(symbol=symbol)
+        data = sandbox_exchange.cancel_all_orders(symbol=symbol)
         print(data)
         assert isinstance(data, pd.DataFrame)

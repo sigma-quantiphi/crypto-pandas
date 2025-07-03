@@ -1,3 +1,6 @@
+## [0.9.19]
+* Added parsing for `fetchLastPrices`, `fetchIsolatedBorrowRates` and `fetchIsolatedBorrowRate`.
+
 ## [0.9.18]
 * Added parsing for `fetchMarkets`, `fetchMarkPrices` and `fetchMarkPrice`.
 
