@@ -1,3 +1,6 @@
+## [0.9.20]
+* Added fields to numeric and numeric_datetime columns for parsing: fee, expiryDate, createdDate.
+
 ## [0.9.19]
 * Added parsing for `fetchLastPrices`, `fetchIsolatedBorrowRates` and `fetchIsolatedBorrowRate`.
 

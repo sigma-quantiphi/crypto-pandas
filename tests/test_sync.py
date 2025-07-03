@@ -188,6 +188,7 @@ def test_fetch_greeks(bybit_exchange):
     print(data)
     assert isinstance(data, dict)
 
+
 # def test_fetch_position(exchange):
 #     data = exchange.fetch_position(symbol)
 #     print(data)
