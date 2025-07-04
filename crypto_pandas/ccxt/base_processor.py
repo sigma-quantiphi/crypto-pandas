@@ -105,7 +105,6 @@ class BaseProcessor:
         "crossWalletBalance",
         "entryPrice",
         "exercisePrice",
-        "fee",
         "fee_cost",
         "fee_currency",
         "free",
@@ -255,8 +254,7 @@ class BaseProcessor:
         return self.preprocess_dataframe(data)
 
     def markets_to_dataframe(self, data: dict) -> pd.DataFrame:
-        data = pd.DataFrame(data).transpose()
-        return self.preprocess_dataframe(data)
+        return self.preprocess_dataframe(pd.DataFrame(data).transpose())
 
     def balance_to_dataframe(self, data: dict) -> pd.DataFrame:
         if "total" in data:
