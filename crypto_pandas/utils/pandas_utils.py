@@ -232,14 +232,19 @@ def preprocess_order_dataframe(
                 ),
                 axis=1,
             )
-        if orders[["limits_price.min", "limits_price.max"]].notnull().all(axis=None):
+        if orders[["limits_price.min", "limits_price.max"]].notnull().all(axis=1).all():
             if price_out_of_range == "warn":
-                warnings.warn(
-                    f"Removing orders with price outside limits:\n{orders.query("`limits_price.min` <= price <= `limits_price.max`").to_markdown(index=False)}"
+                price_in_bounds = orders["price"].between(
+                    orders["limits_price.min"], orders["limits_price.max"]
                 )
-                orders = orders.query(
-                    "`limits_price.min` <= price <= `limits_price.max`"
-                ).reset_index(drop=True)
+                out_of_bounds_orders = orders.loc[~price_in_bounds].reset_index(
+                    drop=True
+                )
+                orders = orders.loc[price_in_bounds].reset_index(drop=True)
+                if not out_of_bounds_orders.empty:
+                    warnings.warn(
+                        f"Removing orders with price outside limits:\n{orders.to_markdown(index=False)}"
+                    )
             else:
                 orders["price"] = orders["price"].clip(
                     orders["limits_price.min"], orders["limits_price.max"]
@@ -254,14 +259,24 @@ def preprocess_order_dataframe(
                 ),
                 axis=1,
             )
-        if orders[["limits_amount.min", "limits_amount.max"]].notnull().all(axis=None):
+        if (
+            orders[["limits_amount.min", "limits_amount.max"]]
+            .notnull()
+            .all(axis=1)
+            .all()
+        ):
             if amount_out_of_range == "warn":
-                warnings.warn(
-                    f"Removing orders with amount outside limits:\n{orders.query("~(`limits_price.min` <= amount <= `limits_amount.max`)").to_markdown(index=False)}"
+                amount_in_bounds = orders["amount"].between(
+                    orders["limits_amount.min"], orders["limits_amount.max"]
                 )
-                orders = orders.query(
-                    "`limits_amount.min` <= amount <= `limits_amount.max`"
-                ).reset_index(drop=True)
+                out_of_bounds_orders = orders.loc[~amount_in_bounds].reset_index(
+                    drop=True
+                )
+                orders = orders.loc[amount_in_bounds].reset_index(drop=True)
+                if not out_of_bounds_orders.empty:
+                    warnings.warn(
+                        f"Removing orders with amount outside limits:\n{orders.to_markdown(index=False)}"
+                    )
             else:
                 orders["amount"] = orders["amount"].clip(
                     orders["limits_amount.min"], orders["limits_amount.max"]

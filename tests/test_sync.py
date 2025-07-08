@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from crypto_pandas.ccxt.ccxt_pandas_exchange import CCXTPandasExchange
 
 load_dotenv()
-symbol = "BNB/USDC:USDC"
+symbol = "BNB/USDT:USDT"
 
 
 @pytest.fixture(scope="module")
@@ -50,28 +50,28 @@ def test_load_markets(sandbox_exchange):
     assert isinstance(data, pd.DataFrame)
 
 
-def test_fetch_balance(sandbox_exchange):
-    data = sandbox_exchange.fetch_balance()
+def test_fetch_balance(binance_exchange):
+    data = binance_exchange.fetch_balance()
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
 
 
-def test_fetch_trading_fee(sandbox_exchange):
-    data = sandbox_exchange.fetch_trading_fee(symbol=symbol)
+def test_fetch_trading_fee(binance_exchange):
+    data = binance_exchange.fetch_trading_fee(symbol=symbol)
     print(data)
     assert isinstance(data, dict)
 
 
-def test_fetch_trading_fees(sandbox_exchange):
-    data = sandbox_exchange.fetch_trading_fees()
+def test_fetch_trading_fees(binance_exchange):
+    data = binance_exchange.fetch_trading_fees()
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
 
 
-def test_fetch_transfers(sandbox_exchange):
-    data = sandbox_exchange.fetch_transfers()
+def test_fetch_transfers(binance_exchange):
+    data = binance_exchange.fetch_transfers()
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
@@ -111,8 +111,8 @@ def test_fetch_ohlcv(sandbox_exchange):
     assert isinstance(data, pd.DataFrame)
 
 
-def test_fetch_status(sandbox_exchange):
-    data = sandbox_exchange.fetch_status()
+def test_fetch_status(binance_exchange):
+    data = binance_exchange.fetch_status()
     print(data)
     assert isinstance(data, dict)
 
@@ -134,7 +134,6 @@ def test_fetch_my_trades(sandbox_exchange):
 def test_mark_price(sandbox_exchange):
     data = sandbox_exchange.fetch_mark_price(symbol)
     print(data)
-    print(data.dtypes)
     assert isinstance(data, dict)
 
 
@@ -202,8 +201,8 @@ def test_fetch_greeks(bybit_exchange):
 #     assert isinstance(data, pd.DataFrame)
 
 
-def test_fetch_ledger(sandbox_exchange):
-    data = sandbox_exchange.fetch_ledger()
+def test_fetch_ledger(binance_exchange):
+    data = binance_exchange.fetch_ledger()
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
@@ -223,8 +222,8 @@ def test_fetch_funding_rate_history(sandbox_exchange):
     assert isinstance(data, pd.DataFrame)
 
 
-def test_fetch_last_prices(binance_exchange):
-    data = binance_exchange.fetch_last_prices(symbols=[symbol])
+def test_fetch_last_prices(sandbox_exchange):
+    data = sandbox_exchange.fetch_last_prices(symbols=[symbol])
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
@@ -236,8 +235,8 @@ def test_fetch_open_interest(sandbox_exchange):
     assert isinstance(data, dict)
 
 
-def test_fetch_open_interest_history(sandbox_exchange):
-    data = sandbox_exchange.fetch_open_interest_history(symbol)
+def test_fetch_open_interest_history(binance_exchange):
+    data = binance_exchange.fetch_open_interest_history(symbol)
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
@@ -257,8 +256,8 @@ def test_fetch_leverages(sandbox_exchange):
     assert isinstance(data, pd.DataFrame)
 
 
-def test_fetch_long_short_ratio_history(sandbox_exchange):
-    data = sandbox_exchange.fetch_long_short_ratio_history(symbol)
+def test_fetch_long_short_ratio_history(binance_exchange):
+    data = binance_exchange.fetch_long_short_ratio_history(symbol)
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
@@ -291,8 +290,8 @@ def test_fetch_funding_rates(sandbox_exchange):
     assert isinstance(data, pd.DataFrame)
 
 
-def test_fetch_convert_trade_history(sandbox_exchange):
-    data = sandbox_exchange.fetch_convert_trade_history()
+def test_fetch_convert_trade_history(binance_exchange):
+    data = binance_exchange.fetch_convert_trade_history()
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
@@ -312,8 +311,8 @@ def test_fetch_canceled_and_closed_orders(sandbox_exchange):
     assert isinstance(data, pd.DataFrame)
 
 
-def test_create_order(sandbox_exchange):
-    data = sandbox_exchange.create_order(
+def test_create_order(binance_exchange):
+    data = binance_exchange.create_order(
         symbol=symbol,
         type="limit",
         side="buy",
@@ -322,19 +321,19 @@ def test_create_order(sandbox_exchange):
     )
     print(data)
     assert isinstance(data, dict)
-    data = sandbox_exchange.fetch_order(id=data["id"], symbol=symbol)
+    data = binance_exchange.fetch_order(id=data["id"], symbol=symbol)
     print(data)
     assert isinstance(data, dict)
-    data = sandbox_exchange.cancel_order(id=data["id"], symbol=symbol)
+    data = binance_exchange.cancel_order(id=data["id"], symbol=symbol)
     print(data)
     assert isinstance(data, dict)
 
 
-def test_create_orders(sandbox_exchange):
+def test_create_orders(binance_exchange):
     orders = [
         dict(
             side="buy",
-            price=600,
+            price=300,
         ),
         dict(
             side="sell",
@@ -345,17 +344,17 @@ def test_create_orders(sandbox_exchange):
     orders["notional"] = 7
     orders["type"] = "limit"
     orders["symbol"] = symbol
-    data = sandbox_exchange.create_orders(orders=orders)
+    data = binance_exchange.create_orders(orders=orders)
     print(data)
     assert isinstance(data, pd.DataFrame)
-    data = sandbox_exchange.fetch_open_orders(symbol=symbol)
+    data = binance_exchange.fetch_open_orders(symbol=symbol)
     print(data)
     assert isinstance(data, pd.DataFrame)
     if not data.empty:
-        data["amount"] = 0.02
-        data = sandbox_exchange.edit_orders(orders=data)
+        data["amount"] *= 2
+        data = binance_exchange.edit_orders(orders=data)
         print(data)
         assert isinstance(data, pd.DataFrame)
-        data = sandbox_exchange.cancel_all_orders(symbol=symbol)
+        data = binance_exchange.cancel_all_orders(symbol=symbol)
         print(data)
         assert isinstance(data, pd.DataFrame)

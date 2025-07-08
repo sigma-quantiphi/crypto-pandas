@@ -79,6 +79,8 @@ class CCXTPandasExchange:
             amount_out_of_range=self.amount_out_of_range,
             price_out_of_range=self.price_out_of_range,
         )
+        if self.exchange_name is None:
+            self.exchange_name = self.exchange.id
 
     def __getattr__(self, method_name: str) -> Callable:
         original_method = getattr(self.exchange, method_name)
