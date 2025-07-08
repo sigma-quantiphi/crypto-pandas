@@ -1,6 +1,7 @@
 ## v0.9.22
 - Print warnings for out of bounds orders only if dataframe not empty.
 - Extract exchange name from exchange class if not provided.
+- Certain tests reverted to prod Binance exchange.
 
 ## v0.9.20
 - Added fields to numeric and numeric_datetime columns for parsing: fee, expiryDate, createdDate.
