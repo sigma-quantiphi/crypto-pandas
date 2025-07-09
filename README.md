@@ -1,7 +1,7 @@
 # Crypto Pandas
 
 ![Python version](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13-blue.svg)
-![GitHub](https://img.shields.io/badge/github-Visit&nbsp;Repo-black?style=for-the-badge&logo=github)](https://github.com/sigma-quantiphi/crypto-pandas)
+[![GitHub](https://img.shields.io/badge/github-Visit&nbsp;Repo-black?style=for-the-badge&logo=github)](https://github.com/sigma-quantiphi/crypto-pandas)
 [![PyPI version](https://badge.fury.io/py/crypto-pandas.svg)](https://pypi.org/project/crypto-pandas/)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/sigma-quantiphi/crypto-pandas/HEAD?urlpath=%2Fdoc%2Ftree%2Fexamples)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/sigma-quantiphi/crypto-pandas/blob/main/LICENSE.md)
