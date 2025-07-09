@@ -83,6 +83,8 @@ class AsyncCCXTPandasExchange:
     _semaphore: Semaphore = field(default_factory=Semaphore)
 
     def __post_init__(self):
+        if self.exchange_name is None:
+            self.exchange_name = self.exchange.id
         self._ccxt_processor = BaseProcessor(
             exchange_name=self.exchange_name,
             account_name=self.account_name,

@@ -1,3 +1,6 @@
+## v0.9.23
+- Add `return_exceptions` to lists of lists in async_concat_results.
+
 ## v0.9.22
 - Print warnings for out of bounds orders only if dataframe not empty.
 - Extract exchange name from exchange class if not provided.

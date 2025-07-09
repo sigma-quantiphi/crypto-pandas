@@ -335,7 +335,7 @@ async def async_concat_results(
         for group in tasks
     ):
         flat_tasks = [t for group in tasks for t in group]
-        flat_results = await asyncio.gather(*flat_tasks)
+        flat_results = await asyncio.gather(*flat_tasks, return_exceptions=True)
         # Reconstruct shape
         results = []
         i = 0
