@@ -1,3 +1,6 @@
+## v0.9.24
+- Addition of `fetch_funding_rate` parsing.
+
 ## v0.9.23
 - Add `return_exceptions` to lists of lists in async_concat_results.
 

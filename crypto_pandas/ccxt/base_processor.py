@@ -69,7 +69,8 @@ class BaseProcessor:
     int_to_datetime_fields: tuple = (
         "createTime",
         "created",
-        "createDate" "expiry",
+        "createDate",
+        "expiry",
         "expiryDate",
         "fundingTimestamp",
         "nextFundingTimestamp",

@@ -89,6 +89,7 @@ dict_methods = {
     "create_order",
     "edit_order",
     "fetch_deposit",
+    "fetch_funding_rate",
     "fetch_greeks",
     "fetch_isolated_borrow_rate",
     "fetch_mark_price",
