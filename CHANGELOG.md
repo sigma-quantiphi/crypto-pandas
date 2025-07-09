@@ -1,3 +1,6 @@
+## v0.9.25
+- Addition of `fetch_all_greeks` parsing.
+
 ## v0.9.24
 - Addition of `fetch_funding_rate` parsing.
 

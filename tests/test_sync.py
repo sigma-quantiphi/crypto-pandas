@@ -18,6 +18,7 @@ def binance_exchange():
         "secret": os.getenv("API_SECRET"),
         "options": {
             "defaultType": "future",
+            "loadAllOptions": True,
         },
     }
     exchange = ccxt.binance(settings)
@@ -31,6 +32,7 @@ def sandbox_exchange():
         "secret": os.getenv("SANDBOX_API_SECRET"),
         "options": {
             "defaultType": "future",
+            "loadAllOptions": True,
         },
     }
     exchange = ccxt.binance(settings)
@@ -179,13 +181,20 @@ def test_fetch_closed_orders(sandbox_exchange):
     assert isinstance(data, pd.DataFrame)
 
 
-def test_fetch_greeks(bybit_exchange):
+def test_fetch_greeks(binance_exchange):
     options_symbol = (
-        bybit_exchange.load_markets().query("type == 'option'")["symbol"].values[0]
+        binance_exchange.load_markets().query("type == 'option'")["symbol"].values[0]
     )
-    data = bybit_exchange.fetch_greeks(options_symbol)
+    data = binance_exchange.fetch_greeks(options_symbol)
     print(data)
     assert isinstance(data, dict)
+
+
+def test_fetch_all_greeks(binance_exchange):
+    data = binance_exchange.fetch_all_greeks()
+    print(data.dropna(axis=1))
+    print(data.dtypes)
+    assert isinstance(data, pd.DataFrame)
 
 
 # def test_fetch_position(exchange):

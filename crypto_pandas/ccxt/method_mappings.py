@@ -54,6 +54,7 @@ standard_dataframe_methods = {
     "watch_trades_for_symbols",
 }
 markets_dataframe_methods = {
+    "fetch_all_greeks",
     "fetch_bids_asks",
     "fetch_currencies",
     "fetch_funding_rates",
