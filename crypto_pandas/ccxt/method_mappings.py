@@ -21,6 +21,7 @@ standard_dataframe_methods = {
     "fetch_borrow_rate_histories",
     "fetch_borrow_rate_history",
     "fetch_convert_trade_history",
+    "fetch_cross_borrow_rates",
     "fetch_deposit_withdraw_fees",
     "fetch_deposits",
     "fetch_funding_history",
@@ -56,6 +57,7 @@ standard_dataframe_methods = {
 markets_dataframe_methods = {
     "fetch_all_greeks",
     "fetch_bids_asks",
+    "fetch_convert_currencies",
     "fetch_currencies",
     "fetch_funding_rates",
     "fetch_isolated_borrow_rates",
@@ -79,6 +81,7 @@ orderbook_dataframe_methods = {
 orderbooks_dataframe_methods = {"fetch_order_books"}
 orders_dataframe_methods = {
     "fetch_canceled_and_closed_orders",
+    "fetch_canceled_orders",
     "fetch_closed_orders",
     "fetch_open_orders",
     "fetch_orders",
@@ -89,6 +92,7 @@ dict_methods = {
     "cancel_order",
     "create_order",
     "edit_order",
+    "fetch_cross_borrow_rate",
     "fetch_deposit",
     "fetch_funding_rate",
     "fetch_greeks",

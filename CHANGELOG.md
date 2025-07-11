@@ -1,3 +1,6 @@
+## v0.9.26
+- Addition of `fetch_cross_borrow_rate(s)` parsing.
+
 ## v0.9.25
 - Addition of `fetch_all_greeks` parsing.
 
