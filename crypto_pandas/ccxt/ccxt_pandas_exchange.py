@@ -41,6 +41,7 @@ class CCXTPandasExchange:
         exchange (ccxt.Exchange): An instance of the CCXT exchange client.
         exchange_name (str | None): The name of the exchange to interact with.
         account_name (str | None): The account name, if required for tracking.
+        dropna_fields (bool): Determines whether empty (NaN) columns are removed from DataFrame outputs.
         max_order_notional (float): Maximum notional value for any single order.
         max_number_of_orders (int): Maximum number of bulk orders allowed.
         markets_cache_time (int): Cache duration (in seconds) for markets data.
@@ -63,6 +64,7 @@ class CCXTPandasExchange:
     exchange: ccxt.Exchange = field(default_factory=ccxt.binance)
     exchange_name: str | None = None
     account_name: str | None = None
+    dropna_fields: bool = True
     max_order_notional: float = 10_000
     max_number_of_orders: int = 5
     markets_cache_time: int = 3600

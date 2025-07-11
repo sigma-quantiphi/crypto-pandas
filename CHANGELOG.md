@@ -1,4 +1,8 @@
 ## v0.9.26
+- Added `fundingRate` and `estimatedSettlePrice` to numeric fields.
+- Introduced `dropna_fields` with default True to automatically remove all Na columns. 
+
+## v0.9.26
 - Addition of `fetch_cross_borrow_rate(s)` parsing.
 
 ## v0.9.25

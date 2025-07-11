@@ -45,6 +45,7 @@ class AsyncCCXTPandasExchange:
         exchange (ccxt.Exchange): The ccxt exchange instance, defaulting to Binance.
         exchange_name (str | None): The name of the exchange, used for processor initialization.
         account_name (str | None): The account name, used for processor initialization.
+        dropna_fields (bool): Determines whether empty (NaN) columns are removed from DataFrame outputs.
         max_order_notional (float): The maximum allowable notional value for a single order.
         max_number_of_orders (int): The maximum number of orders allowed in bulk order processing.
         markets_cache_time (int): The cache time in seconds for market data.
@@ -71,6 +72,7 @@ class AsyncCCXTPandasExchange:
     exchange: ccxt.Exchange = field(default_factory=ccxt.binance)
     exchange_name: str | None = None
     account_name: str | None = None
+    dropna_fields: bool = True
     max_order_notional: float = 10_000
     max_number_of_orders: int = 5
     markets_cache_time: int = 3600

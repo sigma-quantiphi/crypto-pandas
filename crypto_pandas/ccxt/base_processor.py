@@ -43,6 +43,7 @@ class BaseProcessor:
     Attributes:
         exchange_name (str): Name of the exchange being processed (e.g., "binance").
         account_name (str): Name of the account associated with the API data.
+        dropna_fields (bool): Determines whether empty (NaN) columns are removed from DataFrame outputs.
         order_schema (OrderSchema): Schema used to validate and process orders.
         amount_out_of_range (str): Defines behavior when volume exceeds acceptable ranges. Options include:
             - "warn": Logs a warning while removing the order.
@@ -61,6 +62,7 @@ class BaseProcessor:
 
     exchange_name: str = None
     account_name: str = None
+    dropna_fields: bool = True
     order_schema: OrderSchema = field(default=OrderSchema)
     datetime_to_int_fields: tuple = None
     conduct_order_checks: bool = True
@@ -112,11 +114,13 @@ class BaseProcessor:
         "crossWalletBalance",
         "delta",
         "entryPrice",
+        "estimatedSettlePrice",
         "exercisePrice",
         "fee_cost",
         "fee_currency",
         "free",
         "freeze",
+        "fundingRate",
         "gamma",
         "indexPrice",
         "initialMargin",
@@ -191,18 +195,21 @@ class BaseProcessor:
         Returns:
             dict: A dictionary with properly formatted fields.
         """
+        new_data = {}
         for key, value in data.items():
             if self.int_to_datetime_fields and (key in self.int_to_datetime_fields):
-                data[key] = pd.Timestamp(pd.to_numeric(value), unit="ms", tz="UTC")
+                value = pd.Timestamp(pd.to_numeric(value), unit="ms", tz="UTC")
             elif self.str_to_datetime_fields and (key in self.str_to_datetime_fields):
-                data[key] = pd.Timestamp(value, tz="UTC")
+                value = pd.Timestamp(value, tz="UTC")
             elif self.numeric_fields and (key in self.numeric_fields):
-                data[key] = pd.to_numeric(value, errors="coerce")
+                value = pd.to_numeric(value, errors="coerce")
+            if pd.notnull(value):
+                new_data[key] = value
         if self.exchange_name:
-            data["exchange"] = self.exchange_name
+            new_data["exchange"] = self.exchange_name
         if self.account_name:
-            data["account"] = self.account_name
-        return data
+            new_data["account"] = self.account_name
+        return new_data
 
     def preprocess_dataframe(self, data: pd.DataFrame) -> pd.DataFrame:
         """
@@ -244,6 +251,8 @@ class BaseProcessor:
         if self.bool_fields:
             bool_columns_to_convert = [x for x in columns if x in self.bool_fields]
             data[bool_columns_to_convert] = data[bool_columns_to_convert].astype(bool)
+        if self.dropna_fields:
+            data = data.dropna(axis=1, how="all")
         if self.exchange_name:
             data["exchange"] = self.exchange_name
         if self.account_name:
