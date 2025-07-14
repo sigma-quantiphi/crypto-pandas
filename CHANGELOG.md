@@ -1,5 +1,5 @@
 ## v0.9.28
-- Only concat non empty orderbooks
+- Only concat non empty orderbooks.
 
 ## v0.9.27
 - Added `fundingRate` and `estimatedSettlePrice` to numeric fields.
