@@ -75,14 +75,14 @@ class CCXTPandasExchange:
     _ccxt_processor: BaseProcessor = field(default_factory=BaseProcessor)
 
     def __post_init__(self):
+        if self.exchange_name is None:
+            self.exchange_name = self.exchange.id
         self._ccxt_processor = BaseProcessor(
             exchange_name=self.exchange_name,
             account_name=self.account_name,
             amount_out_of_range=self.amount_out_of_range,
             price_out_of_range=self.price_out_of_range,
         )
-        if self.exchange_name is None:
-            self.exchange_name = self.exchange.id
 
     def __getattr__(self, method_name: str) -> Callable:
         original_method = getattr(self.exchange, method_name)
