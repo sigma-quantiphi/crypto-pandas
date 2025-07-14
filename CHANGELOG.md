@@ -1,3 +1,6 @@
+## v0.9.28
+- Only concat non empty orderbooks
+
 ## v0.9.27
 - Added `fundingRate` and `estimatedSettlePrice` to numeric fields.
 - Introduced `dropna_fields` with default True to automatically remove all Na columns. 

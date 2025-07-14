@@ -350,8 +350,9 @@ class BaseProcessor:
         df = []
         for symbol, symbol_data in data.items():
             symbol_data = self.order_book_to_dataframe(symbol_data)
-            symbol_data["symbol"] = symbol
-            df.append(symbol_data.copy())
+            if not symbol_data.empty:
+                symbol_data["symbol"] = symbol
+                df.append(symbol_data.copy())
         return pd.concat(df, ignore_index=True)
 
     def ohlcv_to_dataframe(self, data: list, symbol: str | None = None) -> pd.DataFrame:
