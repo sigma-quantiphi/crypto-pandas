@@ -1,3 +1,6 @@
+## v0.9.29
+- Added `nextFundingDatetime` to datetime parsing.
+
 ## v0.9.28
 - Only concat non empty orderbooks.
 

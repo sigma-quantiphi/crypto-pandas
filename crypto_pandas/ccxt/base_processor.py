@@ -85,6 +85,7 @@ class BaseProcessor:
         "datetime",
         "expiryDatetime",
         "fundingDatetime",
+        "nextFundingDatetime",
         "previousFundingDatetime",
     )
     numeric_fields: tuple = (
