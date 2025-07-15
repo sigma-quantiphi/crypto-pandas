@@ -1,4 +1,4 @@
-## v0.9.30
+## v0.9.31
 - Only adding `timestamp` and `datetime` fields to balance dataframe when present in dict.
 - Only parsing numeric/bool/datetime fields if list non empty.
 
