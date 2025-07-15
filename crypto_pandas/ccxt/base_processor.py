@@ -230,28 +230,32 @@ class BaseProcessor:
             datetime_columns_to_convert = [
                 x for x in columns if x in self.int_to_datetime_fields
             ]
-            data[datetime_columns_to_convert] = (
-                data[datetime_columns_to_convert]
-                .apply(pd.to_numeric, errors="coerce")
-                .apply(pd.to_datetime, unit="ms", utc=True, errors="coerce")
-            )
+            if datetime_columns_to_convert:
+                data[datetime_columns_to_convert] = (
+                    data[datetime_columns_to_convert]
+                    .apply(pd.to_numeric, errors="coerce")
+                    .apply(pd.to_datetime, unit="ms", utc=True, errors="coerce")
+                )
         if self.str_to_datetime_fields:
             datetime_columns_to_convert = [
                 x for x in columns if x in self.str_to_datetime_fields
             ]
-            data[datetime_columns_to_convert] = data[datetime_columns_to_convert].apply(
-                pd.to_datetime, utc=True, errors="coerce"
-            )
+            if datetime_columns_to_convert:
+                data[datetime_columns_to_convert] = data[datetime_columns_to_convert].apply(
+                    pd.to_datetime, utc=True, errors="coerce"
+                )
         if self.numeric_fields:
             numeric_columns_to_convert = [
                 x for x in columns if x in self.numeric_fields
             ]
-            data[numeric_columns_to_convert] = data[numeric_columns_to_convert].apply(
-                pd.to_numeric, errors="coerce"
-            )
+            if numeric_columns_to_convert:
+                data[numeric_columns_to_convert] = data[numeric_columns_to_convert].apply(
+                    pd.to_numeric, errors="coerce"
+                )
         if self.bool_fields:
             bool_columns_to_convert = [x for x in columns if x in self.bool_fields]
-            data[bool_columns_to_convert] = data[bool_columns_to_convert].astype(bool)
+            if bool_columns_to_convert:
+                data[bool_columns_to_convert] = data[bool_columns_to_convert].astype(bool)
         if self.dropna_fields:
             data = data.dropna(axis=1, how="all")
         if self.exchange_name:
@@ -300,8 +304,10 @@ class BaseProcessor:
                         symbol_data = data[row["symbol"]]
                         if column in symbol_data:
                             df.loc[index, f"{x}_{column}"] = symbol_data[row[x]][column]
-        df["timestamp"] = data["timestamp"]
-        df["datetime"] = data["datetime"]
+        if "timestamp" in data:
+            df["timestamp"] = data["timestamp"]
+        if "datetime" in data:
+            df["datetime"] = data["datetime"]
         return self.preprocess_dataframe(df)
 
     def order_book_to_dataframe(self, data: Union[dict, list]) -> pd.DataFrame:

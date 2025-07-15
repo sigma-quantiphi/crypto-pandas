@@ -1,3 +1,7 @@
+## v0.9.30
+- Only adding `timestamp` and `datetime` fields to balance dataframe when present in dict.
+- Only parsing numeric/bool/datetime fields if list non empty.
+
 ## v0.9.29
 - Added `nextFundingDatetime` to datetime parsing.
 
