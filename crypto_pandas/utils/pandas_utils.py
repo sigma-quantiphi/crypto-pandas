@@ -137,7 +137,7 @@ def preprocess_order(
     amount_out_of_range: Literal["warn", "clip"] = "warn",
 ) -> tuple:
     market = (
-        markets.reindex(order_data_columns)
+        markets.reindex(columns=order_data_columns)
         .query(f"symbol == '{symbol}'")
         .to_dict("records")[0]
     )
@@ -225,7 +225,7 @@ def preprocess_order_dataframe(
         orders_error = orders.query(f"notional > {max_notional}")
         if not orders_error.empty:
             raise ValueError(f"Orders exceeding max notional: {orders_error}")
-    orders = orders.merge(markets.reindex(order_data_columns))
+    orders = orders.merge(markets.reindex(columns=order_data_columns))
     if "price" in orders.columns:
         if orders["precision_price"].notnull().all():
             orders["price"] = orders.apply(
