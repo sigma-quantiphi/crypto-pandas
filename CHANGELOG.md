@@ -1,4 +1,8 @@
 ## v0.9.32
+- Remove error message on missing `amount` orders. Allows compatible with params={"cost": value}.
+- Created fix using `reindex` should precision/ limit fields not exist in markets data.
+
+## v0.9.32
 - Enabled notional -> amount calculation for market orders.
 - Created fix using `reindex` should precision/ limit fields not exist in markets data.
 

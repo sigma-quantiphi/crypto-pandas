@@ -216,8 +216,9 @@ class BaseProcessor:
                 value = pd.Timestamp(value, tz="UTC")
             elif self.numeric_fields and (key in self.numeric_fields):
                 value = pd.to_numeric(value, errors="coerce")
-            if pd.notnull(value):
-                new_data[key] = value
+            if value:
+                if isinstance(value, (list, set, tuple)) | pd.notnull(value):
+                    new_data[key] = value
         if self.exchange_name:
             new_data["exchange"] = self.exchange_name
         if self.account_name:
