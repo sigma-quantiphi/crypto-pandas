@@ -319,16 +319,19 @@ def test_fetch_canceled_and_closed_orders(sandbox_exchange):
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
 
+
 def test_fetch_convert_currencies(binance_exchange):
     data = binance_exchange.fetch_convert_currencies()
     print(data.dropna(axis=1))
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
 
+
 def test_fetch_cross_borrow_rate(binance_exchange):
     data = binance_exchange.fetch_cross_borrow_rate(code="BTC")
     print(data)
     assert isinstance(data, dict)
+
 
 def test_create_order(binance_exchange):
     data = binance_exchange.create_order(

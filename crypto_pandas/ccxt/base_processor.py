@@ -68,122 +68,134 @@ class BaseProcessor:
     conduct_order_checks: bool = True
     amount_out_of_range: Literal["warn", "clip"] = "warn"
     price_out_of_range: Literal["warn", "clip"] = "warn"
-    int_to_datetime_fields: tuple = (
-        "createTime",
-        "created",
-        "createDate",
-        "expiry",
-        "expiryDate",
-        "fundingTimestamp",
-        "nextFundingTimestamp",
-        "previousFundingTimestamp",
-        "time",
-        "timestamp",
-        "updateTime",
+    int_to_datetime_fields: tuple = field(
+        repr=False,
+        default=(
+            "createTime",
+            "created",
+            "createDate",
+            "expiry",
+            "expiryDate",
+            "fundingTimestamp",
+            "nextFundingTimestamp",
+            "previousFundingTimestamp",
+            "time",
+            "timestamp",
+            "updateTime",
+        ),
     )
-    str_to_datetime_fields: tuple = (
-        "datetime",
-        "expiryDatetime",
-        "fundingDatetime",
-        "nextFundingDatetime",
-        "previousFundingDatetime",
+    str_to_datetime_fields: tuple = field(
+        repr=False,
+        default=(
+            "datetime",
+            "expiryDatetime",
+            "fundingDatetime",
+            "nextFundingDatetime",
+            "previousFundingDatetime",
+        ),
     )
-    numeric_fields: tuple = (
-        "ask",
-        "askImpliedVolatility",
-        "askPrice",
-        "askSize",
-        "askVolume",
-        "availableBalance",
-        "average",
-        "baseRate",
-        "baseVolume",
-        "bid",
-        "bidImpliedVolatility",
-        "bidPrice",
-        "bidSize",
-        "bidVolume",
-        "buySellRatio",
-        "buyVol",
-        "change",
-        "close",
-        "collateral",
-        "collateralMarginLevel",
-        "contractSize",
-        "contracts",
-        "crossUnPnl",
-        "crossWalletBalance",
-        "delta",
-        "entryPrice",
-        "estimatedSettlePrice",
-        "exercisePrice",
-        "fee_cost",
-        "fee_currency",
-        "free",
-        "freeze",
-        "fundingRate",
-        "gamma",
-        "indexPrice",
-        "initialMargin",
-        "initialMarginPercentage",
-        "last",
-        "lastPrice",
-        "leverage",
-        "liquidationPrice",
-        "locked",
-        "longAccount",
-        "longShortRatio",
-        "maintMargin",
-        "maintenanceMargin",
-        "maintenanceMarginPercentage",
-        "marginBalance",
-        "marginLevel",
-        "marginRatio",
-        "markImpliedVolatility",
-        "markPrice",
-        "maxNotional",
-        "maxWithdrawAmount",
-        "nextFundingRate",
-        "notional",
-        "open",
-        "openOrderInitialMargin",
-        "percentage",
-        "period",
-        "positionAmount",
-        "positionInitialMargin",
-        "previousClose",
-        "previousFundingRate",
-        "price",
-        "quantity",
-        "quoteRate",
-        "quoteVolume",
-        "realStrikePrice",
-        "rho",
-        "sellVol",
-        "shortAccount",
-        "strike",
-        "strikePrice",
-        "theta",
-        "totalAssetOfBtc",
-        "totalCollateralValueInUSDT",
-        "totalLiabilityOfBtc",
-        "totalNetAssetOfBtc",
-        "underlyingPrice",
-        "unrealizedPnl",
-        "unrealizedProfit",
-        "vega",
-        "vwap",
-        "walletBalance",
-        "withdrawing",
+    numeric_fields: tuple = field(
+        repr=False,
+        default=(
+            "ask",
+            "askImpliedVolatility",
+            "askPrice",
+            "askSize",
+            "askVolume",
+            "availableBalance",
+            "average",
+            "baseRate",
+            "baseVolume",
+            "bid",
+            "bidImpliedVolatility",
+            "bidPrice",
+            "bidSize",
+            "bidVolume",
+            "buySellRatio",
+            "buyVol",
+            "change",
+            "close",
+            "collateral",
+            "collateralMarginLevel",
+            "contractSize",
+            "contracts",
+            "crossUnPnl",
+            "crossWalletBalance",
+            "delta",
+            "entryPrice",
+            "estimatedSettlePrice",
+            "exercisePrice",
+            "fee_cost",
+            "fee_currency",
+            "free",
+            "freeze",
+            "fundingRate",
+            "gamma",
+            "indexPrice",
+            "initialMargin",
+            "initialMarginPercentage",
+            "last",
+            "lastPrice",
+            "leverage",
+            "liquidationPrice",
+            "locked",
+            "longAccount",
+            "longShortRatio",
+            "maintMargin",
+            "maintenanceMargin",
+            "maintenanceMarginPercentage",
+            "marginBalance",
+            "marginLevel",
+            "marginRatio",
+            "markImpliedVolatility",
+            "markPrice",
+            "maxNotional",
+            "maxWithdrawAmount",
+            "nextFundingRate",
+            "notional",
+            "open",
+            "openOrderInitialMargin",
+            "percentage",
+            "period",
+            "positionAmount",
+            "positionInitialMargin",
+            "previousClose",
+            "previousFundingRate",
+            "price",
+            "quantity",
+            "quoteRate",
+            "quoteVolume",
+            "realStrikePrice",
+            "rho",
+            "sellVol",
+            "shortAccount",
+            "strike",
+            "strikePrice",
+            "theta",
+            "totalAssetOfBtc",
+            "totalCollateralValueInUSDT",
+            "totalLiabilityOfBtc",
+            "totalNetAssetOfBtc",
+            "underlyingPrice",
+            "unrealizedPnl",
+            "unrealizedProfit",
+            "vega",
+            "vwap",
+            "walletBalance",
+            "withdrawing",
+        ),
     )
-    bool_fields: tuple = None
-    ohlcv_fields: tuple = (
-        "timestamp",
-        "open",
-        "high",
-        "low",
-        "close",
-        "volume",
+    bool_fields: tuple = field(repr=False, default=None)
+    ohlcv_fields: tuple = field(
+        repr=False,
+        default=(
+            "timestamp",
+            "open",
+            "high",
+            "low",
+            "close",
+            "volume",
+        ),
     )
 
     def preprocess_dict(self, data: dict) -> dict:
@@ -241,21 +253,23 @@ class BaseProcessor:
                 x for x in columns if x in self.str_to_datetime_fields
             ]
             if datetime_columns_to_convert:
-                data[datetime_columns_to_convert] = data[datetime_columns_to_convert].apply(
-                    pd.to_datetime, utc=True, errors="coerce"
-                )
+                data[datetime_columns_to_convert] = data[
+                    datetime_columns_to_convert
+                ].apply(pd.to_datetime, utc=True, errors="coerce")
         if self.numeric_fields:
             numeric_columns_to_convert = [
                 x for x in columns if x in self.numeric_fields
             ]
             if numeric_columns_to_convert:
-                data[numeric_columns_to_convert] = data[numeric_columns_to_convert].apply(
-                    pd.to_numeric, errors="coerce"
-                )
+                data[numeric_columns_to_convert] = data[
+                    numeric_columns_to_convert
+                ].apply(pd.to_numeric, errors="coerce")
         if self.bool_fields:
             bool_columns_to_convert = [x for x in columns if x in self.bool_fields]
             if bool_columns_to_convert:
-                data[bool_columns_to_convert] = data[bool_columns_to_convert].astype(bool)
+                data[bool_columns_to_convert] = data[bool_columns_to_convert].astype(
+                    bool
+                )
         if self.dropna_fields:
             data = data.dropna(axis=1, how="all")
         if self.exchange_name:

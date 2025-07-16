@@ -1,3 +1,7 @@
+## v0.9.32
+- Enabled notional -> amount calculation for market orders.
+- Created fix using `reindex` should precision/ limit fields not exist in markets data.
+
 ## v0.9.31
 - Only adding `timestamp` and `datetime` fields to balance dataframe when present in dict.
 - Only parsing numeric/bool/datetime fields if list non empty.
