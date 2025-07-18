@@ -2,6 +2,7 @@ import asyncio
 import warnings
 from typing import Literal, Awaitable, Any
 
+import ccxt
 import numpy as np
 import pandas as pd
 import pandera as pa
@@ -9,8 +10,6 @@ from pandas import DataFrame
 
 order_data_columns = [
     "symbol",
-    "precision_amount",
-    "precision_price",
     "limits_price.min",
     "limits_price.max",
     "limits_amount.min",
@@ -90,49 +89,15 @@ def combine_params(row: pd.Series, param_cols: list) -> dict:
     }
 
 
-def round_price(price: float, precision: float, side: str, strategy: str) -> float:
-    price /= precision
-    if (
-        strategy == "defensive"
-        and side == "buy"
-        or strategy == "aggressive"
-        and side == "sell"
-    ):
-        price = np.floor(price)
-    elif (
-        strategy == "defensive"
-        and side == "sell"
-        or strategy == "aggressive"
-        and side == "buy"
-    ):
-        price = np.ceil(price)
-    else:
-        price = round(price)
-    return price * precision
-
-
-def round_amount(amount: float, precision: float, strategy: str) -> float:
-    amount /= precision
-    if strategy == "floor":
-        amount = np.floor(amount)
-    elif strategy == "ceil":
-        amount = np.ceil(amount)
-    else:
-        amount = round(amount)
-    return amount * precision
-
-
 def preprocess_order(
+    exchange: ccxt.Exchange,
     symbol: str,
-    type: str,
-    side: str,
+    order_type: str,
     amount: float,
     price: float,
     notional: float,
     markets: pd.DataFrame,
     max_notional: float,
-    price_strategy: str,
-    amount_strategy: str,
     price_out_of_range: Literal["warn", "clip"] = "warn",
     amount_out_of_range: Literal["warn", "clip"] = "warn",
 ) -> tuple:
@@ -144,7 +109,7 @@ def preprocess_order(
     if pd.isnull(amount):
         if pd.notnull(notional) & pd.notnull(price):
             amount = notional / price
-    if type == "limit":
+    if order_type == "limit":
         if pd.isnull(price):
             raise ValueError("Missing price for limit order.")
         elif pd.notnull(amount):
@@ -155,13 +120,6 @@ def preprocess_order(
             raise ValueError(
                 f"Order notional {notional} larger than limit {max_notional}"
             )
-        if pd.notnull(market["precision_price"]):
-            price = round_price(
-                price=price,
-                precision=market["precision_price"],
-                side=side,
-                strategy=price_strategy,
-            )
         if pd.notnull(market["limits_price.min"]) and pd.notnull(
             market["limits_price.max"]
         ):
@@ -171,27 +129,29 @@ def preprocess_order(
                     <= price
                     <= market["limits_price.max"]
                 ):
+                    warnings.warn(
+                        f"Price amount {amount} outside limits {market['limits_price.min']}, {market['limits_price.max']}."
+                    )
                     price = None
             else:
                 price = np.clip(
                     price, market["limits_price.min"], market["limits_price.max"]
                 )
-    if pd.notnull(market["precision_amount"]):
-        amount = round_amount(
-            amount=amount,
-            precision=market["precision_amount"],
-            strategy=amount_strategy,
-        )
     if pd.notnull(market["limits_amount.min"]) and pd.notnull(
         market["limits_amount.max"]
     ):
         if amount_out_of_range == "warn":
             if not market["limits_amount.min"] <= amount <= market["limits_amount.max"]:
+                warnings.warn(
+                    f"Order amount {amount} outside limits {market['limits_amount.min']}, {market['limits_amount.max']}."
+                )
                 amount = None
         else:
             amount = np.clip(
                 amount, market["limits_amount.min"], market["limits_amount.max"]
             )
+    amount = exchange.amount_to_precision(symbol=symbol, amount=amount)
+    price = exchange.price_to_precision(symbol=symbol, price=price)
     return amount, price
 
 
@@ -210,8 +170,6 @@ def preprocess_order_dataframe(
     markets: pd.DataFrame,
     max_orders: int,
     max_notional: float,
-    price_strategy: str,
-    amount_strategy: str,
     price_out_of_range: Literal["warn", "clip"] = "warn",
     amount_out_of_range: Literal["warn", "clip"] = "warn",
 ) -> pd.DataFrame:
@@ -227,16 +185,6 @@ def preprocess_order_dataframe(
             raise ValueError(f"Orders exceeding max notional: {orders_error}")
     orders = orders.merge(markets.reindex(columns=order_data_columns))
     if "price" in orders.columns:
-        if orders["precision_price"].notnull().all():
-            orders["price"] = orders.apply(
-                lambda row: round_price(
-                    price=row["price"],
-                    precision=row["precision_price"],
-                    side=row["side"],
-                    strategy=price_strategy,
-                ),
-                axis=1,
-            )
         if orders[["limits_price.min", "limits_price.max"]].notnull().all(axis=1).all():
             if price_out_of_range == "warn":
                 price_in_bounds = orders["price"].between(
@@ -255,15 +203,6 @@ def preprocess_order_dataframe(
                     orders["limits_price.min"], orders["limits_price.max"]
                 )
     if "amount" in orders.columns:
-        if orders["precision_amount"].notnull().all():
-            orders["amount"] = orders.apply(
-                lambda row: round_amount(
-                    amount=row["amount"],
-                    precision=row["precision_amount"],
-                    strategy=amount_strategy,
-                ),
-                axis=1,
-            )
         if (
             orders[["limits_amount.min", "limits_amount.max"]]
             .notnull()

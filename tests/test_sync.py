@@ -333,29 +333,29 @@ def test_fetch_cross_borrow_rate(binance_exchange):
     assert isinstance(data, dict)
 
 
-def test_create_order(binance_exchange):
-    data = binance_exchange.create_order(
+def test_create_order(sandbox_exchange):
+    data = sandbox_exchange.create_order(
         symbol=symbol,
         type="limit",
         side="buy",
         amount=0.01,
-        price=600,
+        price=600.0,
     )
     print(data)
     assert isinstance(data, dict)
-    data = binance_exchange.fetch_order(id=data["id"], symbol=symbol)
+    data = sandbox_exchange.fetch_order(id=data["id"], symbol=symbol)
     print(data)
     assert isinstance(data, dict)
-    data = binance_exchange.cancel_order(id=data["id"], symbol=symbol)
+    data = sandbox_exchange.cancel_order(id=data["id"], symbol=symbol)
     print(data)
     assert isinstance(data, dict)
 
 
-def test_create_orders(binance_exchange):
+def test_create_orders(sandbox_exchange):
     orders = [
         dict(
             side="buy",
-            price=300,
+            price=300.0,
         ),
         dict(
             side="sell",
@@ -366,17 +366,17 @@ def test_create_orders(binance_exchange):
     orders["notional"] = 7
     orders["type"] = "limit"
     orders["symbol"] = symbol
-    data = binance_exchange.create_orders(orders=orders)
+    data = sandbox_exchange.create_orders(orders=orders)
     print(data)
     assert isinstance(data, pd.DataFrame)
-    data = binance_exchange.fetch_open_orders(symbol=symbol)
+    data = sandbox_exchange.fetch_open_orders(symbol=symbol)
     print(data)
     assert isinstance(data, pd.DataFrame)
     if not data.empty:
         data["amount"] *= 2
-        data = binance_exchange.edit_orders(orders=data)
+        data = sandbox_exchange.edit_orders(orders=data)
         print(data)
         assert isinstance(data, pd.DataFrame)
-        data = binance_exchange.cancel_all_orders(symbol=symbol)
+        data = sandbox_exchange.cancel_all_orders(symbol=symbol)
         print(data)
         assert isinstance(data, pd.DataFrame)

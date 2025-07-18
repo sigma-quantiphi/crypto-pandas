@@ -1,3 +1,7 @@
+## v0.10.0
+- Delegated price/amount rounding to ccxt.exchange.price_to_precision/amount_to_precision .
+- Removal of price/amount rounding strategy.
+
 ## v0.9.32
 - Remove error message on missing `amount` orders. Allows compatible with params={"cost": value}.
 - Created fix using `reindex` should precision/ limit fields not exist in markets data.

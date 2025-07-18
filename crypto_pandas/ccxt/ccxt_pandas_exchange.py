@@ -45,8 +45,6 @@ class CCXTPandasExchange:
         max_order_notional (float): Maximum notional value for any single order.
         max_number_of_orders (int): Maximum number of bulk orders allowed.
         markets_cache_time (int): Cache duration (in seconds) for markets data.
-        order_amount_rounding (Literal["floor", "ceil", "round"]): Strategy for rounding order amounts.
-        order_price_rounding (Literal["aggressive", "defensive", "round"]): Strategy for rounding order prices.
         amount_out_of_range (str): Defines behavior when volume exceeds acceptable ranges. Options include:
             - "warn": Logs a warning while removing the order.
             - "clip": Clips or limits the volume to valid ranges.
@@ -68,8 +66,6 @@ class CCXTPandasExchange:
     max_order_notional: float = 10_000
     max_number_of_orders: int = 5
     markets_cache_time: int = 3600
-    order_amount_rounding: Literal["floor", "ceil", "round"] = "round"
-    order_price_rounding: Literal["aggressive", "defensive", "round"] = "round"
     amount_out_of_range: Literal["warn", "clip"] = "warn"
     price_out_of_range: Literal["warn", "clip"] = "warn"
     _ccxt_processor: BaseProcessor = field(default_factory=BaseProcessor)
@@ -95,16 +91,14 @@ class CCXTPandasExchange:
                 kwargs["since"] = timestamp_to_int(kwargs["since"])
             if method_name in single_order_methods:
                 kwargs["amount"], kwargs["price"] = preprocess_order(
+                    exchange=self.exchange,
                     symbol=kwargs["symbol"],
-                    type=kwargs["type"],
-                    side=kwargs["side"],
+                    order_type=kwargs["type"],
                     amount=kwargs.get("amount"),
                     price=kwargs.get("price"),
                     notional=kwargs.get("notional"),
                     markets=self.load_cached_markets(),
                     max_notional=self.max_order_notional,
-                    price_strategy=self.order_price_rounding,
-                    amount_strategy=self.order_amount_rounding,
                 )
                 if "notional" in kwargs:
                     kwargs.pop("notional")
@@ -114,11 +108,10 @@ class CCXTPandasExchange:
                     markets=self.load_cached_markets(),
                     max_orders=self.max_number_of_orders,
                     max_notional=self.max_order_notional,
-                    price_strategy=self.order_price_rounding,
-                    amount_strategy=self.order_amount_rounding,
                 )
                 kwargs["orders"] = self._ccxt_processor.orders_to_dict(
-                    orders=kwargs["orders"]
+                    orders=kwargs["orders"],
+                    exchange=self.exchange,
                 )
             elif method_name in symbol_order_methods:
                 kwargs["orders"] = kwargs["orders"][["id", "symbol"]].to_dict("records")

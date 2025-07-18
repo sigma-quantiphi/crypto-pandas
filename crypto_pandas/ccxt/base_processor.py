@@ -16,6 +16,7 @@ Attributes:
 from dataclasses import dataclass, field
 from typing import Union, Literal
 
+import ccxt
 import pandas as pd
 
 from crypto_pandas.ccxt.order_schema import OrderSchema
@@ -459,12 +460,14 @@ class BaseProcessor:
             orders = orders.merge(trades, how="outer")
         return self.preprocess_dataframe(orders)
 
-    def orders_to_dict(self, orders: pd.DataFrame) -> list:
+    def orders_to_dict(self, orders: pd.DataFrame, exchange: ccxt.Exchange) -> list:
         """
         Convert a DataFrame of orders into a list of dictionaries suitable for API submission.
 
         Args:
             orders (DataFrame): DataFrame containing order data.
+            exchange (ccxt.Exchange): The CCXT exchange instance, used to ensure order details
+                (price and amount) conform to the exchange precision rules.
 
         Returns:
             list: List of dictionaries representing orders.
@@ -473,4 +476,14 @@ class BaseProcessor:
             self.order_schema.validate(orders)
         fields = determine_mandatory_optional_fields_pandera(self.order_schema)
         fields["optional"] = [x for x in orders.columns if x in fields["optional"]]
+        orders["price"] = orders.apply(
+            lambda x: exchange.price_to_precision(symbol=x["symbol"], price=x["price"]),
+            axis=1,
+        )
+        orders["amount"] = orders.apply(
+            lambda x: exchange.amount_to_precision(
+                symbol=x["symbol"], amount=x["amount"]
+            ),
+            axis=1,
+        )
         return orders[fields["mandatory"] + fields["optional"]].to_dict("records")
