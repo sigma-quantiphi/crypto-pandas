@@ -1,3 +1,9 @@
+## v0.10.2
+- Improved performance by dropping Na before type conversion.
+
+## v0.10.1
+- Quick fix dict values params `|` changed to `or`
+
 ## v0.10.0
 - Delegated price/amount rounding to ccxt.exchange.price_to_precision/amount_to_precision .
 - Removal of price/amount rounding strategy.

@@ -236,10 +236,12 @@ class BaseProcessor:
         Returns:
             pd.DataFrame: A processed DataFrame with formatted columns.
         """
-        columns = data.columns
         data = expand_dict_columns(
             data.drop(columns=["info"], errors="ignore"), separator="_"
         )
+        if self.dropna_fields:
+            data = data.dropna(axis=1, how="all")
+        columns = data.columns
         if self.int_to_datetime_fields:
             datetime_columns_to_convert = [
                 x for x in columns if x in self.int_to_datetime_fields
@@ -272,8 +274,6 @@ class BaseProcessor:
                 data[bool_columns_to_convert] = data[bool_columns_to_convert].astype(
                     bool
                 )
-        if self.dropna_fields:
-            data = data.dropna(axis=1, how="all")
         if self.exchange_name:
             data["exchange"] = self.exchange_name
         if self.account_name:
