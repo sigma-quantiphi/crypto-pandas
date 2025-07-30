@@ -5,6 +5,7 @@
 [![PyPI version](https://badge.fury.io/py/crypto-pandas.svg)](https://pypi.org/project/crypto-pandas/)
 [![Downloads](https://img.shields.io/pypi/dm/crypto-pandas)](https://pypi.org/project/crypto-pandas/#files)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/sigma-quantiphi/crypto-pandas/HEAD?urlpath=%2Fdoc%2Ftree%2Fexamples)
+[![Explore Data](https://img.shields.io/badge/Explore%20Data-CCXT--Explorer-ffffff?logo=streamlit&style=plastic&color=ffffff&logoColor=FF4B4B)](https://www.ccxt-explorer.com/)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/sigma-quantiphi/crypto-pandas/blob/main/LICENSE.md)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Docs](https://readthedocs.org/projects/crypto-pandas/badge/?version=latest)](https://crypto-pandas.readthedocs.io/en/latest/)

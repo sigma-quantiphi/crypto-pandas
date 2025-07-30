@@ -6,7 +6,9 @@ import pandera as pa
 class OrderSchema(pa.DataFrameModel):
     """Base schema for orders (general for any exchange)."""
 
-    id: Optional[str] = pa.Field(nullable=True, default=None, description="Exchange-assigned order ID")
+    id: Optional[str] = pa.Field(
+        nullable=True, default=None, description="Exchange-assigned order ID"
+    )
     symbol: str = pa.Field(description="Unified CCXT market symbol")
     side: str = pa.Field(isin=["buy", "sell"])
     type: str = pa.Field(isin=["limit", "market", "stop_loss", "take_profit"])
