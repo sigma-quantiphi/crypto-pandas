@@ -126,22 +126,28 @@ class BaseProcessor:
             "entryPrice",
             "estimatedSettlePrice",
             "exercisePrice",
+            "fee",  # Potential remove?
             "fee_cost",
             "fee_currency",
             "free",
             "freeze",
             "fundingRate",
             "gamma",
+            "high",
             "indexPrice",
             "initialMargin",
             "initialMarginPercentage",
+            "interestRate",
             "last",
             "lastPrice",
             "leverage",
             "liquidationPrice",
             "locked",
             "longAccount",
+            "longLeverage",
             "longShortRatio",
+            "low",
+            "maker",
             "maintMargin",
             "maintenanceMargin",
             "maintenanceMarginPercentage",
@@ -152,14 +158,21 @@ class BaseProcessor:
             "markPrice",
             "maxNotional",
             "maxWithdrawAmount",
+            "network_fee",
+            "network_precision",
+            "network_limits_withdraw.min",
+            "network_limits_withdraw.max",
+            "network_limits_deposit.min"
             "nextFundingRate",
+            "nonce",
             "notional",
             "open",
             "openOrderInitialMargin",
-            "percentage",
+            # "percentage", in load_markets -> bool
             "period",
             "positionAmount",
             "positionInitialMargin",
+            "precision",
             "previousClose",
             "previousFundingRate",
             "price",
@@ -170,8 +183,10 @@ class BaseProcessor:
             "rho",
             "sellVol",
             "shortAccount",
+            "shortLeverage",
             "strike",
             "strikePrice",
+            "taker",
             "theta",
             "totalAssetOfBtc",
             "totalCollateralValueInUSDT",
@@ -186,7 +201,20 @@ class BaseProcessor:
             "withdrawing",
         ),
     )
-    bool_fields: tuple = field(repr=False, default=None)
+    bool_fields: tuple = field(
+        repr=False,
+        default=(
+            "active",
+            "contract",
+            "deposit",
+            "inverse",
+            "linear",
+            "withdraw",
+            "network_active",
+            "network_deposit",
+            "network_withdraw",
+        ),
+    )
     ohlcv_fields: tuple = field(
         repr=False,
         default=(
@@ -300,6 +328,22 @@ class BaseProcessor:
 
     def markets_to_dataframe(self, data: dict) -> pd.DataFrame:
         return self.preprocess_dataframe(pd.DataFrame(data).transpose())
+
+    def currencies_to_dataframe(self, data: dict) -> pd.DataFrame:
+        data = pd.DataFrame(data).transpose()
+        networks = []
+        for index, row in data.iterrows():
+            network = pd.DataFrame(row["networks"]).T
+            network.columns = [
+                f"network_{x}" if x != "network" else x for x in network.columns
+            ]
+            network["id"] = row["id"]
+            networks.append(network.copy())
+        return self.preprocess_dataframe(
+            data.merge(pd.concat(networks, ignore_index=True)).drop(
+                columns=["networks", "network_info", "fees"]
+            )
+        )
 
     def balance_to_dataframe(self, data: dict) -> pd.DataFrame:
         if "total" in data:

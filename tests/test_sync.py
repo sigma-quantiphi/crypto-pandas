@@ -79,8 +79,8 @@ def test_fetch_transfers(binance_exchange):
     assert isinstance(data, pd.DataFrame)
 
 
-def test_fetch_currencies(sandbox_exchange):
-    data = sandbox_exchange.fetch_currencies()
+def test_fetch_currencies(binance_exchange):
+    data = binance_exchange.fetch_currencies()
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
@@ -259,7 +259,7 @@ def test_fetch_open_interest_history(binance_exchange):
 
 
 def test_fetch_leverages(sandbox_exchange):
-    data = sandbox_exchange.fetch_leverages([symbol])
+    data = sandbox_exchange.fetch_leverages(symbols=[symbol])
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)

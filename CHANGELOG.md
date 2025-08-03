@@ -1,3 +1,7 @@
+## v0.10.3
+- Separate dataframe format for `fetch_currencies`.
+- Switched `fetched_leverages` from standard to markets dataframe format.
+
 ## v0.10.2
 - Improved performance by dropping Na before type conversion.
 

@@ -24,6 +24,7 @@ from crypto_pandas.ccxt.method_mappings import (
     symbol_order_methods,
     ohlcv_symbols_dataframe_methods,
     orderbooks_dataframe_methods,
+    currencies_dataframe_methods,
 )
 from crypto_pandas.utils.pandas_utils import (
     timestamp_to_int,
@@ -133,6 +134,8 @@ class AsyncCCXTPandasExchange:
                 result = self._ccxt_processor.response_to_dataframe(data=result)
             elif method_name in markets_dataframe_methods:
                 result = self._ccxt_processor.markets_to_dataframe(data=result)
+            elif method_name in currencies_dataframe_methods:
+                result = self._ccxt_processor.currencies_to_dataframe(data=result)
             elif method_name in balance_dataframe_methods:
                 result = self._ccxt_processor.balance_to_dataframe(data=result)
             elif method_name in ohlcv_dataframe_methods:

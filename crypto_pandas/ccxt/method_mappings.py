@@ -28,7 +28,6 @@ standard_dataframe_methods = {
     "fetch_funding_rate_history",
     "fetch_ledger",
     "fetch_leverage_tiers",
-    "fetch_leverages",
     "fetch_liquidations",
     "fetch_long_short_ratio_history",
     "fetch_margin_adjustment_history",
@@ -58,16 +57,17 @@ markets_dataframe_methods = {
     "fetch_all_greeks",
     "fetch_bids_asks",
     "fetch_convert_currencies",
-    "fetch_currencies",
     "fetch_funding_rates",
     "fetch_isolated_borrow_rates",
     "fetch_last_prices",
+    "fetch_leverages",
     "fetch_mark_prices",
     "fetch_tickers",
     "fetch_trading_fees",
     "load_markets",
     "watch_bids_asks",
 }
+currencies_dataframe_methods = {"fetch_currencies"}
 balance_dataframe_methods = {
     "fetch_balance",
 }
@@ -100,6 +100,7 @@ dict_methods = {
     "fetch_mark_price",
     "fetch_open_interest",
     "fetch_option",
+    "fetch_option_chain",
     "fetch_order",
     "fetch_position",
     "fetch_status",
@@ -114,6 +115,7 @@ bulk_order_methods = {"create_orders", "edit_orders"}
 symbol_order_methods = {"cancel_orders_for_symbols"}
 standard_dataframe_methods = add_camel_case_methods(standard_dataframe_methods)
 markets_dataframe_methods = add_camel_case_methods(markets_dataframe_methods)
+currencies_dataframe_methods = add_camel_case_methods(currencies_dataframe_methods)
 balance_dataframe_methods = add_camel_case_methods(balance_dataframe_methods)
 orderbook_dataframe_methods = add_camel_case_methods(orderbook_dataframe_methods)
 orderbooks_dataframe_methods = add_camel_case_methods(orderbooks_dataframe_methods)
@@ -125,6 +127,7 @@ symbol_order_methods = add_camel_case_methods(symbol_order_methods)
 dataframe_methods = (
     standard_dataframe_methods
     | markets_dataframe_methods
+    | currencies_dataframe_methods
     | balance_dataframe_methods
     | ohlcv_dataframe_methods
     | orderbook_dataframe_methods
