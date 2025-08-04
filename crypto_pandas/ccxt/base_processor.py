@@ -162,8 +162,7 @@ class BaseProcessor:
             "network_precision",
             "network_limits_withdraw.min",
             "network_limits_withdraw.max",
-            "network_limits_deposit.min"
-            "nextFundingRate",
+            "network_limits_deposit.min" "nextFundingRate",
             "nonce",
             "notional",
             "open",
@@ -330,7 +329,13 @@ class BaseProcessor:
         return self.preprocess_dataframe(pd.DataFrame(data).transpose())
 
     def currencies_to_dataframe(self, data: dict) -> pd.DataFrame:
-        data = pd.DataFrame(data).transpose()
+        data = (
+            pd.DataFrame(data)
+            .transpose()
+            .drop(columns=["id"], errors="ignore")
+            .reset_index()
+            .rename(columns={"index": "id"})
+        )
         networks = []
         for index, row in data.iterrows():
             network = pd.DataFrame(row["networks"]).T
@@ -339,9 +344,15 @@ class BaseProcessor:
             ]
             network["id"] = row["id"]
             networks.append(network.copy())
+        networks = (
+            pd.concat(networks)
+            .drop(columns=["network"], errors="ignore")
+            .reset_index()
+            .rename(columns={"index": "network"})
+        )
         return self.preprocess_dataframe(
-            data.merge(pd.concat(networks, ignore_index=True)).drop(
-                columns=["networks", "network_info", "fees"]
+            data.merge(networks).drop(
+                columns=["networks", "network_info", "fees"], errors="ignore"
             )
         )
 

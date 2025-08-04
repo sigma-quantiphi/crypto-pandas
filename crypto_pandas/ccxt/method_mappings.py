@@ -22,7 +22,6 @@ standard_dataframe_methods = {
     "fetch_borrow_rate_history",
     "fetch_convert_trade_history",
     "fetch_cross_borrow_rates",
-    "fetch_deposit_withdraw_fees",
     "fetch_deposits",
     "fetch_funding_history",
     "fetch_funding_rate_history",
@@ -67,7 +66,7 @@ markets_dataframe_methods = {
     "load_markets",
     "watch_bids_asks",
 }
-currencies_dataframe_methods = {"fetch_currencies"}
+currencies_dataframe_methods = {"fetch_currencies", "fetch_deposit_withdraw_fees"}
 balance_dataframe_methods = {
     "fetch_balance",
 }
@@ -107,6 +106,7 @@ dict_methods = {
     "fetch_ticker",
     "fetch_trade",
     "fetch_trading_fee",
+    "fetch_deposit_withdraw_fee",
     "watch_position",
     "watch_ticker",
 }

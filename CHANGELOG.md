@@ -1,3 +1,6 @@
+## v0.10.4
+- Migrated `fetch_deposit_withdraw_fees` to `currencies` format.
+
 ## v0.10.3
 - Separate dataframe format for `fetch_currencies`.
 - Switched `fetched_leverages` from standard to markets dataframe format.

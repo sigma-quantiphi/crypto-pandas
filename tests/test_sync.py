@@ -86,6 +86,13 @@ def test_fetch_currencies(binance_exchange):
     assert isinstance(data, pd.DataFrame)
 
 
+def test_fetch_deposit_withdraw_fees(binance_exchange):
+    data = binance_exchange.fetch_deposit_withdraw_fees()
+    print(data)
+    print(data.dtypes)
+    assert isinstance(data, pd.DataFrame)
+
+
 def test_fetch_ticker(sandbox_exchange):
     data = sandbox_exchange.fetch_ticker(symbol)
     print(data)
