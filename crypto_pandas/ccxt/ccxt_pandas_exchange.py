@@ -9,19 +9,9 @@ from cachetools.func import ttl_cache
 
 from crypto_pandas.ccxt.base_processor import BaseProcessor
 from crypto_pandas.ccxt.method_mappings import (
-    orderbook_dataframe_methods,
-    orders_dataframe_methods,
-    dict_methods,
-    ohlcv_dataframe_methods,
-    balance_dataframe_methods,
-    markets_dataframe_methods,
-    standard_dataframe_methods,
     bulk_order_methods,
     single_order_methods,
-    symbol_order_methods,
-    ohlcv_symbols_dataframe_methods,
-    orderbooks_dataframe_methods,
-    currencies_dataframe_methods,
+    symbol_order_methods, modified_methods,
 )
 from crypto_pandas.utils.pandas_utils import (
     timestamp_to_int,
@@ -81,10 +71,10 @@ class CCXTPandasExchange:
             price_out_of_range=self.price_out_of_range,
         )
 
-    def __getattr__(self, method_name: str) -> Callable:
+    def __getattribute__(self, method_name: str) -> Callable:
+        if method_name not in modified_methods:
+            return super().__getattribute__(method_name)
         original_method = getattr(self.exchange, method_name)
-        if not callable(original_method):
-            return original_method
 
         @wraps(original_method)
         def wrapped(*args, **kwargs) -> Union[dict, pd.DataFrame]:
@@ -117,28 +107,9 @@ class CCXTPandasExchange:
             elif method_name in symbol_order_methods:
                 kwargs["orders"] = kwargs["orders"][["id", "symbol"]].to_dict("records")
             result = original_method(*args, **kwargs)
-            if method_name in standard_dataframe_methods:
-                result = self._ccxt_processor.response_to_dataframe(data=result)
-            elif method_name in markets_dataframe_methods:
-                result = self._ccxt_processor.markets_to_dataframe(data=result)
-            elif method_name in currencies_dataframe_methods:
-                result = self._ccxt_processor.currencies_to_dataframe(data=result)
-            elif method_name in balance_dataframe_methods:
-                result = self._ccxt_processor.balance_to_dataframe(data=result)
-            elif method_name in ohlcv_dataframe_methods:
-                result = self._ccxt_processor.ohlcv_to_dataframe(
-                    data=result, symbol=kwargs.get("symbol")
-                )
-            elif method_name in orderbook_dataframe_methods:
-                result = self._ccxt_processor.order_book_to_dataframe(data=result)
-            elif method_name in orderbooks_dataframe_methods:
-                result = self._ccxt_processor.order_books_to_dataframe(data=result)
-            elif method_name in orders_dataframe_methods:
-                result = self._ccxt_processor.orders_to_dataframe(data=result)
-            elif method_name in ohlcv_symbols_dataframe_methods:
-                result = self._ccxt_processor.ohlcv_symbols_to_dataframe(data=result)
-            elif method_name in dict_methods:
-                result = self._ccxt_processor.preprocess_dict(data=result)
+            result = self._ccxt_processor.preprocess_outputs(
+                method_name=method_name, result=result, symbol=kwargs.get("symbol")
+            )
             return result
 
         return wrapped

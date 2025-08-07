@@ -133,3 +133,4 @@ dataframe_methods = (
     | orderbook_dataframe_methods
     | orders_dataframe_methods
 )
+modified_methods = dataframe_methods | dict_methods
