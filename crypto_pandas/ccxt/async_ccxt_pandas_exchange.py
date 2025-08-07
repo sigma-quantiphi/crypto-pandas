@@ -12,20 +12,12 @@ from async_lru import alru_cache
 
 from crypto_pandas.ccxt.base_processor import BaseProcessor
 from crypto_pandas.ccxt.method_mappings import (
-    orderbook_dataframe_methods,
-    orders_dataframe_methods,
-    dict_methods,
-    ohlcv_dataframe_methods,
-    balance_dataframe_methods,
-    markets_dataframe_methods,
-    standard_dataframe_methods,
     bulk_order_methods,
     single_order_methods,
     symbol_order_methods,
-    ohlcv_symbols_dataframe_methods,
-    orderbooks_dataframe_methods,
-    currencies_dataframe_methods,
+    modified_methods,
 )
+from crypto_pandas.utils.async_ccxt_pandas_exchange_typed import AsyncCCXTPandasExchangeTyped
 from crypto_pandas.utils.pandas_utils import (
     timestamp_to_int,
     preprocess_order,
@@ -37,7 +29,7 @@ if sys.platform.startswith("win"):
 
 
 @dataclass
-class AsyncCCXTPandasExchange:
+class AsyncCCXTPandasExchange(AsyncCCXTPandasExchangeTyped):
     """
     An asynchronous wrapper class for ccxt Exchange that integrates pandas for enhanced data handling
     and provides preprocessing utilities for working with cryptocurrency trading data.
@@ -92,10 +84,10 @@ class AsyncCCXTPandasExchange:
         )
         self._semaphore = Semaphore(self.semaphore_value)
 
-    def __getattr__(self, method_name: str) -> Callable:
+    def __getattribute__(self, method_name: str) -> Callable:
+        if method_name not in modified_methods:
+            return super().__getattribute__(method_name)
         original_method = getattr(self.exchange, method_name)
-        if not callable(original_method):
-            return original_method
 
         async def preprocess_kwargs(kwargs: dict) -> dict:
             if "since" in kwargs:
@@ -127,43 +119,24 @@ class AsyncCCXTPandasExchange:
                 kwargs["orders"] = kwargs["orders"][["id", "symbol"]].to_dict("records")
             return kwargs
 
-        def preprocess_data(
-            result: dict | list, symbol: str | None = None
-        ) -> dict | list | pd.DataFrame:
-            if method_name in standard_dataframe_methods:
-                result = self._ccxt_processor.response_to_dataframe(data=result)
-            elif method_name in markets_dataframe_methods:
-                result = self._ccxt_processor.markets_to_dataframe(data=result)
-            elif method_name in currencies_dataframe_methods:
-                result = self._ccxt_processor.currencies_to_dataframe(data=result)
-            elif method_name in balance_dataframe_methods:
-                result = self._ccxt_processor.balance_to_dataframe(data=result)
-            elif method_name in ohlcv_dataframe_methods:
-                result = self._ccxt_processor.ohlcv_to_dataframe(
-                    data=result, symbol=symbol
-                )
-            elif method_name in orderbook_dataframe_methods:
-                result = self._ccxt_processor.order_book_to_dataframe(data=result)
-            elif method_name in orderbooks_dataframe_methods:
-                result = self._ccxt_processor.order_books_to_dataframe(data=result)
-            elif method_name in orders_dataframe_methods:
-                result = self._ccxt_processor.orders_to_dataframe(data=result)
-            elif method_name in ohlcv_symbols_dataframe_methods:
-                result = self._ccxt_processor.ohlcv_symbols_to_dataframe(data=result)
-            elif method_name in dict_methods:
-                result = self._ccxt_processor.preprocess_dict(data=result)
-            return result
-
         @wraps(original_method)
         async def wrapped(*args, **kwargs) -> Union[dict, pd.DataFrame, asyncio.Future]:
             kwargs = await preprocess_kwargs(kwargs=kwargs)
             async with self._semaphore:
                 if asyncio.iscoroutinefunction(original_method):
                     result = await original_method(*args, **kwargs)
-                    return preprocess_data(result, symbol=kwargs.get("symbol"))
+                    return self._ccxt_processor.preprocess_outputs(
+                        method_name=method_name,
+                        result=result,
+                        symbol=kwargs.get("symbol"),
+                    )
                 else:
                     result = original_method(*args, **kwargs)
-                    return preprocess_data(result, symbol=kwargs.get("symbol"))
+                    return self._ccxt_processor.preprocess_outputs(
+                        method_name=method_name,
+                        result=result,
+                        symbol=kwargs.get("symbol"),
+                    )
 
         return wrapped
 

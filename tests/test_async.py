@@ -2,20 +2,20 @@ import asyncio
 
 import ccxt.pro as ccxt
 from crypto_pandas.ccxt.async_ccxt_pandas_exchange import AsyncCCXTPandasExchange
-from tests.test_sync import settings
+from tests.test_sync import sandbox_settings
 
 
 async def main():
-    exchange = ccxt.binance(settings)
+    exchange = ccxt.binance(sandbox_settings)
     exchange.set_sandbox_mode(True)
-    exchange = AsyncCCXTPandasExchange(exchange=exchange, max_number_of_orders=5)
+    pandas_exchange = AsyncCCXTPandasExchange(exchange=exchange, max_number_of_orders=5)
     markets, order_book, bids_asks, trades = await asyncio.gather(
-        exchange.load_cached_markets(),
-        exchange.fetch_order_book(symbol="BNB/USDT:USDT"),
-        exchange.fetch_bids_asks(
+        pandas_exchange.load_cached_markets(),
+        pandas_exchange.fetch_order_book(symbol="BNB/USDT:USDT"),
+        pandas_exchange.fetch_bids_asks(
             symbols=["BNB/USDT:USDT", "DOGE/USDT:USDT", "XRP/USDT:USDT"]
         ),
-        exchange.fetch_trades(symbol="BNB/USDT"),
+        pandas_exchange.fetch_trades(symbol="BNB/USDT"),
         return_exceptions=True,
     )
     print(markets)
@@ -31,10 +31,10 @@ async def main():
     orders["price"] /= 4
     orders["notional"] = 12
     orders["type"] = "limit"
-    response = await exchange.create_orders(orders=orders)
+    response = await pandas_exchange.create_orders(orders=orders)
     print(response)
     for symbol in response["symbol"]:
-        cancel_response = await exchange.cancel_all_orders(symbol=symbol)
+        cancel_response = await pandas_exchange.cancel_all_orders(symbol=symbol)
         print(cancel_response)
     await exchange.close()
 

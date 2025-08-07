@@ -19,6 +19,18 @@ from typing import Union, Literal
 import ccxt
 import pandas as pd
 
+from crypto_pandas.ccxt.method_mappings import (
+    standard_dataframe_methods,
+    markets_dataframe_methods,
+    currencies_dataframe_methods,
+    balance_dataframe_methods,
+    ohlcv_dataframe_methods,
+    orderbook_dataframe_methods,
+    orderbooks_dataframe_methods,
+    orders_dataframe_methods,
+    ohlcv_symbols_dataframe_methods,
+    dict_methods,
+)
 from crypto_pandas.ccxt.order_schema import OrderSchema
 from crypto_pandas.utils.pandas_utils import (
     expand_dict_columns,
@@ -542,3 +554,28 @@ class BaseProcessor:
             axis=1,
         )
         return orders[fields["mandatory"] + fields["optional"]].to_dict("records")
+
+    def preprocess_outputs(
+        self, method_name: str, result: dict | list, symbol: str | None = None
+    ) -> dict | list | pd.DataFrame:
+        if method_name in standard_dataframe_methods:
+            result = self.response_to_dataframe(data=result)
+        elif method_name in markets_dataframe_methods:
+            result = self.markets_to_dataframe(data=result)
+        elif method_name in currencies_dataframe_methods:
+            result = self.currencies_to_dataframe(data=result)
+        elif method_name in balance_dataframe_methods:
+            result = self.balance_to_dataframe(data=result)
+        elif method_name in ohlcv_dataframe_methods:
+            result = self.ohlcv_to_dataframe(data=result, symbol=symbol)
+        elif method_name in orderbook_dataframe_methods:
+            result = self.order_book_to_dataframe(data=result)
+        elif method_name in orderbooks_dataframe_methods:
+            result = self.order_books_to_dataframe(data=result)
+        elif method_name in orders_dataframe_methods:
+            result = self.orders_to_dataframe(data=result)
+        elif method_name in ohlcv_symbols_dataframe_methods:
+            result = self.ohlcv_symbols_to_dataframe(data=result)
+        elif method_name in dict_methods:
+            result = self.preprocess_dict(data=result)
+        return result

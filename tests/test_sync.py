@@ -9,33 +9,33 @@ from crypto_pandas.ccxt.ccxt_pandas_exchange import CCXTPandasExchange
 
 load_dotenv()
 symbol = "BNB/USDT:USDT"
+sandbox_settings = {
+    "apiKey": os.getenv("SANDBOX_API_KEY"),
+    "secret": os.getenv("SANDBOX_API_SECRET"),
+    "options": {
+        "defaultType": "future",
+        "loadAllOptions": True,
+    },
+}
+settings = {
+    "apiKey": os.getenv("API_KEY"),
+    "secret": os.getenv("API_SECRET"),
+    "options": {
+        "defaultType": "future",
+        "loadAllOptions": True,
+    },
+}
 
 
 @pytest.fixture(scope="module")
 def binance_exchange():
-    settings = {
-        "apiKey": os.getenv("API_KEY"),
-        "secret": os.getenv("API_SECRET"),
-        "options": {
-            "defaultType": "future",
-            "loadAllOptions": True,
-        },
-    }
     exchange = ccxt.binance(settings)
     return CCXTPandasExchange(exchange=exchange)
 
 
 @pytest.fixture(scope="module")
 def sandbox_exchange():
-    settings = {
-        "apiKey": os.getenv("SANDBOX_API_KEY"),
-        "secret": os.getenv("SANDBOX_API_SECRET"),
-        "options": {
-            "defaultType": "future",
-            "loadAllOptions": True,
-        },
-    }
-    exchange = ccxt.binance(settings)
+    exchange = ccxt.binance(sandbox_settings)
     exchange.set_sandbox_mode(True)
     return CCXTPandasExchange(exchange=exchange)
 

@@ -52,7 +52,7 @@ async def run_bids_asks_loop():
 async def run_trades_loop():
     while True:
         try:
-            results["trades"] = await pandas_exchange.watchTradesForSymbols(
+            results["trades"] = await pandas_exchange.watch_trades_for_symbols(
                 symbols=symbols
             )
             tick()
