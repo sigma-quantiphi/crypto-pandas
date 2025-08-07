@@ -14,8 +14,10 @@ from crypto_pandas.ccxt.base_processor import BaseProcessor
 from crypto_pandas.ccxt.method_mappings import (
     bulk_order_methods,
     single_order_methods,
-    symbol_order_methods, modified_methods,
+    symbol_order_methods,
+    modified_methods,
 )
+from crypto_pandas.utils.async_ccxt_pandas_exchange_typed import AsyncCCXTPandasExchangeTyped
 from crypto_pandas.utils.pandas_utils import (
     timestamp_to_int,
     preprocess_order,
@@ -27,7 +29,7 @@ if sys.platform.startswith("win"):
 
 
 @dataclass
-class AsyncCCXTPandasExchange:
+class AsyncCCXTPandasExchange(AsyncCCXTPandasExchangeTyped):
     """
     An asynchronous wrapper class for ccxt Exchange that integrates pandas for enhanced data handling
     and provides preprocessing utilities for working with cryptocurrency trading data.
@@ -124,12 +126,16 @@ class AsyncCCXTPandasExchange:
                 if asyncio.iscoroutinefunction(original_method):
                     result = await original_method(*args, **kwargs)
                     return self._ccxt_processor.preprocess_outputs(
-                        method_name=method_name, result=result, symbol=kwargs.get("symbol")
+                        method_name=method_name,
+                        result=result,
+                        symbol=kwargs.get("symbol"),
                     )
                 else:
                     result = original_method(*args, **kwargs)
                     return self._ccxt_processor.preprocess_outputs(
-                        method_name=method_name, result=result, symbol=kwargs.get("symbol")
+                        method_name=method_name,
+                        result=result,
+                        symbol=kwargs.get("symbol"),
                     )
 
         return wrapped

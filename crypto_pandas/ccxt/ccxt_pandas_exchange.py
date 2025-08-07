@@ -1,6 +1,5 @@
 from functools import wraps
 from typing import Literal, Callable, Union
-
 import ccxt
 import pandas as pd
 from dataclasses import dataclass, field
@@ -11,8 +10,10 @@ from crypto_pandas.ccxt.base_processor import BaseProcessor
 from crypto_pandas.ccxt.method_mappings import (
     bulk_order_methods,
     single_order_methods,
-    symbol_order_methods, modified_methods,
+    symbol_order_methods,
+    modified_methods,
 )
+from crypto_pandas.utils.ccxt_pandas_exchange_typed import CCXTPandasExchangeTyped
 from crypto_pandas.utils.pandas_utils import (
     timestamp_to_int,
     preprocess_order,
@@ -21,7 +22,7 @@ from crypto_pandas.utils.pandas_utils import (
 
 
 @dataclass
-class CCXTPandasExchange:
+class CCXTPandasExchange(CCXTPandasExchangeTyped):
     """
     CCXTPandasExchange is a wrapper for the CCXT library that integrates with Pandas
     to provide streamlined data processing for cryptocurrency exchanges. It enables users

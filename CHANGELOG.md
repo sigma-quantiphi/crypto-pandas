@@ -1,3 +1,7 @@
+## v0.11.0
+- Refactored `preprocess_data` as method of CCXTProcessor and not CCXTPandasExchange.
+- Introduced a type-hinting generator and used the created classes to introduce type-hinting.
+
 ## v0.10.4
 - Migrated `fetch_deposit_withdraw_fees` to `currencies` format.
 

@@ -130,6 +130,7 @@ dataframe_methods = (
     | currencies_dataframe_methods
     | balance_dataframe_methods
     | ohlcv_dataframe_methods
+    | ohlcv_symbols_dataframe_methods
     | orderbook_dataframe_methods
     | orders_dataframe_methods
 )
