@@ -89,6 +89,6 @@ if __name__ == "__main__":
     )
     with open("ccxt_pandas_exchange_typed.py", "w") as f:
         f.write(sync_code)
-    with open("ccxt_pro_pandas_exchange_typed.py", "w") as f:
+    with open("async_ccxt_pandas_exchange_typed.py", "w") as f:
         f.write(async_code)
     print("Generated both typed interface files.")

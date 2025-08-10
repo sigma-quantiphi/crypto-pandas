@@ -1,3 +1,6 @@
+## v0.11.1
+- Added `fetch_deposits_withdrawals`, `fetch_order_trades` and `fetch_volatility_history` methods.
+
 ## v0.11.0
 - Refactored `preprocess_data` as method of CCXTProcessor and not CCXTPandasExchange.
 - Introduced a type-hinting generator and used the created classes to introduce type-hinting.
