@@ -1,3 +1,6 @@
+## v0.11.2
+- Forward `close` as well into `AsyncCCXTPandasExchange`.
+
 ## v0.11.1
 - Added `fetch_deposits_withdrawals`, `fetch_order_trades` and `fetch_volatility_history` methods.
 

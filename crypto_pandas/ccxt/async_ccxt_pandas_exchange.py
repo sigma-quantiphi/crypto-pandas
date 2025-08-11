@@ -85,7 +85,7 @@ class AsyncCCXTPandasExchange(AsyncCCXTPandasExchangeTyped):
         self._semaphore = Semaphore(self.semaphore_value)
 
     def __getattribute__(self, method_name: str) -> Callable:
-        if method_name not in modified_methods:
+        if method_name not in modified_methods | {"close"}:
             return super().__getattribute__(method_name)
         original_method = getattr(self.exchange, method_name)
 
