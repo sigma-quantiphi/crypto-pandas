@@ -1,6 +1,6 @@
 import asyncio
 import warnings
-from typing import Literal, Awaitable, Any
+from typing import Literal, Awaitable, Any, overload
 
 import ccxt
 import numpy as np
@@ -17,7 +17,17 @@ order_data_columns = [
 ]
 
 
-def format_timestamp(timestamp: int | pd.Timestamp | dict | str | None) -> pd.Timestamp:
+@overload
+def format_timestamp(timestamp: None) -> None: ...
+
+
+@overload
+def format_timestamp(timestamp: int | pd.Timestamp | dict | str) -> pd.Timestamp: ...
+
+
+def format_timestamp(
+    timestamp: int | pd.Timestamp | dict | str | None,
+) -> pd.Timestamp | None:
     now = pd.Timestamp.now(tz="UTC")
     if isinstance(timestamp, dict):
         timestamp = now + pd.DateOffset(**timestamp)

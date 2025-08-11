@@ -17,7 +17,9 @@ from crypto_pandas.ccxt.method_mappings import (
     symbol_order_methods,
     modified_methods,
 )
-from crypto_pandas.utils.async_ccxt_pandas_exchange_typed import AsyncCCXTPandasExchangeTyped
+from crypto_pandas.utils.async_ccxt_pandas_exchange_typed import (
+    AsyncCCXTPandasExchangeTyped,
+)
 from crypto_pandas.utils.pandas_utils import (
     timestamp_to_int,
     preprocess_order,
