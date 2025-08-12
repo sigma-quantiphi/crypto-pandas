@@ -72,13 +72,10 @@ markets_dataframe_methods = {
     "watch_bids_asks",
     "watch_funding_rates",
     "watch_mark_prices",
-    "watch_tickers"
+    "watch_tickers",
 }
 currencies_dataframe_methods = {"fetch_currencies", "fetch_deposit_withdraw_fees"}
-balance_dataframe_methods = {
-    "fetch_balance",
-    "watch_balance"
-}
+balance_dataframe_methods = {"fetch_balance", "watch_balance"}
 ohlcv_dataframe_methods = {"fetch_ohlcv", "fetchOHLCV", "watch_ohlcv", "watchOHLCV"}
 ohlcv_symbols_dataframe_methods = {"watch_ohlcv_for_symbols", "watchOHLCVForSymbols"}
 orderbook_dataframe_methods = {
@@ -93,6 +90,8 @@ orders_dataframe_methods = {
     "fetch_closed_orders",
     "fetch_open_orders",
     "fetch_orders",
+    "fetch_orders_by_ids",
+    "fetch_orders_by_status",
     "watch_orders",
     "watch_orders_for_symbols",
 }

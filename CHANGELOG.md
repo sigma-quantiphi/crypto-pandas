@@ -1,3 +1,6 @@
+## v0.11.6
+- Added `fetch_orders_by_ids`, `fetch_orders_by_status`.
+
 ## v0.11.5
 - Added multiple watch methods parsing: balance, my_liquidations, funding_rate.
 
