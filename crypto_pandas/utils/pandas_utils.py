@@ -241,10 +241,31 @@ def preprocess_order_dataframe(
     return orders
 
 
+@overload
 def concat_results(
-    results: list[pd.DataFrame] | list[dict],
+    results: list[pd.DataFrame],
     errors: Literal["raise", "warn", "ignore"] = "raise",
-) -> pd.DataFrame:
+) -> DataFrame: ...
+
+
+@overload
+def concat_results(
+    results: list[dict],
+    errors: Literal["raise", "warn", "ignore"] = "raise",
+) -> DataFrame: ...
+
+
+@overload
+def concat_results(
+    results: list[None],
+    errors: Literal["raise", "warn", "ignore"] = "raise",
+) -> list[None]: ...
+
+
+def concat_results(
+    results: list[pd.DataFrame | dict | None],
+    errors: Literal["raise", "warn", "ignore"] = "raise",
+) -> DataFrame | list[dict | DataFrame | None]:
     """Concatenate results from asyncio gather"""
     clean_results, errors_results = [], []
     for x in results:
@@ -267,15 +288,14 @@ def concat_results(
                 columns=["info"], errors="ignore"
             )
         else:
-            raise ValueError(
-                "Results must be either a list of DataFrames or a list of dictionaries."
-            )
+            return clean_results
     else:
         return pd.DataFrame()
 
 
 async def async_concat_results(
-    tasks: list, errors: Literal["raise", "warn", "ignore"] = "raise"
+    tasks: Awaitable | list[Awaitable] | list[list[Awaitable]],
+    errors: Literal["raise", "warn", "ignore"] = "raise",
 ) -> DataFrame | list[DataFrame] | Any:
     # Single coroutine
     if isinstance(tasks, Awaitable):

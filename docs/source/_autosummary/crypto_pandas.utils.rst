@@ -1,4 +1,4 @@
-﻿crypto\_pandas.utils
+crypto\_pandas.utils
 ====================
 
 .. automodule:: crypto_pandas.utils
@@ -10,4 +10,6 @@
    :toctree:
    :recursive:
 
+   async_ccxt_pandas_exchange_typed
+   ccxt_pandas_exchange_typed
    pandas_utils

@@ -12,7 +12,7 @@ import datetime
 
 sys.path.insert(0, os.path.abspath("../../"))  # adjust based on where your code is
 
-project = "Crypto Pandas"
+project = "Crypto-Pandas"
 copyright = f"{datetime.datetime.now().year}, Sigma Quantiphi"
 author = "Sigma Quantiphi"
 with open("../../pyproject.toml", "rb") as toml_file:
@@ -34,6 +34,7 @@ extensions = [
     "sphinxcontrib.redirects",
     # "sphinx.ext.intersphinx",
 ]
+source_suffix = {".rst": "restructuredtext", ".md": "markdown"}
 autosummary_generate = True
 autodoc_default_options = {
     "members": True,
@@ -49,15 +50,10 @@ exclude_patterns = []
 html_baseurl = "https://crypto-pandas.readthedocs.io/en/latest/"
 html_theme = "furo"
 html_static_path = ["_static"]
-html_logo = "_static/sigma-quantiphi-logo.svg"
-html_favicon = "_static/favicon.ico"
+html_context = {"default_mode": "dark"}
+html_logo = "_static/Sigma-Quantiphi-logo-new.png"
+html_favicon = "_static/favicon.png"
 html_theme_options = {
-    # "light_logo": "sigma-quantiphi-logo.svg",
-    # "dark_logo":  "sigma-quantiphi-logo.svg",
-    "favicon": {
-        "light": "favicon-light.png",
-        "dark": "favicon-dark.png",
-    },
     # shows a GitHub icon in the header **and**
     # an “Edit this page” button in the right sidebar
     "source_repository": "https://github.com/sigma-quantiphi/crypto-pandas/",

@@ -1,4 +1,4 @@
-# Crypto Pandas
+# Crypto-Pandas
 
 ![Python version](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13-blue.svg)
 [![GitHub](https://img.shields.io/badge/github-Visit&nbsp;Repo-black?style=for-the-badge&logo=github)](https://github.com/sigma-quantiphi/crypto-pandas)
@@ -11,21 +11,20 @@
 [![Docs](https://readthedocs.org/projects/crypto-pandas/badge/?version=latest)](https://crypto-pandas.readthedocs.io/en/latest/)
 [![Medium badge](https://img.shields.io/badge/-Follow&nbsp;on&nbsp;Medium-black?style=social&logo=medium)](https://medium.com/@lucasjamar47)
 
-Crypto Pandas is a lightweight Python library that fuses the power of [pandas](https://pandas.pydata.org/) with the market-connectivity of [CCXT](https://github.com/ccxt/ccxt/).
-In a single line, it transforms CCXT’s raw JSON into a clean, typed DataFrame, ready for analysis, back-testing, or real-time dashboards.
-The same DataFrame-centric API also lets you create, edit, and cancel live exchange orders directly from pandas DataFrames.
+## CCXT DATA → PANDAS DATAFRAME IN JUST 1 LINE OF CODE
+Crypto-Pandas fuses the power of [Pandas](https://pandas.pydata.org/) with the market-connectivity of [CCXT](https://github.com/ccxt/ccxt/).
+It turns CCXT’s nested JSON into clean, typed DataFrames for analysis, backtests, or real-time dashboards — and lets you place/cancel live orders using the same DataFrame-centric API.
 
-## Features
+## Why Crypto-Pandas?
+1-liners, everywhere. Fetch OHLCV, tickers, trades, order books, balances, orders → all as DataFrames.
 
-- Transformation of outputs to pandas DataFrame when applicable.
-- Setting proper data types.
-- Transformation of DataFrame of orders to ensure proper format for exchange:
-  - Determining volume based on notional amount if user prefers providing notional
-  - Rounding and capping of price and volume based on exchange's symbol parameters.
+* Consistent columns & dtypes. Timestamps as UTC datetime64[ns, UTC], numeric columns as proper numerics.
+* Zero boilerplate. Stop writing JSON-to-DataFrame glue for every exchange.
+* CCXT-compatible. Keep your favorite CCXT params; just get DataFrames back.
 
 ## Installation
 
-Crypto Pandas can be installed on Python 3.11~3.13:
+Crypto-Pandas can be installed on Python 3.11~3.13:
 
 ```bash
 pip install crypto-pandas
@@ -33,8 +32,8 @@ pip install crypto-pandas
 
 ## Getting Started
 
-Crypt -Pandas works near identically to CCXT. Just add `exchange = CCXTPandasExchange(exchange=exchange)`
-and the exchange methods provided by CCXT will be exposed to Crypto Pandas.
+Crypto-Pandas works near identically to CCXT. Just add `exchange = CCXTPandasExchange(exchange=exchange)`
+and the exchange methods provided by CCXT will be exposed to Crypto-Pandas.
 More examples can be found on [Binder](https://mybinder.org/v2/gh/sigma-quantiphi/crypto-pandas/HEAD?urlpath=%2Fdoc%2Ftree%2Fexamples): 
 
 ```python
@@ -44,6 +43,15 @@ from crypto_pandas import CCXTPandasExchange
 # Initialize a CCXTPandasExchange object
 exchange = ccxt.binance(dict(apiKey="your_api_key_here", secret="your_secret_here"))
 exchange = CCXTPandasExchange(exchange=exchange)
+
+# OHLCV
+ohlcv = exchange.fetch_ohlcv("BTC/USDT", timeframe="1m", limit=100)      # -> DataFrame
+# Trades
+trades = exchange.fetch_trades("BTC/USDT", limit=1000)                   # -> DataFrame
+# Orderbook
+ob = exchange.fetch_order_book("BTC/USDT", limit=50)                 # -> DataFrame
+# Tickers
+tick = exchange.fetch_tickers()                               # -> DataFrame
 
 # Fetch open orders from an exchange
 open_orders = exchange.fetch_open_orders(symbol="BTC/USDT")

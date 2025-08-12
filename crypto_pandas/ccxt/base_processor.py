@@ -90,6 +90,8 @@ class BaseProcessor:
             "expiry",
             "expiryDate",
             "fundingTimestamp",
+            "lastTradeTimestamp",
+            "lastUpdateTimestamp",
             "nextFundingTimestamp",
             "previousFundingTimestamp",
             "time",
@@ -140,7 +142,6 @@ class BaseProcessor:
             "exercisePrice",
             "fee",  # Potential remove?
             "fee_cost",
-            "fee_currency",
             "free",
             "freeze",
             "fundingRate",

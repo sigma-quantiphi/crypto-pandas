@@ -1,6 +1,5 @@
 import inspect
 from typing import Callable
-import pandas as pd
 import ccxt
 import ccxt.pro as ccxt_pro
 
@@ -63,11 +62,11 @@ def get_signature_with_custom_types(method: Callable, method_name: str) -> str:
 def generate_typed_interface_class(base: type, class_name: str) -> str:
     import_lines = """from decimal import Decimal
 from types import NoneType
-from typing import List, Union
+from typing import List, Union, Protocol
 from ccxt.base.types import Int, OrderSide, OrderType, Str, Strings
 import pandas as pd\n\n
 """
-    class_header = f'''class {class_name}:
+    class_header = f'''class {class_name}(Protocol):
     """A Class to add type hinting to {class_name}"""
 '''
     lines = []

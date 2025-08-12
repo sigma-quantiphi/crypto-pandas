@@ -1,3 +1,6 @@
+## v0.11.4
+- Added `lastTradeTimestamp` and `lastUpdateTimestamp` to datetime columns.
+
 ## v0.11.2
 - Forward `close` as well into `AsyncCCXTPandasExchange`.
 
