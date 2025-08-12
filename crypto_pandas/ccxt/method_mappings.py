@@ -49,6 +49,8 @@ standard_dataframe_methods = {
     "fetch_withdrawals",
     "watch_liquidations",
     "watch_liquidations_for_symbols",
+    "watch_my_liquidations",
+    "watch_my_liquidations_for_symbols",
     "watch_my_trades",
     "watch_my_trades_for_symbols",
     "watch_positions",
@@ -68,10 +70,14 @@ markets_dataframe_methods = {
     "fetch_trading_fees",
     "load_markets",
     "watch_bids_asks",
+    "watch_funding_rates",
+    "watch_mark_prices",
+    "watch_tickers"
 }
 currencies_dataframe_methods = {"fetch_currencies", "fetch_deposit_withdraw_fees"}
 balance_dataframe_methods = {
     "fetch_balance",
+    "watch_balance"
 }
 ohlcv_dataframe_methods = {"fetch_ohlcv", "fetchOHLCV", "watch_ohlcv", "watchOHLCV"}
 ohlcv_symbols_dataframe_methods = {"watch_ohlcv_for_symbols", "watchOHLCVForSymbols"}
@@ -110,6 +116,8 @@ dict_methods = {
     "fetch_trade",
     "fetch_trading_fee",
     "fetch_deposit_withdraw_fee",
+    "watch_funding_rate",
+    "watch_mark_price",
     "watch_position",
     "watch_ticker",
 }

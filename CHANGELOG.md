@@ -1,3 +1,6 @@
+## v0.11.5
+- Added multiple watch methods parsing: balance, my_liquidations, funding_rate.
+
 ## v0.11.4
 - Added `lastTradeTimestamp` and `lastUpdateTimestamp` to datetime columns.
 
