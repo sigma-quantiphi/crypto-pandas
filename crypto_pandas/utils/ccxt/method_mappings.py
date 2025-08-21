@@ -12,6 +12,9 @@ def add_camel_case_methods(methods: set) -> set:
 
 
 standard_dataframe_methods = {
+    "fetch_accounts",
+    "fetch_portfolio_details",
+    "fetch_portfolios",
     "cancel_all_orders",
     "cancel_orders",
     "cancel_orders_for_symbols",
@@ -22,6 +25,7 @@ standard_dataframe_methods = {
     "fetch_borrow_rate_history",
     "fetch_convert_trade_history",
     "fetch_cross_borrow_rates",
+    "fetch_deposit_addresses",
     "fetch_deposits",
     "fetch_deposits_withdrawals",
     "fetch_funding_history",
@@ -33,6 +37,7 @@ standard_dataframe_methods = {
     "fetch_margin_adjustment_history",
     "fetch_margin_modes",
     "fetch_markets",
+    "fetch_my_dust_trades",
     "fetch_my_liquidations",
     "fetch_my_trades",
     "fetch_open_interest_history",
@@ -92,6 +97,8 @@ orders_dataframe_methods = {
     "fetch_orders",
     "fetch_orders_by_ids",
     "fetch_orders_by_status",
+    "fetch_orders_classic"
+    "fetch_orders_ws",
     "watch_orders",
     "watch_orders_for_symbols",
 }
@@ -108,6 +115,7 @@ dict_methods = {
     "fetch_open_interest",
     "fetch_option",
     "fetch_option_chain",
+    "fetch_option_positions",
     "fetch_order",
     "fetch_position",
     "fetch_status",

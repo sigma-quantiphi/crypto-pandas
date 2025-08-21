@@ -1,7 +1,7 @@
 import asyncio
 
 import ccxt.pro as ccxt
-from crypto_pandas.ccxt.async_ccxt_pandas_exchange import AsyncCCXTPandasExchange
+from crypto_pandas.utils.ccxt.async_ccxt_pandas_exchange import AsyncCCXTPandasExchange
 from tests.test_sync import sandbox_settings
 
 

@@ -3,7 +3,7 @@ from typing import Callable
 import ccxt
 import ccxt.pro as ccxt_pro
 
-from crypto_pandas.ccxt.method_mappings import dataframe_methods, modified_methods
+from crypto_pandas.utils.ccxt.method_mappings import dataframe_methods, modified_methods
 
 types_dict = {
     "Literal['buy', 'sell']": "OrderSide",
@@ -86,8 +86,8 @@ if __name__ == "__main__":
     async_code = generate_typed_interface_class(
         ccxt_pro.Exchange, "AsyncCCXTPandasExchangeTyped"
     )
-    with open("ccxt_pandas_exchange_typed.py", "w") as f:
+    with open("crypto_pandas/utils/ccxt/ccxt_pandas_exchange_typed.py", "w") as f:
         f.write(sync_code)
-    with open("async_ccxt_pandas_exchange_typed.py", "w") as f:
+    with open("crypto_pandas/utils/ccxt/async_ccxt_pandas_exchange_typed.py", "w") as f:
         f.write(async_code)
     print("Generated both typed interface files.")

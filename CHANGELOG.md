@@ -1,3 +1,6 @@
+## v0.11.7
+- Added `fetch_my_dust_trades`, `fetch_portfolios`, `fetch_portfolio_details`, `fetch_accounts`.
+
 ## v0.11.6
 - Added `fetch_orders_by_ids`, `fetch_orders_by_status`.
 

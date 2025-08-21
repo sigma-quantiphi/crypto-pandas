@@ -19,7 +19,7 @@ from typing import Union, Literal
 import ccxt
 import pandas as pd
 
-from crypto_pandas.ccxt.method_mappings import (
+from crypto_pandas.utils.ccxt.method_mappings import (
     standard_dataframe_methods,
     markets_dataframe_methods,
     currencies_dataframe_methods,
@@ -31,7 +31,7 @@ from crypto_pandas.ccxt.method_mappings import (
     ohlcv_symbols_dataframe_methods,
     dict_methods,
 )
-from crypto_pandas.ccxt.order_schema import OrderSchema
+from crypto_pandas.utils.ccxt.order_schema import OrderSchema
 from crypto_pandas.utils.pandas_utils import (
     expand_dict_columns,
     determine_mandatory_optional_fields_pandera,

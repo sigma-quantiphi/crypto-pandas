@@ -5,7 +5,7 @@ import pytest
 import pandas as pd
 from dotenv import load_dotenv
 
-from crypto_pandas.ccxt.ccxt_pandas_exchange import CCXTPandasExchange
+from crypto_pandas.utils.ccxt.ccxt_pandas_exchange import CCXTPandasExchange
 
 load_dotenv()
 symbol = "BNB/USDT:USDT"
@@ -25,6 +25,21 @@ settings = {
         "loadAllOptions": True,
     },
 }
+okx_settings = {
+    "apiKey": os.getenv("OKX_API_KEY"),
+    "secret": os.getenv("OKX_API_SECRET"),
+    "password": os.getenv("OKX_API_PASSWORD"),
+}
+coinbase_settings = {
+    "apiKey": os.getenv("COINBASE_API_KEY"),
+    "secret": os.getenv("COINBASE_API_SECRET").replace('\\n', '\n'),
+}
+
+
+@pytest.fixture(scope="module")
+def coinbase_exchange():
+    exchange = ccxt.coinbase(coinbase_settings)
+    return CCXTPandasExchange(exchange=exchange)
 
 
 @pytest.fixture(scope="module")
@@ -36,6 +51,13 @@ def binance_exchange():
 @pytest.fixture(scope="module")
 def sandbox_exchange():
     exchange = ccxt.binance(sandbox_settings)
+    exchange.set_sandbox_mode(True)
+    return CCXTPandasExchange(exchange=exchange)
+
+
+@pytest.fixture(scope="module")
+def okx_exchange():
+    exchange = ccxt.okx(okx_settings)
     exchange.set_sandbox_mode(True)
     return CCXTPandasExchange(exchange=exchange)
 
@@ -54,6 +76,24 @@ def test_load_markets(sandbox_exchange):
 
 def test_fetch_balance(binance_exchange):
     data = binance_exchange.fetch_balance()
+    print(data)
+    print(data.dtypes)
+    assert isinstance(data, pd.DataFrame)
+
+
+def test_accounts(okx_exchange):
+    data = okx_exchange.fetch_accounts()
+    print(data)
+    print(data.dtypes)
+    assert isinstance(data, pd.DataFrame)
+
+
+def test_portfolios(coinbase_exchange):
+    data = coinbase_exchange.fetch_portfolios()
+    print(data)
+    print(data.dtypes)
+    assert isinstance(data, pd.DataFrame)
+    data = coinbase_exchange.fetch_portfolio_details(portfolioUuid=data["id"][0])
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
