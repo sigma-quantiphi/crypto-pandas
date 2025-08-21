@@ -6,8 +6,8 @@ from dataclasses import dataclass, field
 
 from cachetools.func import ttl_cache
 
-from crypto_pandas.utils.ccxt.base_processor import BaseProcessor
-from crypto_pandas.utils.ccxt.method_mappings import (
+from crypto_pandas.ccxt.base_processor import BaseProcessor
+from crypto_pandas.ccxt.method_mappings import (
     bulk_order_methods,
     single_order_methods,
     symbol_order_methods,

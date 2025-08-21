@@ -5,7 +5,7 @@ import pytest
 import pandas as pd
 from dotenv import load_dotenv
 
-from crypto_pandas.utils.ccxt.ccxt_pandas_exchange import CCXTPandasExchange
+from crypto_pandas.ccxt.ccxt_pandas_exchange import CCXTPandasExchange
 
 load_dotenv()
 symbol = "BNB/USDT:USDT"
