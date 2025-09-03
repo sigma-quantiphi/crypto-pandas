@@ -112,16 +112,13 @@ def preprocess_order(
     market[cap_zero_columns] = market[cap_zero_columns].fillna(0)
     market[cap_inf_columns] = market[cap_inf_columns].fillna(np.inf)
     market = market.to_dict("records")[0]
-    if pd.isnull(amount):
-        if pd.notnull(cost) & pd.notnull(price):
-            amount = cost / price
-    if order_type == "limit":
-        if pd.isnull(price):
-            raise ValueError("Missing price for limit order.")
-        elif pd.notnull(amount):
-            cost = amount * price
-        else:
-            raise ValueError("Either cost or amount is required for limit order.")
+    if pd.isnull(amount) and (pd.notnull(cost) and pd.notnull(price)):
+        amount = cost / price
+    elif pd.isnull(cost) and (pd.notnull(amount) and pd.notnull(price)):
+        cost = amount * price
+    if (order_type == "limit") and pd.isnull(price):
+        raise ValueError("Missing price for limit order.")
+    if pd.notnull(cost):
         if cost > max_cost:
             raise ValueError(f"Order cost {cost} larger than limit {max_cost}")
     values = {"amount": amount, "price": price, "cost": cost}
