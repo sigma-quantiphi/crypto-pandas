@@ -34,9 +34,12 @@ class CCXTPandasExchange(CCXTPandasExchangeTyped):
         exchange_name (str | None): The name of the exchange to interact with.
         account_name (str | None): The account name, if required for tracking.
         dropna_fields (bool): Determines whether empty (NaN) columns are removed from DataFrame outputs.
-        max_order_notional (float): Maximum notional value for any single order.
+        max_order_cost (float): Maximum cost value for any single order.
         max_number_of_orders (int): Maximum number of bulk orders allowed.
         markets_cache_time (int): Cache duration (in seconds) for markets data.
+        cost_out_of_range (str): Defines behavior when cost exceeds acceptable ranges. Options include:
+            - "warn": Logs a warning while removing the order.
+            - "clip": Clips or limits the volume to valid ranges.
         amount_out_of_range (str): Defines behavior when volume exceeds acceptable ranges. Options include:
             - "warn": Logs a warning while removing the order.
             - "clip": Clips or limits the volume to valid ranges.
@@ -55,9 +58,10 @@ class CCXTPandasExchange(CCXTPandasExchangeTyped):
     exchange_name: str | None = None
     account_name: str | None = None
     dropna_fields: bool = True
-    max_order_notional: float = 10_000
+    max_order_cost: float = 10_000
     max_number_of_orders: int = 5
     markets_cache_time: int = 3600
+    cost_out_of_range: Literal["warn", "clip"] = "warn"
     amount_out_of_range: Literal["warn", "clip"] = "warn"
     price_out_of_range: Literal["warn", "clip"] = "warn"
     _ccxt_processor: BaseProcessor = field(default_factory=BaseProcessor)
@@ -68,6 +72,7 @@ class CCXTPandasExchange(CCXTPandasExchangeTyped):
         self._ccxt_processor = BaseProcessor(
             exchange_name=self.exchange_name,
             account_name=self.account_name,
+            cost_out_of_range=self.cost_out_of_range,
             amount_out_of_range=self.amount_out_of_range,
             price_out_of_range=self.price_out_of_range,
         )
@@ -88,22 +93,24 @@ class CCXTPandasExchange(CCXTPandasExchangeTyped):
                     order_type=kwargs["type"],
                     amount=kwargs.get("amount"),
                     price=kwargs.get("price"),
-                    notional=kwargs.get("notional"),
+                    cost=kwargs.get("cost"),
                     markets=self.load_cached_markets(),
-                    max_notional=self.max_order_notional,
-                    price_out_of_range=self.price_out_of_range,
+                    max_cost=self.max_order_cost,
+                    cost_out_of_range=self.cost_out_of_range,
                     amount_out_of_range=self.amount_out_of_range,
+                    price_out_of_range=self.price_out_of_range,
                 )
-                if "notional" in kwargs:
-                    kwargs.pop("notional")
+                if "cost" in kwargs:
+                    kwargs.pop("cost")
             elif method_name in bulk_order_methods:
                 kwargs["orders"] = preprocess_order_dataframe(
                     orders=kwargs["orders"],
                     markets=self.load_cached_markets(),
                     max_orders=self.max_number_of_orders,
-                    max_notional=self.max_order_notional,
-                    price_out_of_range=self.price_out_of_range,
+                    max_cost=self.max_order_cost,
+                    cost_out_of_range=self.cost_out_of_range,
                     amount_out_of_range=self.amount_out_of_range,
+                    price_out_of_range=self.price_out_of_range,
                 )
                 kwargs["orders"] = self._ccxt_processor.orders_to_dict(
                     orders=kwargs["orders"],

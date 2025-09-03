@@ -1,3 +1,7 @@
+## v0.12.0
+- Breaking Change: Replaced `notional` argument when sending orders with `cost` to align with CCXT.
+- Added checks for order cost within bounds.
+
 ## v0.11.9
 - Fix `orders_to_dict` should there be no price column.
 - Added order create, cancel, edit methods that use websockets.
@@ -49,7 +53,7 @@
 - Created fix using `reindex` should precision/ limit fields not exist in markets data.
 
 ## v0.9.32
-- Enabled notional -> amount calculation for market orders.
+- Enabled cost -> amount calculation for market orders.
 - Created fix using `reindex` should precision/ limit fields not exist in markets data.
 
 ## v0.9.31

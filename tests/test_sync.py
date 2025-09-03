@@ -410,7 +410,7 @@ def test_create_orders(sandbox_exchange):
         ),
     ]
     orders = pd.DataFrame(orders)
-    orders["notional"] = 7
+    orders["cost"] = 7
     orders["type"] = "limit"
     orders["symbol"] = symbol
     data = sandbox_exchange.create_orders(orders=orders)

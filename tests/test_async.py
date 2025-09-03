@@ -29,7 +29,7 @@ async def main():
     )
     orders["side"] = "buy"
     orders["price"] /= 4
-    orders["notional"] = 12
+    orders["cost"] = 12
     orders["type"] = "limit"
     response = await pandas_exchange.create_orders(orders=orders)
     print(response)

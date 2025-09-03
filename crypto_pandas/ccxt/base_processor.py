@@ -58,6 +58,9 @@ class BaseProcessor:
         account_name (str): Name of the account associated with the API data.
         dropna_fields (bool): Determines whether empty (NaN) columns are removed from DataFrame outputs.
         order_schema (OrderSchema): Schema used to validate and process orders.
+        cost_out_of_range: (str): Defines behavior when cost exceeds acceptable ranges. Options include:
+            - "warn": Logs a warning while removing the order.
+            - "clip": Clips or limits the volume to valid ranges.
         amount_out_of_range (str): Defines behavior when volume exceeds acceptable ranges. Options include:
             - "warn": Logs a warning while removing the order.
             - "clip": Clips or limits the volume to valid ranges.
@@ -79,6 +82,7 @@ class BaseProcessor:
     order_schema: OrderSchema = field(default=OrderSchema)
     datetime_to_int_fields: tuple = None
     conduct_order_checks: bool = True
+    cost_out_of_range: Literal["warn", "clip"] = "warn"
     amount_out_of_range: Literal["warn", "clip"] = "warn"
     price_out_of_range: Literal["warn", "clip"] = "warn"
     int_to_datetime_fields: tuple = field(
@@ -134,6 +138,7 @@ class BaseProcessor:
             "collateralMarginLevel",
             "contractSize",
             "contracts",
+            "cost",
             "crossUnPnl",
             "crossWalletBalance",
             "delta",
@@ -175,7 +180,8 @@ class BaseProcessor:
             "network_precision",
             "network_limits_withdraw.min",
             "network_limits_withdraw.max",
-            "network_limits_deposit.min" "nextFundingRate",
+            "network_limits_deposit.min",
+            "nextFundingRate",
             "nonce",
             "notional",
             "open",

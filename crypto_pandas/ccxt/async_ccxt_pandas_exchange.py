@@ -41,9 +41,12 @@ class AsyncCCXTPandasExchange(AsyncCCXTPandasExchangeTyped):
         exchange_name (str | None): The name of the exchange, used for processor initialization.
         account_name (str | None): The account name, used for processor initialization.
         dropna_fields (bool): Determines whether empty (NaN) columns are removed from DataFrame outputs.
-        max_order_notional (float): The maximum allowable notional value for a single order.
+        max_order_cost (float): The maximum allowable cost value for a single order.
         max_number_of_orders (int): The maximum number of orders allowed in bulk order processing.
         markets_cache_time (int): The cache time in seconds for market data.
+        cost_out_of_range (str): Defines behavior when cost exceeds acceptable ranges. Options include:
+            - "warn": Logs a warning while removing the order.
+            - "clip": Clips or limits the volume to valid ranges.
         amount_out_of_range (str): Defines behavior when volume exceeds acceptable ranges. Options include:
             - "warn": Logs a warning while removing the order.
             - "clip": Clips or limits the volume to valid ranges.
@@ -66,9 +69,10 @@ class AsyncCCXTPandasExchange(AsyncCCXTPandasExchangeTyped):
     exchange_name: str | None = None
     account_name: str | None = None
     dropna_fields: bool = True
-    max_order_notional: float = 10_000
+    max_order_cost: float = 10_000
     max_number_of_orders: int = 5
     markets_cache_time: int = 3600
+    cost_out_of_range: Literal["warn", "clip"] = "warn"
     amount_out_of_range: Literal["warn", "clip"] = "warn"
     price_out_of_range: Literal["warn", "clip"] = "warn"
     semaphore_value: int = 1000
@@ -81,6 +85,7 @@ class AsyncCCXTPandasExchange(AsyncCCXTPandasExchangeTyped):
         self._ccxt_processor = BaseProcessor(
             exchange_name=self.exchange_name,
             account_name=self.account_name,
+            cost_out_of_range=self.cost_out_of_range,
             amount_out_of_range=self.amount_out_of_range,
             price_out_of_range=self.price_out_of_range,
         )
@@ -101,20 +106,20 @@ class AsyncCCXTPandasExchange(AsyncCCXTPandasExchangeTyped):
                     order_type=kwargs["type"],
                     amount=kwargs.get("amount"),
                     price=kwargs.get("price"),
-                    notional=kwargs.get("notional"),
+                    cost=kwargs.get("cost"),
                     markets=await self.load_cached_markets(),
-                    max_notional=self.max_order_notional,
+                    max_cost=self.max_order_cost,
                     price_out_of_range=self.price_out_of_range,
                     amount_out_of_range=self.amount_out_of_range,
                 )
-                if "notional" in kwargs:
-                    kwargs.pop("notional")
+                if "cost" in kwargs:
+                    kwargs.pop("cost")
             elif method_name in bulk_order_methods:
                 kwargs["orders"] = preprocess_order_dataframe(
                     orders=kwargs["orders"],
                     markets=await self.load_cached_markets(),
                     max_orders=self.max_number_of_orders,
-                    max_notional=self.max_order_notional,
+                    max_cost=self.max_order_cost,
                     price_out_of_range=self.price_out_of_range,
                     amount_out_of_range=self.amount_out_of_range,
                 )
