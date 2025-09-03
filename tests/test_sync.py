@@ -32,7 +32,7 @@ okx_settings = {
 }
 coinbase_settings = {
     "apiKey": os.getenv("COINBASE_API_KEY"),
-    "secret": os.getenv("COINBASE_API_SECRET").replace('\\n', '\n'),
+    "secret": os.getenv("COINBASE_API_SECRET").replace("\\n", "\n"),
 }
 
 

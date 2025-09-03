@@ -1,3 +1,7 @@
+## v0.11.9
+- Fix `orders_to_dict` should there be no price column.
+- Added order create, cancel, edit methods that use websockets.
+
 ## v0.11.8
 - Fixed order preprocessing for orders out of bounds.
 

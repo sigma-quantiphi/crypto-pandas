@@ -544,10 +544,13 @@ class BaseProcessor:
             self.order_schema.validate(orders)
         fields = determine_mandatory_optional_fields_pandera(self.order_schema)
         fields["optional"] = [x for x in orders.columns if x in fields["optional"]]
-        orders["price"] = orders.apply(
-            lambda x: exchange.price_to_precision(symbol=x["symbol"], price=x["price"]),
-            axis=1,
-        )
+        if "price" in orders.columns:
+            orders["price"] = orders.apply(
+                lambda x: exchange.price_to_precision(
+                    symbol=x["symbol"], price=x["price"]
+                ),
+                axis=1,
+            )
         orders["amount"] = orders.apply(
             lambda x: exchange.amount_to_precision(
                 symbol=x["symbol"], amount=x["amount"]

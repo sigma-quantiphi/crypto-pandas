@@ -16,10 +16,14 @@ standard_dataframe_methods = {
     "fetch_portfolio_details",
     "fetch_portfolios",
     "cancel_all_orders",
+    "cancel_all_orders_ws",
     "cancel_orders",
+    "cancel_orders_ws",
     "cancel_orders_for_symbols",
     "create_orders",
+    "create_orders_ws",
     "edit_orders",
+    "edit_orders_ws",
     "fetch_borrow_interest",
     "fetch_borrow_rate_histories",
     "fetch_borrow_rate_history",
@@ -97,15 +101,17 @@ orders_dataframe_methods = {
     "fetch_orders",
     "fetch_orders_by_ids",
     "fetch_orders_by_status",
-    "fetch_orders_classic"
-    "fetch_orders_ws",
+    "fetch_orders_classic" "fetch_orders_ws",
     "watch_orders",
     "watch_orders_for_symbols",
 }
 dict_methods = {
     "cancel_order",
+    "cancel_order_ws",
     "create_order",
+    "create_order_ws",
     "edit_order",
+    "edit_order_ws",
     "fetch_cross_borrow_rate",
     "fetch_deposit",
     "fetch_funding_rate",
@@ -128,8 +134,18 @@ dict_methods = {
     "watch_position",
     "watch_ticker",
 }
-single_order_methods = {"create_order", "edit_order"}
-bulk_order_methods = {"create_orders", "edit_orders"}
+single_order_methods = {
+    "create_order",
+    "edit_order",
+    "create_order_ws",
+    "edit_order_ws",
+}
+bulk_order_methods = {
+    "create_orders",
+    "edit_orders",
+    "create_orders_ws",
+    "edit_orders_ws",
+}
 symbol_order_methods = {"cancel_orders_for_symbols"}
 standard_dataframe_methods = add_camel_case_methods(standard_dataframe_methods)
 markets_dataframe_methods = add_camel_case_methods(markets_dataframe_methods)
