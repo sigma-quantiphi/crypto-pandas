@@ -104,6 +104,8 @@ class AsyncCCXTPandasExchange(AsyncCCXTPandasExchangeTyped):
                     notional=kwargs.get("notional"),
                     markets=await self.load_cached_markets(),
                     max_notional=self.max_order_notional,
+                    price_out_of_range=self.price_out_of_range,
+                    amount_out_of_range=self.amount_out_of_range,
                 )
                 if "notional" in kwargs:
                     kwargs.pop("notional")
@@ -113,6 +115,8 @@ class AsyncCCXTPandasExchange(AsyncCCXTPandasExchangeTyped):
                     markets=await self.load_cached_markets(),
                     max_orders=self.max_number_of_orders,
                     max_notional=self.max_order_notional,
+                    price_out_of_range=self.price_out_of_range,
+                    amount_out_of_range=self.amount_out_of_range,
                 )
                 kwargs["orders"] = self._ccxt_processor.orders_to_dict(
                     kwargs["orders"], exchange=self.exchange
