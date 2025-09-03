@@ -8,15 +8,9 @@ import pandas as pd
 import pandera as pa
 from pandas import DataFrame
 
-order_data_columns = [
-    "symbol",
-    "limits_price.min",
-    "limits_price.max",
-    "limits_amount.min",
-    "limits_amount.max",
-    "limits_cost.min",
-    "limits_cost.max",
-]
+cap_zero_columns = ["limits_price.min", "limits_cost.min", "limits_amount.min"]
+cap_inf_columns = ["limits_price.max", "limits_cost.max", "limits_amount.max"]
+order_data_columns = ["symbol"] + cap_zero_columns + cap_inf_columns
 
 
 @overload
@@ -114,11 +108,10 @@ def preprocess_order(
     price_out_of_range: Literal["warn", "clip"] = "warn",
     amount_out_of_range: Literal["warn", "clip"] = "warn",
 ) -> tuple:
-    market = (
-        markets.reindex(columns=order_data_columns)
-        .query(f"symbol == '{symbol}'")
-        .to_dict("records")[0]
-    )
+    market = markets.query(f"symbol == '{symbol}'").reindex(columns=order_data_columns)
+    market[cap_zero_columns] = market[cap_zero_columns].fillna(0)
+    market[cap_inf_columns] = market[cap_inf_columns].fillna(np.inf)
+    market = market.to_dict("records")[0]
     if pd.isnull(amount):
         if pd.notnull(cost) & pd.notnull(price):
             amount = cost / price
@@ -142,15 +135,14 @@ def preprocess_order(
             out_of_range = amount_out_of_range
         limits_min = market[f"limits_{key}.min"]
         limits_max = market[f"limits_{key}.max"]
-        if pd.notnull(limits_min) and pd.notnull(limits_max):
-            if out_of_range == "warn":
-                if not limits_min <= value <= limits_max:
-                    warnings.warn(
-                        f"{key} {amount} outside limits {limits_min}, {limits_max}."
-                    )
-                    value = None
-            else:
-                value = np.clip(value, limits_min, limits_max)
+        if out_of_range == "warn":
+            if not limits_min <= value <= limits_max:
+                warnings.warn(
+                    f"{key} {amount} outside limits {limits_min}, {limits_max}."
+                )
+                value = None
+        else:
+            value = np.clip(value, limits_min, limits_max)
         new_values[key] = value
     new_values["amount"] = exchange.amount_to_precision(
         symbol=symbol, amount=new_values["amount"]
@@ -190,7 +182,10 @@ def preprocess_order_dataframe(
         orders_error = orders.query(f"cost > {max_cost}")
         if not orders_error.empty:
             raise ValueError(f"Orders exceeding max cost: {orders_error}")
-    orders = orders.merge(markets.reindex(columns=order_data_columns))
+    order_markets = markets.reindex(columns=order_data_columns)
+    order_markets[cap_zero_columns] = order_markets[cap_zero_columns].fillna(0)
+    order_markets[cap_inf_columns] = order_markets[cap_inf_columns].fillna(np.inf)
+    orders = orders.merge(order_markets)
     for column, out_of_range in [
         ("cost", cost_out_of_range),
         ("price", price_out_of_range),
@@ -198,21 +193,18 @@ def preprocess_order_dataframe(
     ]:
         min_limit, max_limit = f"limits_{column}.min", f"limits_{column}.max"
         if column in orders.columns:
-            if orders[[min_limit, max_limit]].notnull().all(axis=1).all():
-                if out_of_range == "warn":
-                    in_bounds = orders[column].between(
-                        orders[min_limit], orders[max_limit]
+            if out_of_range == "warn":
+                in_bounds = orders[column].between(orders[min_limit], orders[max_limit])
+                out_of_bounds_orders = orders.loc[~in_bounds].reset_index(drop=True)
+                orders = orders.loc[in_bounds].reset_index(drop=True)
+                if not out_of_bounds_orders.empty:
+                    warnings.warn(
+                        f"Removing orders with {column} outside limits:\n{out_of_bounds_orders.to_markdown(index=False)}"
                     )
-                    out_of_bounds_orders = orders.loc[~in_bounds].reset_index(drop=True)
-                    orders = orders.loc[in_bounds].reset_index(drop=True)
-                    if not out_of_bounds_orders.empty:
-                        warnings.warn(
-                            f"Removing orders with {column} outside limits:\n{out_of_bounds_orders.to_markdown(index=False)}"
-                        )
-                else:
-                    orders[column] = orders[column].clip(
-                        orders[min_limit], orders[max_limit]
-                    )
+            else:
+                orders[column] = orders[column].clip(
+                    orders[min_limit], orders[max_limit]
+                )
     if "params" not in orders.columns:
         param_cols = orders.columns[orders.columns.str.startswith("params.")]
         orders["params"] = orders.apply(combine_params, axis=1, param_cols=param_cols)

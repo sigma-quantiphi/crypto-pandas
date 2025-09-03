@@ -1,3 +1,6 @@
+## v0.12.1
+- Replaced Na values inside of markets limits with 0 for min and np.inf for max.
+
 ## v0.12.0
 - Breaking Change: Replaced `notional` argument when sending orders with `cost` to align with CCXT.
 - Added checks for order cost within bounds.
