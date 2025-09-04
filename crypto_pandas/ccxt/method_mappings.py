@@ -1,15 +1,4 @@
-def snake_to_camel(s: str) -> str:
-    parts = s.split("_")
-    return parts[0] + "".join(word.capitalize() for word in parts[1:])
-
-
-def add_camel_case_methods(methods: set) -> set:
-    new_set = set()
-    for item in methods:
-        new_set.add(item)
-        new_set.add(snake_to_camel(item))
-    return new_set
-
+from crypto_pandas.utils.utils import add_camel_case_methods
 
 standard_dataframe_methods = {
     "fetch_accounts",

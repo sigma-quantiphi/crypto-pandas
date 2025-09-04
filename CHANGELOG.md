@@ -1,3 +1,6 @@
+## v0.12.3
+- Introduced `has_method` method.
+
 ## v0.12.1
 - Replaced Na values inside of markets limits with 0 for min and np.inf for max.
 

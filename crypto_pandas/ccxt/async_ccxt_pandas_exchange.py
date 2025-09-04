@@ -25,6 +25,7 @@ from crypto_pandas.utils.pandas_utils import (
     preprocess_order,
     preprocess_order_dataframe,
 )
+from crypto_pandas.utils.utils import exchange_has_method
 
 if sys.platform.startswith("win"):
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
@@ -159,3 +160,6 @@ class AsyncCCXTPandasExchange(AsyncCCXTPandasExchangeTyped):
                 return await self.load_markets(reload=True, params=params)
 
         return await _cached_load_markets()
+
+    def has_method(self, method_name: str) -> bool:
+        return exchange_has_method(self.exchange, method_name)
