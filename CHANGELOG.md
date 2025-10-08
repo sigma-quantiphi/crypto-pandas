@@ -1,3 +1,7 @@
+## v0.12.4
+- Changed `market_to_dataframe` parsing to use `pd.DataFrame.from_dict`.
+- 
+
 ## v0.12.3
 - Introduced `has_method` method.
 

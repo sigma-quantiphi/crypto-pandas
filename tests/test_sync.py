@@ -8,12 +8,12 @@ from dotenv import load_dotenv
 from crypto_pandas.ccxt.ccxt_pandas_exchange import CCXTPandasExchange
 
 load_dotenv()
-symbol = "BNB/USDT:USDT"
+symbol = "BNB/USDT"
 sandbox_settings = {
     "apiKey": os.getenv("SANDBOX_API_KEY"),
     "secret": os.getenv("SANDBOX_API_SECRET"),
     "options": {
-        "defaultType": "future",
+        "defaultType": "spot",
         "loadAllOptions": True,
     },
 }
@@ -140,7 +140,7 @@ def test_fetch_ticker(sandbox_exchange):
 
 
 def test_fetch_tickers(sandbox_exchange):
-    data = sandbox_exchange.fetch_tickers([symbol, "ETH/USDT:USDT"])
+    data = sandbox_exchange.fetch_tickers([symbol, "ETH/USDT"])
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
@@ -271,8 +271,8 @@ def test_fetch_ledger(binance_exchange):
 #     assert isinstance(data, pd.DataFrame)
 
 
-def test_fetch_funding_rate_history(sandbox_exchange):
-    data = sandbox_exchange.fetch_funding_rate_history(symbol)
+def test_fetch_funding_rate_history(binance_exchange):
+    data = binance_exchange.fetch_funding_rate_history("BNB/USDT:USDT")
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
@@ -305,29 +305,29 @@ def test_fetch_open_interest_history(binance_exchange):
 #     assert isinstance(data, pd.DataFrame)
 
 
-def test_fetch_leverages(sandbox_exchange):
-    data = sandbox_exchange.fetch_leverages(symbols=[symbol])
+def test_fetch_leverages(binance_exchange):
+    data = binance_exchange.fetch_leverages(symbols=["BNB/USDT:USDT"])
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
 
 
 def test_fetch_long_short_ratio_history(binance_exchange):
-    data = binance_exchange.fetch_long_short_ratio_history(symbol)
+    data = binance_exchange.fetch_long_short_ratio_history("BNB/USDT:USDT")
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
 
 
-def test_fetch_margin_adjustment_history(sandbox_exchange):
-    data = sandbox_exchange.fetch_margin_adjustment_history(symbol=symbol)
+def test_fetch_margin_adjustment_history(binance_exchange):
+    data = binance_exchange.fetch_margin_adjustment_history(symbol="BNB/USDT:USDT")
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
 
 
-def test_fetch_my_liquidations(sandbox_exchange):
-    data = sandbox_exchange.fetch_my_liquidations(symbol)
+def test_fetch_my_liquidations(binance_exchange):
+    data = binance_exchange.fetch_my_liquidations("BNB/USDT:USDT")
     print(data)
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
