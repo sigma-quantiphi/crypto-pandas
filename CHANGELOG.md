@@ -1,3 +1,9 @@
+## v0.12.5
+- Fixed order to dataframe by adding optional `attach_trades_to_orders` argument.
+
+## v0.12.4
+- Changed `market_to_dataframe` parsing to use `pd.DataFrame.from_dict`.
+
 ## v0.12.3
 - Introduced `has_method` method.
 

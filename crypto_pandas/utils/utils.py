@@ -15,7 +15,9 @@ def add_camel_case_methods(methods: set) -> set:
     return new_set
 
 
-def exchange_has_method(exchange: ccxt.Exchange | ccxt_pro.Exchange, method: str) -> bool:
+def exchange_has_method(
+    exchange: ccxt.Exchange | ccxt_pro.Exchange, method: str
+) -> bool:
     """Checks if an exchange has a specific method"""
     method = snake_to_camel(method)
     return method in exchange.has and not exchange.has[method] in [False, None]

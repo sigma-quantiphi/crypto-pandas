@@ -57,6 +57,7 @@ class BaseProcessor:
         exchange_name (str): Name of the exchange being processed (e.g., "binance").
         account_name (str): Name of the account associated with the API data.
         dropna_fields (bool): Determines whether empty (NaN) columns are removed from DataFrame outputs.
+        attach_trades_to_orders (bool): Determines whether trades are attached to orders when converting orders to DataFrame.
         order_schema (OrderSchema): Schema used to validate and process orders.
         cost_out_of_range: (str): Defines behavior when cost exceeds acceptable ranges. Options include:
             - "warn": Logs a warning while removing the order.
@@ -79,6 +80,7 @@ class BaseProcessor:
     exchange_name: str = None
     account_name: str = None
     dropna_fields: bool = True
+    attach_trades_to_orders: bool = False
     order_schema: OrderSchema = field(default=OrderSchema)
     datetime_to_int_fields: tuple = None
     conduct_order_checks: bool = True
@@ -345,7 +347,7 @@ class BaseProcessor:
         return self.preprocess_dataframe(data)
 
     def markets_to_dataframe(self, data: dict) -> pd.DataFrame:
-        return self.preprocess_dataframe(pd.DataFrame(data).transpose())
+        return self.preprocess_dataframe(pd.DataFrame.from_dict(data, orient="index"))
 
     def currencies_to_dataframe(self, data: dict) -> pd.DataFrame:
         data = (
@@ -498,40 +500,41 @@ class BaseProcessor:
         Returns:
             pd.DataFrame: A preprocessed orders DataFrame.
         """
-        trades = pd.json_normalize(
-            data=data,
-            record_path="trades",
-            meta=[
-                "id",
-                "clientOrderId",
-                "timestamp",
-                "datetime",
-                "lastTradeTimestamp",
-                "lastUpdateTimestamp",
-                "symbol",
-                "type",
-                "timeInForce",
-                "postOnly",
-                "reduceOnly",
-                "side",
-                "price",
-                "triggerPrice",
-                "amount",
-                "cost",
-                "average",
-                "filled",
-                "remaining",
-                "status",
-                "fee",
-                "fees",
-                "stopPrice",
-                "takeProfitPrice",
-                "stopLossPrice",
-            ],
-        )
         orders = pd.DataFrame(data=data)
-        if not trades.empty:
-            orders = orders.merge(trades, how="outer")
+        if self.attach_trades_to_orders:
+            trades = pd.json_normalize(
+                data=data,
+                record_path="trades",
+                meta=[
+                    "id",
+                    "clientOrderId",
+                    "timestamp",
+                    "datetime",
+                    "lastTradeTimestamp",
+                    "lastUpdateTimestamp",
+                    "symbol",
+                    "type",
+                    "timeInForce",
+                    "postOnly",
+                    "reduceOnly",
+                    "side",
+                    "price",
+                    "triggerPrice",
+                    "amount",
+                    "cost",
+                    "average",
+                    "filled",
+                    "remaining",
+                    "status",
+                    "fee",
+                    "fees",
+                    "stopPrice",
+                    "takeProfitPrice",
+                    "stopLossPrice",
+                ],
+            )
+            if not trades.empty:
+                orders = orders.merge(trades, how="outer")
         return self.preprocess_dataframe(orders)
 
     def orders_to_dict(self, orders: pd.DataFrame, exchange: ccxt.Exchange) -> list:

@@ -90,7 +90,8 @@ orders_dataframe_methods = {
     "fetch_orders",
     "fetch_orders_by_ids",
     "fetch_orders_by_status",
-    "fetch_orders_classic" "fetch_orders_ws",
+    "fetch_orders_classic",
+    "fetch_orders_ws",
     "watch_orders",
     "watch_orders_for_symbols",
 }

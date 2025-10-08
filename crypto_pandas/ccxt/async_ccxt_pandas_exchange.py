@@ -42,6 +42,7 @@ class AsyncCCXTPandasExchange(AsyncCCXTPandasExchangeTyped):
         exchange_name (str | None): The name of the exchange, used for processor initialization.
         account_name (str | None): The account name, used for processor initialization.
         dropna_fields (bool): Determines whether empty (NaN) columns are removed from DataFrame outputs.
+        attach_trades_to_orders (bool): Determines whether trades are attached to orders when processing orders.
         max_order_cost (float): The maximum allowable cost value for a single order.
         max_number_of_orders (int): The maximum number of orders allowed in bulk order processing.
         markets_cache_time (int): The cache time in seconds for market data.
@@ -70,6 +71,7 @@ class AsyncCCXTPandasExchange(AsyncCCXTPandasExchangeTyped):
     exchange_name: str | None = None
     account_name: str | None = None
     dropna_fields: bool = True
+    attach_trades_to_orders: bool = False
     max_order_cost: float = 10_000
     max_number_of_orders: int = 5
     markets_cache_time: int = 3600
@@ -86,6 +88,8 @@ class AsyncCCXTPandasExchange(AsyncCCXTPandasExchangeTyped):
         self._ccxt_processor = BaseProcessor(
             exchange_name=self.exchange_name,
             account_name=self.account_name,
+            dropna_fields=self.dropna_fields,
+            attach_trades_to_orders=self.attach_trades_to_orders,
             cost_out_of_range=self.cost_out_of_range,
             amount_out_of_range=self.amount_out_of_range,
             price_out_of_range=self.price_out_of_range,
