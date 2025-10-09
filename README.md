@@ -24,11 +24,14 @@ It turns CCXT’s nested JSON into clean, typed DataFrames for analysis, backtes
 
 ## Installation
 
-Crypto-Pandas can be installed on Python 3.11~3.13:
+Crypto-Pandas can be installed on Python 3.11~3.14:
 
 ```bash
 pip install crypto-pandas
 ```
+
+## Examples
+Find all examples in the [Crypto-Pandas-Example Repository](https://github.com/sigma-quantiphi/crypto-pandas-examples)
 
 ## Getting Started
 
