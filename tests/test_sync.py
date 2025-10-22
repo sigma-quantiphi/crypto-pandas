@@ -237,9 +237,14 @@ def test_fetch_greeks(binance_exchange):
     assert isinstance(data, dict)
 
 
+def test_fetch_option_chain(bybit_exchange):
+    data = bybit_exchange.fetch_option_chain(code="BTC")
+    print(data.dtypes)
+    assert isinstance(data, pd.DataFrame)
+
+
 def test_fetch_all_greeks(binance_exchange):
     data = binance_exchange.fetch_all_greeks()
-    print(data.dropna(axis=1))
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
 
@@ -250,11 +255,18 @@ def test_fetch_all_greeks(binance_exchange):
 #     assert isinstance(data, dict)
 
 
-# def test_fetch_positions(exchange):
-#     data = exchange.fetch_positions([symbol])
-#     print(data)
-#     print(data.dtypes)
-#     assert isinstance(data, pd.DataFrame)
+def test_fetch_positions(binance_exchange):
+    data = binance_exchange.fetch_positions()
+    print(data)
+    print(data.dtypes)
+    assert isinstance(data, pd.DataFrame)
+
+
+def test_fetch_option_positions(binance_exchange):
+    data = binance_exchange.fetch_options_positions()
+    print(data)
+    print(data.dtypes)
+    assert isinstance(data, pd.DataFrame)
 
 
 def test_fetch_ledger(binance_exchange):
@@ -369,7 +381,6 @@ def test_fetch_canceled_and_closed_orders(sandbox_exchange):
 
 def test_fetch_convert_currencies(binance_exchange):
     data = binance_exchange.fetch_convert_currencies()
-    print(data.dropna(axis=1))
     print(data.dtypes)
     assert isinstance(data, pd.DataFrame)
 
@@ -378,6 +389,19 @@ def test_fetch_cross_borrow_rate(binance_exchange):
     data = binance_exchange.fetch_cross_borrow_rate(code="BTC")
     print(data)
     assert isinstance(data, dict)
+
+
+def test_fetch_funding_interval(okx_exchange):
+    data = okx_exchange.fetch_funding_interval(symbol="BTC/USDT:USDT")
+    print(data)
+    assert isinstance(data, dict)
+
+
+def test_fetch_funding_intervals(binance_exchange):
+    data = binance_exchange.fetch_funding_intervals()
+    print(data)
+    print(data.dtypes)
+    assert isinstance(data, pd.DataFrame)
 
 
 def test_create_order(sandbox_exchange):
@@ -398,7 +422,7 @@ def test_create_order(sandbox_exchange):
     assert isinstance(data, dict)
 
 
-def test_create_orders(sandbox_exchange):
+def test_create_orders(okx_exchange):
     orders = [
         dict(
             side="buy",
@@ -413,17 +437,17 @@ def test_create_orders(sandbox_exchange):
     orders["cost"] = 7
     orders["type"] = "limit"
     orders["symbol"] = symbol
-    data = sandbox_exchange.create_orders(orders=orders)
+    data = okx_exchange.create_orders(orders=orders)
     print(data)
     assert isinstance(data, pd.DataFrame)
-    data = sandbox_exchange.fetch_open_orders(symbol=symbol)
+    data = okx_exchange.fetch_open_orders(symbol=symbol)
     print(data)
     assert isinstance(data, pd.DataFrame)
     if not data.empty:
         data["amount"] *= 2
-        data = sandbox_exchange.edit_orders(orders=data)
+        data = okx_exchange.edit_orders(orders=data)
         print(data)
         assert isinstance(data, pd.DataFrame)
-        data = sandbox_exchange.cancel_all_orders(symbol=symbol)
+        data = okx_exchange.cancel_all_orders(symbol=symbol)
         print(data)
         assert isinstance(data, pd.DataFrame)
