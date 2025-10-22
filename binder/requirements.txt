@@ -1,4 +1,0 @@
-crypto-pandas>=0.9.0
-matplotlib
-plotly
-python-dotenv

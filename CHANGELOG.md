@@ -1,3 +1,6 @@
+## v0.12.6
+- Added new methods such as `fetchFundingIntervals` and `fetchOptionChain`.
+
 ## v0.12.5
 - Fixed order to dataframe by adding optional `attach_trades_to_orders` argument.
 

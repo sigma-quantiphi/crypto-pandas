@@ -534,7 +534,7 @@ class BaseProcessor:
                 ],
             )
             if not trades.empty:
-                orders = orders.merge(trades, how="outer")
+                orders = orders.drop(columns=["trades"]).merge(trades, how="outer")
         return self.preprocess_dataframe(orders)
 
     def orders_to_dict(self, orders: pd.DataFrame, exchange: ccxt.Exchange) -> list:
