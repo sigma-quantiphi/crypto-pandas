@@ -1,3 +1,6 @@
+## v0.12.7
+- Addressed Pandera import issue.
+
 ## v0.12.6
 - Added new methods such as `fetchFundingIntervals` and `fetchOptionChain`.
 

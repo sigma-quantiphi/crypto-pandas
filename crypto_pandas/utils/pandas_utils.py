@@ -5,7 +5,7 @@ from typing import Literal, Awaitable, Any, overload
 import ccxt
 import numpy as np
 import pandas as pd
-import pandera as pa
+import pandera.pandas as pa
 from pandas import DataFrame
 
 cap_zero_columns = ["limits_price.min", "limits_cost.min", "limits_amount.min"]
